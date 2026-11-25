@@ -1,0 +1,1269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Camp New Providence</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=IM+Fell+English:ital@0;1&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a field-survey map fills the left; a ledger panel of tabs (site, story, people, detecting, visit, sources) sits on the right. Stacks on phones. */
+:root {
+  --paper: #e6e9df;       /* cool survey vellum */
+  --paper-2: #d9ddd0;
+  --panel: #f4f5f0;
+  --ink: #26231d;         /* iron-gall ink */
+  --ink-soft: #5b564b;
+  --rule: #b9bcae;
+  --water: #36637f;
+  --continental: #1f3a68; /* Continental blue */
+  --buff: #b8893a;        /* facing buff */
+  --militia: #8a3b2b;     /* madder hunting-shirt red-brown */
+  --modern: #7d838c;
+  --later: #5a4e7a;
+  --hi: #b4442c;
+  --mid: #c08a2b;
+  --low: #5f7f4a;
+  --off: #4a4a4a;
+  --chip: #e2e4da;
+  --focus: #1f6fb2;
+  --f-display: "IM Fell English SC", "Iowan Old Style", Georgia, serif;
+  --f-map: "IM Fell English", "Iowan Old Style", Georgia, serif;
+  --f-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #131a21; --paper-2: #18212a; --panel: #0f151b;
+    --ink: #e6dec9; --ink-soft: #a69e8b; --rule: #2d3843;
+    --water: #7fb0cf; --continental: #93b2ea; --buff: #d9b46c; --militia: #e0907a;
+    --modern: #7d858f; --later: #b3a5dc;
+    --hi: #ec7a5e; --mid: #e3b357; --low: #9cc07f; --off: #9a9a9a;
+    --chip: #1d2731; --focus: #7fb7ec;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #131a21; --paper-2: #18212a; --panel: #0f151b;
+  --ink: #e6dec9; --ink-soft: #a69e8b; --rule: #2d3843;
+  --water: #7fb0cf; --continental: #93b2ea; --buff: #d9b46c; --militia: #e0907a;
+  --modern: #7d858f; --later: #b3a5dc;
+  --hi: #ec7a5e; --mid: #e3b357; --low: #9cc07f; --off: #9a9a9a;
+  --chip: #1d2731; --focus: #7fb7ec;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+[hidden] { display: none !important; }
+img { max-width: 100%; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+html, body { height: 100%; }
+body {
+  background: var(--panel); color: var(--ink);
+  font-family: var(--f-body); font-size: 15px; line-height: 1.55;
+  display: flex; flex-direction: column;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--panel); }
+a { color: var(--continental); text-underline-offset: 2px; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* ---------- header ---------- */
+.top {
+  display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap;
+  padding-block: 10px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  border-bottom: 1px solid var(--rule);
+}
+.brand { display: flex; flex-direction: column; min-width: 0; }
+.brand h1 { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: 1.65rem; line-height: 1.1; letter-spacing: .01em; text-wrap: balance; }
+.brand .sub { font-size: .82rem; color: var(--ink-soft); }
+.notice {
+  margin-left: auto; max-width: 560px; font-size: .8rem; color: var(--ink-soft);
+  border-left: 3px solid var(--buff); padding: 2px 0 2px 10px;
+}
+.notice b { color: var(--ink); font-weight: 600; }
+
+/* ---------- main grid ---------- */
+.main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 430px; }
+@media (max-width: 900px) {
+  body { height: auto; }
+  html { height: auto; }
+  .main { grid-template-columns: 1fr; }
+  .mapwrap { height: 62vh; min-height: 380px; }
+  .panel { border-left: 0; border-top: 1px solid var(--rule); }
+  .notice { margin-left: 0; }
+}
+
+/* ---------- map ---------- */
+.mapwrap { position: relative; min-height: 0; overflow: hidden; background: var(--paper); touch-action: none; }
+.mapwrap::after { /* subtle vellum grain */
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse at 30% 20%, transparent 0 55%, color-mix(in srgb, var(--paper-2) 70%, transparent) 100%),
+    repeating-linear-gradient(0deg, transparent 0 3px, color-mix(in srgb, var(--ink) 2%, transparent) 3px 4px);
+}
+#map { position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab; user-select: none; -webkit-user-select: none; }
+#map.dragging { cursor: grabbing; }
+#map text { font-family: var(--f-map); fill: var(--ink); paint-order: stroke; stroke: var(--paper); stroke-width: 3.5px; stroke-linejoin: round; }
+#map .grat line { stroke: var(--ink); stroke-opacity: .12; stroke-width: 1; }
+#map .grat text { font-family: var(--f-mono); font-size: 10px; fill: var(--ink-soft); stroke-width: 3px; }
+#map .river { fill: none; stroke: var(--water); stroke-linecap: round; stroke-linejoin: round; }
+#map .river-label { fill: var(--water); font-style: italic; font-size: 13px; letter-spacing: .04em; }
+#map .road-old { fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-dasharray: 7 3 1.5 3; opacity: .75; }
+#map .road-new { fill: none; stroke: var(--modern); stroke-width: 3; opacity: .55; stroke-linecap: round; }
+#map .road-new.minor { stroke-width: 1.8; }
+#map .old-label { fill: var(--ink-soft); }
+#map .road-label { fill: var(--modern); font-family: var(--f-body); font-size: 10.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+#map .border { fill: none; stroke: var(--ink-soft); stroke-width: 1.3; stroke-dasharray: 10 4 2 4; opacity: .8; }
+#map .border-label { fill: var(--ink-soft); font-family: var(--f-body); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+#map .town { fill: var(--modern); }
+#map .town-label { fill: var(--modern); font-family: var(--f-body); font-size: 11.5px; font-weight: 600; }
+#map .zone { stroke-width: 1.6; stroke-dasharray: 5 4; fill-opacity: .14; }
+#map .zone-label { font-family: var(--f-body); font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
+#map .camp-block { stroke-width: 1.2; fill-opacity: .22; }
+#map .camp-tent { stroke: none; }
+#map .camp-label { font-family: var(--f-map); font-style: italic; font-size: 12px; }
+#map .site { cursor: pointer; }
+#map .site .halo { fill: var(--paper); }
+#map .site:hover .ring, #map .site.sel .ring { stroke-width: 3; }
+#map .site-label { font-size: 13.5px; }
+#map .site.sel .site-label { font-weight: 700; }
+#map .sel-ring { fill: none; stroke: var(--buff); stroke-width: 2; }
+@media (prefers-reduced-motion: no-preference) {
+  #map .sel-ring { animation: pulse 1.8s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes pulse { 0% { opacity: .9; transform: scale(.8); } 100% { opacity: 0; transform: scale(1.7); } }
+}
+
+.mapctl { position: absolute; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
+.mapctl.tl { top: 12px; left: max(12px, env(safe-area-inset-left, 0px)); }
+.mapctl.tr { top: 12px; right: 12px; align-items: flex-end; }
+.mapctl.bl { bottom: 12px; left: max(12px, env(safe-area-inset-left, 0px)); }
+.btn {
+  background: var(--panel); border: 1px solid var(--rule); border-radius: 3px;
+  padding: 6px 10px; font-size: .82rem; cursor: pointer; line-height: 1.2;
+}
+.btn:hover { border-color: var(--ink-soft); }
+.btn[aria-pressed="true"] { background: var(--continental); color: var(--panel); border-color: var(--continental); }
+.btn.sq { width: 34px; height: 34px; padding: 0; font-size: 1.1rem; }
+.seg { display: flex; }
+.seg .btn { border-radius: 0; }
+.seg .btn:first-child { border-radius: 3px 0 0 3px; }
+.seg .btn:last-child { border-radius: 0 3px 3px 0; border-left: 0; }
+.layers {
+  background: var(--panel); border: 1px solid var(--rule); border-radius: 3px;
+  padding: 8px 10px; font-size: .8rem; display: grid; gap: 3px; max-width: 220px;
+}
+.layers summary { cursor: pointer; font-weight: 700; font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); list-style: none; }
+.layers summary::-webkit-details-marker { display: none; }
+.layers summary::after { content: " ▾"; }
+.layers[open] summary { margin-bottom: 4px; }
+.layers label { display: flex; align-items: center; gap: 7px; cursor: pointer; }
+.layers .sw { width: 14px; height: 4px; border-radius: 1px; flex: none; }
+.scalebox { background: color-mix(in srgb, var(--panel) 85%, transparent); border: 1px solid var(--rule); border-radius: 3px; padding: 5px 8px; font-family: var(--f-mono); font-size: 10.5px; color: var(--ink-soft); }
+.scalebar { height: 6px; border: 1.5px solid var(--ink); border-top: 0; margin-top: 3px; }
+.cursor-pos { margin-top: 3px; }
+.compass { position: absolute; right: 14px; bottom: 14px; width: 74px; height: 74px; pointer-events: none; z-index: 1; opacity: .85; }
+.compass * { stroke: var(--ink); fill: none; }
+.compass .fill { fill: var(--ink); }
+.compass text { fill: var(--ink); stroke: none; font-family: var(--f-display); font-size: 13px; }
+
+/* ---------- panel ---------- */
+.panel { border-left: 1px solid var(--rule); display: flex; flex-direction: column; min-height: 0; background: var(--panel); }
+.tabs {
+  display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none;
+  padding: 8px max(12px, env(safe-area-inset-right, 0px)) 0 12px; border-bottom: 1px solid var(--rule);
+}
+.tab {
+  background: none; border: 0; border-bottom: 2px solid transparent; padding: 8px 10px 9px; cursor: pointer;
+  font-size: .8rem; font-weight: 600; letter-spacing: .04em; color: var(--ink-soft); white-space: nowrap;
+}
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--buff); }
+.pane {
+  flex: 1; overflow-y: auto; min-height: 0;
+  padding-block: 16px 40px;
+  padding-left: 18px; padding-right: max(18px, env(safe-area-inset-right, 0px));
+}
+@media (max-width: 900px) { .pane { overflow: visible; padding-left: max(16px, env(safe-area-inset-left, 0px)); } }
+.pane h2 { font-family: var(--f-display); font-weight: 400; font-size: 1.5rem; line-height: 1.15; margin: 0 0 4px; text-wrap: balance; }
+.pane h3 { font-size: .72rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-soft); margin: 20px 0 6px; }
+.pane p { margin: 0 0 10px; }
+.kicker { font-size: .78rem; color: var(--ink-soft); margin-bottom: 10px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
+.chip { font-size: .72rem; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: var(--chip); border: 1px solid var(--rule); white-space: nowrap; }
+.chip.era-1780 { border-color: var(--continental); color: var(--continental); }
+.chip.era-later { border-color: var(--later); color: var(--later); }
+.chip.st-private { border-color: var(--hi); color: var(--hi); }
+.chip.st-public { border-color: var(--low); color: var(--low); }
+.chip.st-limited { border-color: var(--mid); color: var(--mid); }
+.coord { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-family: var(--f-mono); font-size: .8rem; background: var(--chip); padding: 6px 8px; border-radius: 3px; margin: 10px 0; }
+.coord .approx { font-family: var(--f-body); font-size: .72rem; color: var(--ink-soft); }
+.coord button { margin-left: auto; }
+.linkrow { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .85rem; }
+.note { font-size: .82rem; color: var(--ink-soft); }
+.callout { border-left: 3px solid var(--hi); padding: 6px 0 6px 12px; margin: 12px 0; font-size: .88rem; }
+.callout.ok { border-color: var(--low); }
+.callout.warn { border-color: var(--mid); }
+
+.list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.list > li { border-top: 1px solid var(--rule); }
+.list > li:last-child { border-bottom: 1px solid var(--rule); }
+.rowbtn { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; width: 100%; text-align: left; background: none; border: 0; padding: 10px 2px; cursor: pointer; }
+.rowbtn:hover { background: var(--chip); }
+.rowbtn .when { font-family: var(--f-mono); font-size: .75rem; color: var(--ink-soft); grid-row: span 2; min-width: 82px; padding-top: 2px; font-variant-numeric: tabular-nums; }
+.rowbtn .what { font-weight: 600; }
+.rowbtn .why { font-size: .84rem; color: var(--ink-soft); }
+.rowbtn.today { background: color-mix(in srgb, var(--buff) 16%, transparent); }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+
+.person { border-top: 1px solid var(--rule); padding: 12px 0; }
+.person:last-child { border-bottom: 1px solid var(--rule); }
+.person summary { cursor: pointer; list-style: none; display: grid; grid-template-columns: 1fr auto; gap: 0 10px; }
+.person summary::-webkit-details-marker { display: none; }
+.person .nm { font-family: var(--f-display); font-size: 1.15rem; line-height: 1.2; }
+.person .rk { font-size: .8rem; color: var(--ink-soft); grid-column: 1; }
+.person .side { grid-row: 1 / span 2; grid-column: 2; align-self: center; }
+.person .body { padding-top: 8px; font-size: .9rem; }
+.person[open] .nm { color: var(--continental); }
+
+table.calib { width: 100%; border-collapse: collapse; font-size: .82rem; font-variant-numeric: tabular-nums; }
+table.calib th, table.calib td { text-align: left; padding: 5px 6px 5px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+table.calib th { font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; }
+.tablewrap { overflow-x: auto; }
+.calc { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 8px 0; }
+.calc label { font-size: .75rem; font-weight: 600; color: var(--ink-soft); display: grid; gap: 3px; }
+.calc input { font: inherit; font-family: var(--f-mono); padding: 6px 8px; border: 1px solid var(--rule); border-radius: 3px; background: var(--panel); color: var(--ink); width: 100%; }
+.calc-out { background: var(--chip); border-radius: 3px; padding: 8px 10px; font-size: .86rem; }
+.calc-out b { font-family: var(--f-mono); font-weight: 500; }
+.zonecard { border: 1px solid var(--rule); border-radius: 4px; padding: 10px 12px; margin: 8px 0; display: grid; gap: 4px; }
+.zonecard .zh { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.zonecard .zn { font-weight: 700; }
+.zonecard .zr { font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.zonecard p { font-size: .86rem; margin: 0; }
+.zonecard button { justify-self: start; margin-top: 4px; }
+ul.tight { margin: 4px 0 10px; padding-left: 18px; }
+ul.tight li { margin: 3px 0; }
+.src { font-size: .85rem; }
+.src li { margin: 6px 0; }
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--panel); padding: 7px 14px; border-radius: 3px; font-size: .82rem; z-index: 20; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <h1>Camp New Providence</h1>
+    <span class="sub">Southern Continental Army encampment · Six Mile Creek, Mecklenburg–Union line · Oct–Dec 1780</span>
+  </div>
+  <p class="notice"><b>A Revolutionary War camp, not a Civil War one.</b> The state marker and NC Archives date it to the fall of 1780; some online listings label it Civil War in error. Charlotte's Civil War sites are on the map as a separate layer.</p>
+</header>
+
+<div class="main">
+  <div class="mapwrap" id="mapwrap">
+    <svg id="map" role="application" aria-label="Interactive map. Drag to pan, scroll or pinch to zoom, select a marker for details."></svg>
+
+    <div class="mapctl tl">
+      <div class="seg" role="group" aria-label="Map view">
+        <button class="btn" id="v-camp" aria-pressed="true">Camp</button>
+        <button class="btn" id="v-charlotte" aria-pressed="false">Charlotte</button>
+        <button class="btn" id="v-campaign" aria-pressed="false">Campaign</button>
+      </div>
+      <details class="layers" id="layers" open>
+        <summary>Layers</summary>
+        <label><input type="checkbox" id="L-terrain" checked> <span class="sw" style="background:var(--water)"></span>Creeks, rivers &amp; 1780 road</label>
+        <label><input type="checkbox" id="L-camp" checked> <span class="sw" style="background:var(--continental)"></span>Camp layout (conjectural)</label>
+        <label><input type="checkbox" id="L-sites" checked> <span class="sw" style="background:var(--militia)"></span>1780 campaign sites</label>
+        <label><input type="checkbox" id="L-zones"> <span class="sw" style="background:var(--hi)"></span>Detecting potential</label>
+        <label><input type="checkbox" id="L-modern" checked> <span class="sw" style="background:var(--modern)"></span>Modern roads &amp; towns</label>
+        <label><input type="checkbox" id="L-later"> <span class="sw" style="background:var(--later)"></span>Civil War &amp; later</label>
+        <label><input type="checkbox" id="L-grid" checked> <span class="sw" style="background:var(--ink-soft)"></span>Lat/long graticule</label>
+      </details>
+    </div>
+    <div class="mapctl tr">
+      <button class="btn sq" id="zin" aria-label="Zoom in">+</button>
+      <button class="btn sq" id="zout" aria-label="Zoom out">−</button>
+    </div>
+    <div class="mapctl bl">
+      <div class="scalebox"><span id="scaletxt">1 km</span><div class="scalebar" id="scalebar" style="width:80px"></div><div class="cursor-pos" id="cursorpos">—</div></div>
+    </div>
+    <svg class="compass" viewBox="-40 -40 80 80" aria-hidden="true">
+      <circle r="24" stroke-width="1"/><circle r="20" stroke-width=".6"/>
+      <path class="fill" d="M0,-30 L5,0 L0,4 L-5,0Z"/><path d="M0,30 L5,0 L0,-4 L-5,0Z" stroke-width="1"/>
+      <path d="M-30,0 L0,3 L30,0 L0,-3Z" stroke-width=".8"/>
+      <text x="0" y="-31" text-anchor="middle">N</text>
+    </svg>
+  </div>
+
+  <aside class="panel" aria-label="Details">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="site" aria-selected="true">Site</button>
+      <button class="tab" role="tab" data-tab="story" aria-selected="false">Story</button>
+      <button class="tab" role="tab" data-tab="people" aria-selected="false">People</button>
+      <button class="tab" role="tab" data-tab="detect" aria-selected="false">Detecting</button>
+      <button class="tab" role="tab" data-tab="visit" aria-selected="false">Visit today</button>
+      <button class="tab" role="tab" data-tab="sources" aria-selected="false">Sources</button>
+    </div>
+    <div class="pane" id="pane" role="tabpanel"></div>
+  </aside>
+</div>
+
+<script>
+"use strict";
+/* =====================================================================
+   DATA
+   Coordinates are approximate (generally within a few hundred metres)
+   and were placed from published descriptions, not survey. Each site
+   links out to Google Maps so you can verify on satellite imagery.
+   ===================================================================== */
+
+const SITES = [
+  // ---------- the camp itself ----------
+  { id: "camp", layer: "sites", era: "1780", type: "camp", lat: 35.0298, lon: -80.7800, zl: 0,
+    name: "Camp New Providence", kind: "Encampment · c. Oct 20 – Dec 1780",
+    status: "private", statusText: "Private land",
+    history: [
+      "After the rout at Camden on August 16, 1780, the wreck of the Southern Army fell back into North Carolina. Once Cornwallis gave up Charlotte in mid-October and withdrew to Winnsboro, South Carolina, the Americans pushed their forward camp south to the Providence settlement, on Six Mile Creek astride the road toward the Waxhaws and Camden.",
+      "Local historians date the camp's founding to about October 20, 1780, when Brig. Gen. William Lee Davidson brought North Carolina militia here. Continentals under William Smallwood and Daniel Morgan's new light corps followed. The state marker gives the camp's strength as 1,300 to 2,600 men, rising and falling as militia enlistments ran out and men went home or deserted.",
+      "Here, on November 25, 1780, the senior officers of the Southern Department held a council of war on how to meet Cornwallis's expected invasion of North Carolina. NC Archives credits decisions made at that meeting with setting up the Battle of Cowpens. The light troops at this camp also launched the bloodless capture of Rugeley's Mill in early December.",
+      "Nathanael Greene took over the army at Charlotte on December 3. Finding the country stripped of food, he broke up the camp in mid-December (sources give December 17 or 20). The main army marched to Cheraw, South Carolina, and Morgan's light corps went west across the Catawba toward Cowpens."
+    ],
+    today: "Homes, subdivisions, roads and shopping around Providence Crossing on the Mecklenburg side of the creek, and Weddington on the Union County side. No park preserves the ground, no interpretive trail exists, and no surface features are known to survive.",
+    access: "Private property. You can drive the roads around it, but walking onto lots or HOA common areas needs the owner's permission.",
+    detect: "This is the heart of the camp, so it has the highest theoretical potential. It is also the most built-over and almost entirely private. See the Detecting tab before you knock on any doors." },
+
+  { id: "marker", layer: "sites", era: "1780", type: "marker", lat: 35.0303, lon: -80.7745, zl: 9000,
+    name: "Highway marker L-110", kind: "NC highway historical marker · erected 2010",
+    status: "public", statusText: "Roadside, public",
+    history: [
+      "The North Carolina Office of Archives and History put up marker L-110 in 2010. It calls the camp a winter encampment of Continental and militia troops 'where Patriots laid plans to confront Cornwallis,' and says the site lay 'just west' of the marker.",
+      "The marker names Horatio Gates, William Smallwood, Daniel Morgan, Otho Williams, John Eager Howard, William Washington and Thaddeus Kosciuszko among the officers who served here."
+    ],
+    today: "On Providence Road (NC 16) just south of Belicourt Drive, on the right (west) side when you're heading south. Business listings give the address as the 12800 block of Providence Rd. Some directories file it under Matthews or Weddington and one wrongly calls it a Civil War camp.",
+    access: "NC 16 is a busy divided highway. Park legally nearby and walk; do not stop in a travel lane.",
+    detect: "The marker stands in NCDOT right-of-way. Do not detect or dig there." },
+
+  { id: "ford", layer: "sites", era: "1780", type: "ford", lat: 35.0270, lon: -80.7741, zl: 9000,
+    name: "Six Mile Creek crossing", kind: "Creek crossing on the Providence road",
+    status: "limited", statusText: "Road right-of-way",
+    history: [
+      "A camp is built around water. Six Mile Creek supplied drinking, cooking and washing water, and water for the horses of Washington's dragoons and the army's wagon teams.",
+      "The crossing of the road over the creek was the obvious place for a guard post covering the approach from the south, the direction an attack from Cornwallis's army at Winnsboro would most likely come. The exact 1780 ford may not match the modern bridge."
+    ],
+    today: "Today's NC 16 bridge over Six Mile Creek. The creek is the county line here: Mecklenburg (Charlotte) to the north, Union (Weddington) to the south.",
+    access: "Highway bridge and right-of-way. Not a place to stop.",
+    detect: "Off-limits. NCDOT right-of-way is state-controlled land, where digging for archaeological material needs a permit under NC law." },
+
+  { id: "church", layer: "sites", era: "1780", type: "church", lat: 35.0838, lon: -80.7681, zl: 6000,
+    name: "Providence Presbyterian Church", kind: "Congregation founded 1767 · NRHP-listed",
+    status: "limited", statusText: "Active church, cemetery",
+    history: [
+      "Providence is one of Mecklenburg County's oldest congregations. Its first log meeting house went up in 1767, east of the cemetery. A second building followed in 1804, and the present frame church, about 1858, is the oldest intact antebellum frame church in the county. It was listed on the National Register of Historic Places in 1982.",
+      "The Providence settlement, Providence Road and the camp all take their names from the congregation. Men buried in the churchyard include Neill Morrison, John Flennekin and Henry Downs, all linked to Mecklenburg's 1775 independence resolutions. Families from this congregation filled the local militia companies that turned out in 1780."
+    ],
+    today: "10140 Providence Church Lane, off Providence Road, Charlotte, NC 28277. A Mecklenburg County historic landmark.",
+    access: "Active church. Be respectful; ask the church office before walking the cemetery.",
+    detect: "Never. Cemeteries and churchyards are off-limits, and disturbing graves is a felony in North Carolina." },
+
+  { id: "charlotte", layer: "sites", era: "1780", type: "town", lat: 35.2271, lon: -80.8431, zl: 0,
+    name: "Charlotte", kind: "Headquarters town · 1780",
+    status: "public", statusText: "Public streets",
+    history: [
+      "On September 26, 1780, William R. Davie's horsemen and militia stood at the courthouse at the crossing of Trade and Tryon streets and briefly stopped Cornwallis's advance before falling back. The British held the town for about two weeks. Local tradition says Cornwallis called it 'a hornet's nest of rebellion,' a phrase Charlotte still uses on its seal and police badges.",
+      "Constant militia attacks on British foragers, the McIntyre's Farm fight on October 3, and the destruction of Ferguson's Loyalists at Kings Mountain on October 7 drove Cornwallis out by mid-October.",
+      "Gates brought army headquarters to Charlotte in November while the forward camp sat at New Providence. Nathanael Greene arrived on December 2 and took command on December 3. He talked Davie into becoming commissary general, the officer responsible for feeding the army."
+    ],
+    today: "Independence Square at Trade and Tryon streets marks the courthouse site. Plaques and highway markers around uptown recall the 1780 fight.",
+    access: "Public sidewalks.",
+    detect: "No. Uptown is built over and city property is not open to detecting." },
+
+  { id: "greenway", layer: "sites", era: "1780", type: "park", lat: 34.9950, lon: -80.8170, zl: 6000,
+    name: "Six Mile Creek Greenway", kind: "Modern county greenway · downstream of the camp",
+    status: "public", statusText: "Public park",
+    history: [
+      "Not a documented 1780 site. It is the easiest public place to see Six Mile Creek and get a feel for the bottomland and low ridges that the camp would have used upstream."
+    ],
+    today: "About 0.9 mile of paved trail along Six Mile Creek. The county lists parking at 17820 Marvin Road; other guides put the main entrance between Patterson Road and Firethorne Country Club, so check a map before you go.",
+    access: "Mecklenburg County Park and Recreation property. Open dawn to dusk.",
+    detect: "Treat as no. County park rules restrict digging and ground disturbance. Ask Park and Recreation in writing before bringing a detector." },
+
+  // ---------- campaign sites ----------
+  { id: "waxhaws", layer: "sites", era: "1780", type: "battle", lat: 34.7860, lon: -80.6430, zl: 600,
+    name: "Waxhaws (Buford's defeat)", kind: "Battle · May 29, 1780",
+    status: "public", statusText: "Memorial site",
+    history: [
+      "Banastre Tarleton's British Legion caught Col. Abraham Buford's Virginia Continentals near the NC–SC line and cut them down after they tried to surrender. 'Tarleton's quarter' became a Patriot rallying cry across the Carolina backcountry, and it helped fill the militia ranks that later gathered at New Providence."
+    ],
+    today: "Buford Battlefield memorial and mass grave, Lancaster County, SC.",
+    access: "Public memorial site.",
+    detect: "No. It is a grave site and protected." },
+
+  { id: "camden", layer: "sites", era: "1780", type: "battle", lat: 34.3190, lon: -80.6020, zl: 600,
+    name: "Camden", kind: "Battle · August 16, 1780",
+    status: "public", statusText: "Battlefield preserve",
+    history: [
+      "Horatio Gates marched a hungry, sick army into Cornwallis's veterans north of Camden. The Virginia and North Carolina militia broke at the first British bayonet charge; the Maryland and Delaware Continentals fought on until surrounded, and Baron de Kalb was mortally wounded. Gates rode about 60 miles to Charlotte that night and went on to Hillsborough.",
+      "The survivors of the Maryland and Delaware regiments became the core of the army that later camped at New Providence."
+    ],
+    today: "Camden Battlefield and Longleaf Pine Preserve, a National Historic Landmark north of Camden, SC.",
+    access: "Open to the public with walking trails.",
+    detect: "No. Protected battlefield preserve." },
+
+  { id: "hillsborough", layer: "sites", era: "1780", type: "town", lat: 36.0754, lon: -79.0997, zl: 600,
+    name: "Hillsborough", kind: "Army rallying point · Sept–Oct 1780",
+    status: "public", statusText: "Historic town",
+    history: [
+      "Gates rebuilt what was left of his army here after Camden. Daniel Morgan, newly promoted brigadier general in October 1780, organized his corps of light infantry, riflemen and dragoons before the army moved south toward Charlotte and New Providence."
+    ],
+    today: "Historic district with many 18th-century buildings.",
+    access: "Public streets and sites.",
+    detect: "No." },
+
+  { id: "mcintyre", layer: "sites", era: "1780", type: "battle", lat: 35.3316, lon: -80.8877, zl: 3000,
+    name: "McIntyre's Farm", kind: "Skirmish · October 3, 1780",
+    status: "public", statusText: "County historic site",
+    history: [
+      "A British foraging party raiding a farm north of Charlotte knocked over beehives. While the soldiers swatted bees, local militia opened fire from the woods. The 'Battle of the Bees' is a small fight, but it shows why Cornwallis found Mecklenburg impossible to feed his army in."
+    ],
+    today: "McIntyre Historic Site, Beatties Ford Road, managed by Mecklenburg County Park and Recreation.",
+    access: "Public historic site.",
+    detect: "No. County park property." },
+
+  { id: "kings", layer: "sites", era: "1780", type: "battle", lat: 35.1414, lon: -81.3770, zl: 600,
+    name: "Kings Mountain", kind: "Battle · October 7, 1780",
+    status: "public", statusText: "National Military Park",
+    history: [
+      "Overmountain men and Carolina militia surrounded Maj. Patrick Ferguson's Loyalists on a ridge and destroyed them in about an hour. With his western flank gone, Cornwallis left Charlotte within a week, and that retreat let the Americans move forward to New Providence."
+    ],
+    today: "Kings Mountain National Military Park (NPS), York County, SC.",
+    access: "Open daily, visitor center and battlefield trail.",
+    detect: "Illegal. Federal land under the Archaeological Resources Protection Act." },
+
+  { id: "winnsboro", layer: "sites", era: "1780", type: "enemy", lat: 34.3807, lon: -81.0865, zl: 600,
+    name: "Winnsboro", kind: "British winter quarters · Oct 1780 – Jan 1781",
+    status: "public", statusText: "Historic town",
+    history: [
+      "Cornwallis fell back here after Kings Mountain and spent the late fall recovering from fever and waiting for reinforcements. The council at New Providence was planning against his next move north from this base."
+    ],
+    today: "Seat of Fairfield County, SC.",
+    access: "Public streets.",
+    detect: "No." },
+
+  { id: "rugeley", layer: "sites", era: "1780", type: "battle", lat: 34.4180, lon: -80.5900, zl: 600,
+    name: "Rugeley's Mill (Clermont)", kind: "Ruse · December 4, 1780 (some say Nov 30)",
+    status: "private", statusText: "Private land",
+    history: [
+      "Lt. Col. William Washington's dragoons, sent out from Morgan's light corps, found about 100 to 125 Loyalist militia under Col. Henry Rugeley fortified in a log barn at his Clermont estate, about twelve miles north of Camden. Washington had no cannon, so his men shaped a pine log to look like one, set it on wagon wheels where the garrison could see it, and demanded surrender. Rugeley gave up without a shot.",
+      "Most accounts date the raid to December 4, 1780. One modern study argues for November 30."
+    ],
+    today: "Rural private land in Kershaw County, SC. The exact barn site is not marked for the public.",
+    access: "Private.",
+    detect: "Only with landowner permission." },
+
+  { id: "cheraw", layer: "sites", era: "1780", type: "camp", lat: 34.6680, lon: -79.8890, zl: 600,
+    name: "Cheraw 'camp of repose'", kind: "Greene's camp · Dec 26, 1780 – Jan 1781",
+    status: "public", statusText: "Historic town",
+    history: [
+      "Greene sent Kosciuszko to scout the Pee Dee River for a place where the army could eat and recover. The main army left the Charlotte area about December 20 and camped on Hicks Creek near Cheraw from late December. Greene called it his camp of repose."
+    ],
+    today: "Cheraw, Chesterfield County, SC, with a historic district and St. David's Church.",
+    access: "Public streets.",
+    detect: "No." },
+
+  { id: "cowpens", layer: "sites", era: "1781", type: "battle", lat: 35.1370, lon: -81.8175, zl: 600,
+    name: "Cowpens", kind: "Battle · January 17, 1781",
+    status: "public", statusText: "National Battlefield",
+    history: [
+      "Morgan's light corps, the force that had wintered at New Providence, used a three-line defense to trap and destroy Tarleton's Legion. John Eager Howard's Continentals and William Washington's dragoons broke the British line. It was the payoff for the strategy worked out in the camp that fall."
+    ],
+    today: "Cowpens National Battlefield (NPS), Cherokee County, SC.",
+    access: "Open daily.",
+    detect: "Illegal. Federal land." },
+
+  { id: "guilford", layer: "sites", era: "1781", type: "battle", lat: 36.1314, lon: -79.8430, zl: 600,
+    name: "Guilford Courthouse", kind: "Battle · March 15, 1781",
+    status: "public", statusText: "National Military Park",
+    history: [
+      "After the Race to the Dan, Greene turned and fought Cornwallis. The British held the field but lost about a quarter of their army, and Cornwallis soon marched to the coast and then on toward Yorktown."
+    ],
+    today: "Guilford Courthouse National Military Park (NPS), Greensboro, NC.",
+    access: "Open daily.",
+    detect: "Illegal. Federal land." },
+
+  // ---------- Civil War and later ----------
+  { id: "navyyard", layer: "later", era: "later", type: "later", lat: 35.2292, lon: -80.8382, zl: 25000,
+    name: "Confederate Navy Yard", kind: "Civil War · 1862–1865",
+    status: "public", statusText: "Site only",
+    history: [
+      "When Norfolk was about to fall in 1862, the Confederacy moved its naval ordnance works inland to Charlotte, to be near iron sources and the railroads and far from Union troops. It made heavy forgings, shafts and ordnance for Confederate ships. A fire and explosion in January 1864 badly damaged the works."
+    ],
+    today: "East Trade Street near the railroad underpass. The building was torn down in 1959.",
+    access: "Public sidewalks.", detect: "No." },
+
+  { id: "phifer", layer: "later", era: "later", type: "later", lat: 35.2335, lon: -80.8372, zl: 25000,
+    name: "Phifer House site", kind: "Civil War · April 1865",
+    status: "public", statusText: "Site only",
+    history: [
+      "Jefferson Davis and his cabinet fled south after Richmond fell and stopped in Charlotte. The last meeting of the full Confederate cabinet is usually placed in an upstairs room of William Phifer's house, about April 26, 1865 (sources vary on the date)."
+    ],
+    today: "700 block of North Tryon Street. The house is gone; a highway marker stands nearby.",
+    access: "Public sidewalks.", detect: "No." },
+
+  { id: "bates", layer: "later", era: "later", type: "later", lat: 35.2250, lon: -80.8452, zl: 25000,
+    name: "Where Davis learned of Lincoln's death", kind: "Civil War · April 19, 1865",
+    status: "public", statusText: "Marker",
+    history: [
+      "While Davis spoke to a crowd from the steps of Lewis F. Bates's house on South Tryon Street, he was handed a telegram reporting Abraham Lincoln's assassination."
+    ],
+    today: "South Tryon Street, uptown, marked by a state highway marker and a plaque.",
+    access: "Public sidewalks.", detect: "No." },
+
+  { id: "mint", layer: "later", era: "later", type: "later", lat: 35.2262, lon: -80.8465, zl: 25000,
+    name: "Charlotte Mint (original site)", kind: "U.S. branch mint 1837 · seized 1861",
+    status: "public", statusText: "Site only",
+    history: [
+      "Built for North Carolina's gold rush, the branch mint was seized by the state in 1861 and used by the Confederacy for offices and as a hospital. The building was moved in the 1930s and reopened as the Mint Museum on Randolph Road."
+    ],
+    today: "West Trade Street. The building itself now stands at 2730 Randolph Road as Mint Museum Randolph.",
+    access: "Museum open to the public.", detect: "No." },
+
+  { id: "campgreene", layer: "later", era: "later", type: "later", lat: 35.2340, lon: -80.8880, zl: 9000,
+    name: "Camp Greene", kind: "World War I training camp · 1917–1919",
+    status: "public", statusText: "Neighborhood & marker",
+    history: [
+      "A World War I Army training camp named for Nathanael Greene, the general who took command at Charlotte in December 1780. Tens of thousands of soldiers trained here before it closed in 1919."
+    ],
+    today: "West Charlotte off Wilkinson Boulevard. A small park and highway marker L-25 recall the camp.",
+    access: "Public park.", detect: "No (city/county parkland)." }
+];
+
+/* Lines: [lat, lon] pairs. Hand-placed, approximate, schematic. */
+const LINES = {
+  sixmile:  { layer: "terrain", cls: "river", w: 2.2, label: "Six Mile Creek", li: 3, minS: 2500,
+    pts: [[35.0600,-80.7440],[35.0480,-80.7530],[35.0380,-80.7640],[35.0270,-80.7741],[35.0215,-80.7840],[35.0120,-80.7960],[35.0040,-80.8070],[34.9950,-80.8180],[34.9800,-80.8350],[34.9600,-80.8500],[34.9400,-80.8620]] },
+  mcalpine: { layer: "terrain", cls: "river", w: 2, label: "McAlpine Creek", li: 3, minS: 2500,
+    pts: [[35.1600,-80.7300],[35.1450,-80.7500],[35.1250,-80.7750],[35.0950,-80.8000],[35.0700,-80.8250],[35.0400,-80.8500],[35.0050,-80.8700],[34.9700,-80.8850]] },
+  twelve:   { layer: "terrain", cls: "river", w: 2, label: "Twelve Mile Creek", li: 2, minS: 2500,
+    pts: [[35.0100,-80.6950],[34.9850,-80.7300],[34.9650,-80.7600],[34.9480,-80.8000],[34.9380,-80.8400],[34.9350,-80.8650],[34.9300,-80.8900]] },
+  sugar:    { layer: "terrain", cls: "river", w: 1.8, label: "Sugar Creek", li: 3, minS: 2500,
+    pts: [[35.2700,-80.8000],[35.2450,-80.8250],[35.2150,-80.8550],[35.1800,-80.8800],[35.1400,-80.9000],[35.1000,-80.9150],[35.0500,-80.9300],[35.0000,-80.9400]] },
+  catawba:  { layer: "terrain", cls: "river", w: 3, label: "Catawba – Wateree R.", li: 5, minS: 0,
+    pts: [[35.7400,-81.3500],[35.6000,-81.1500],[35.4300,-80.9900],[35.2800,-81.0000],[35.1500,-81.0100],[35.0000,-80.9500],[34.8000,-80.8800],[34.5500,-80.8400],[34.3500,-80.7000],[34.2000,-80.6600],[34.0000,-80.6300],[33.8000,-80.6000]] },
+  peedee:   { layer: "terrain", cls: "river", w: 3, label: "Yadkin – Pee Dee R.", li: 5, minS: 0,
+    pts: [[36.1500,-80.4500],[35.9000,-80.3500],[35.6700,-80.2500],[35.4000,-80.1200],[35.1500,-80.0600],[34.9500,-79.9300],[34.7000,-79.8800],[34.4500,-79.7300],[34.2000,-79.5800],[33.9500,-79.4400]] },
+  broad:    { layer: "terrain", cls: "river", w: 2.6, label: "Broad R.", li: 3, minS: 0,
+    pts: [[35.3800,-81.9500],[35.2500,-81.7000],[35.0800,-81.5600],[34.8500,-81.4500],[34.5500,-81.3200],[34.2500,-81.1500],[34.0000,-81.0500]] },
+  pacolet:  { layer: "terrain", cls: "river", w: 1.8, label: "Pacolet R.", li: 2, minS: 0,
+    pts: [[35.1800,-82.1500],[35.0600,-81.9000],[34.9700,-81.7000],[34.9000,-81.5200]] },
+  haw:      { layer: "terrain", cls: "river", w: 2.2, label: "Haw R.", li: 2, minS: 0,
+    pts: [[36.2500,-79.6000],[36.0800,-79.3800],[35.9000,-79.2200],[35.7000,-79.0800],[35.6000,-79.0300]] },
+
+  oldroad:  { layer: "terrain", cls: "road-old", label: "Providence road (1780 trace approx.)", li: 4, minS: 2500,
+    pts: [[35.2271,-80.8431],[35.2050,-80.8250],[35.1650,-80.8080],[35.1300,-80.7880],[35.1050,-80.7760],[35.0838,-80.7700],[35.0640,-80.7716],[35.0446,-80.7722],[35.0303,-80.7742],[35.0270,-80.7741],[35.0150,-80.7650],[35.0000,-80.7560],[34.9550,-80.7480],[34.9246,-80.7434],[34.8600,-80.7000],[34.7860,-80.6430]] },
+
+  nc16:     { layer: "modern", cls: "road-new", label: "NC 16 · Providence Rd", li: 5, minS: 5000,
+    pts: [[35.2050,-80.8250],[35.1650,-80.8080],[35.1300,-80.7880],[35.1050,-80.7760],[35.0838,-80.7700],[35.0640,-80.7716],[35.0446,-80.7722],[35.0303,-80.7742],[35.0270,-80.7741],[35.0150,-80.7650],[35.0000,-80.7560],[34.9550,-80.7480],[34.9246,-80.7434]] },
+  i485:     { layer: "modern", cls: "road-new", label: "I-485", li: 3, minS: 2500,
+    pts: [[35.1600,-80.6800],[35.1150,-80.6900],[35.0900,-80.7100],[35.0720,-80.7420],[35.0640,-80.7716],[35.0570,-80.8000],[35.0510,-80.8300],[35.0490,-80.8600],[35.0600,-80.9000],[35.0900,-80.9450],[35.1400,-80.9700]] },
+  ardrey:   { layer: "modern", cls: "road-new minor", label: "Ardrey Kell Rd", li: 1, minS: 7000,
+    pts: [[35.0446,-80.7722],[35.0420,-80.8100],[35.0380,-80.8500]] },
+  nc84:     { layer: "modern", cls: "road-new minor", label: "NC 84", li: 1, minS: 7000,
+    pts: [[35.0150,-80.7650],[35.0080,-80.7200],[34.9950,-80.6700]] },
+
+  county:   { layer: "terrain", cls: "border", label: "Mecklenburg | Union", li: 1, minS: 6000,
+    pts: [[35.1800,-80.6600],[35.1200,-80.7050],[35.0700,-80.7400],[35.0380,-80.7640],[35.0270,-80.7741],[35.0215,-80.7840],[35.0120,-80.7960],[35.0040,-80.8070],[34.9950,-80.8180],[34.9800,-80.8350]] },
+  state:    { layer: "terrain", cls: "border", label: "North Carolina | South Carolina (approx.)", li: 6, minS: 0, maxS: 6000,
+    pts: [[35.2100,-82.6000],[35.1900,-82.3000],[35.1600,-81.0400],[35.0500,-81.0500],[34.9900,-80.9300],[35.0000,-80.8500],[34.8200,-80.8000],[34.8200,-79.6800],[34.3000,-79.0800],[33.8600,-78.5400]] }
+};
+
+const TOWNS = [
+  { name: "Matthews", lat: 35.1168, lon: -80.7237, minS: 4000 },
+  { name: "Weddington", lat: 35.0220, lon: -80.7560, minS: 5000 },
+  { name: "Marvin", lat: 34.9910, lon: -80.8150, minS: 7000 },
+  { name: "Waxhaw", lat: 34.9246, lon: -80.7434, minS: 4000 },
+  { name: "Ballantyne", lat: 35.0530, lon: -80.8490, minS: 5000 },
+  { name: "Pineville", lat: 35.0833, lon: -80.8923, minS: 4000 },
+  { name: "Mint Hill", lat: 35.1796, lon: -80.6473, minS: 4000 },
+  { name: "Monroe", lat: 34.9854, lon: -80.5495, minS: 3000 },
+  { name: "Providence Crossing", lat: 35.0350, lon: -80.7700, minS: 14000 }
+];
+
+/* Detecting-potential zones: centre, radius (m), rating. Inference from how
+   18th-century camps were laid out, NOT from reported finds. */
+const ZONES = [
+  { id: "z-north", lat: 35.0292, lon: -80.7808, r: 480, rating: "hi", ratingText: "High · private",
+    name: "North terrace above the creek",
+    text: "Dry, gently sloping ground above Six Mile Creek, just west of the road, matches the marker's 'just west of here' and is where an 18th-century army would pitch its tent lines. Expect dropped balls, buttons, buckles, and camp-kettle and tool fragments. Most of it is now house lots and HOA land, much of it graded during construction." },
+  { id: "z-south", lat: 35.0195, lon: -80.7835, r: 420, rating: "mid", ratingText: "Moderate–high · private",
+    name: "South side of the creek (Union County)",
+    text: "Sources describe the camp ground as lying on both sides of the creek. Militia often camped apart from the Continentals. Parts of this side are larger, less disturbed residential tracts, which makes it the best realistic place to ask permission." },
+  { id: "z-water", lat: 35.0105, lon: -80.7985, r: 380, rating: "mid", ratingText: "Moderate · check ownership",
+    name: "Downstream bottomland",
+    text: "Horse lines, watering and washing places were usually below camp on the creek. Bottomland finds include horseshoes, horseshoe nails, harness and wagon iron, and lost buttons. Floodplain silt can bury 1780 ground deep. Some of the creek corridor is public greenway or buffer land and off-limits." },
+  { id: "z-ford", lat: 35.0272, lon: -80.7741, r: 220, rating: "off", ratingText: "Off-limits · state ROW",
+    name: "Road crossing and guard posts",
+    text: "Guard and picket posts on the road would have left concentrated losses, but the modern highway corridor is NCDOT right-of-way. Detecting it needs a state permit." },
+  { id: "z-church", lat: 35.0838, lon: -80.7681, r: 160, rating: "off", ratingText: "Never · cemetery",
+    name: "Providence churchyard",
+    text: "Burial ground. Do not detect, probe or dig." }
+];
+
+/* Conjectural camp layout: blocks as [dx, dy, w, h] metres from origin (east, north). */
+const CAMP_ORIGIN = { lat: 35.0268, lon: -80.7800 };
+const CAMP_BLOCKS = [
+  { label: "Maryland & Delaware Continentals", color: "continental", x: -380, y: 230, w: 420, h: 70, tents: 14 },
+  { label: "Officers' line", color: "continental", x: -380, y: 330, w: 420, h: 25, tents: 7 },
+  { label: "Light corps (Morgan)", color: "buff", x: 290, y: 330, w: 150, h: 60, tents: 5 },
+  { label: "Dragoon horse lines", color: "buff", x: -900, y: -900, w: 200, h: 45, tents: 0 },
+  { label: "NC & VA militia (south bank)", color: "militia", x: -420, y: -820, w: 380, h: 80, tents: 12 },
+  { label: "Commissary & wagon park", color: "ink", x: 380, y: 130, w: 120, h: 70, tents: 0 },
+  { label: "Quarter guard", color: "ink", x: -120, y: 440, w: 70, h: 25, tents: 0 }
+];
+const CAMP_PICKETS = [
+  { label: "Picket (north road)", dx: 595, dy: 900 },
+  { label: "Picket (south road)", dx: 1112, dy: -900 }
+];
+
+const TIMELINE = [
+  { d: "1767", md: null, t: "Providence meeting house built", s: "First log church of the Providence congregation, which names the road and the settlement.", site: "church" },
+  { d: "May 31, 1775", md: "05-31", t: "Mecklenburg Resolves", s: "Mecklenburg's committee declares royal commissions void. Three men tied to the county's independence resolutions lie in the Providence churchyard.", site: "charlotte" },
+  { d: "May 29, 1780", md: "05-29", t: "Waxhaws", s: "Tarleton cuts down Buford's Virginians. 'Tarleton's quarter' rallies the backcountry.", site: "waxhaws" },
+  { d: "Aug 16, 1780", md: "08-16", t: "Disaster at Camden", s: "Gates's army is routed. Maryland and Delaware survivors will form the core of the New Providence army.", site: "camden" },
+  { d: "Sept 26, 1780", md: "09-26", t: "Battle of Charlotte", s: "Davie's men fight Cornwallis's advance at the courthouse.", site: "charlotte" },
+  { d: "Oct 3, 1780", md: "10-03", t: "McIntyre's Farm", s: "Militia ambush British foragers north of Charlotte.", site: "mcintyre" },
+  { d: "Oct 7, 1780", md: "10-07", t: "Kings Mountain", s: "Ferguson's Loyalists destroyed; Cornwallis's left flank collapses.", site: "kings" },
+  { d: "Mid-Oct 1780", md: null, t: "British leave Charlotte", s: "Cornwallis withdraws to winter quarters at Winnsboro, SC.", site: "winnsboro" },
+  { d: "c. Oct 20, 1780", md: "10-20", t: "Camp established", s: "Davidson's NC militia occupy Six Mile Creek at Providence; Continentals and Morgan's light corps follow.", site: "camp" },
+  { d: "Nov 11–15, 1780", md: null, t: "Davie writes to Smallwood", s: "Letters from William R. Davie report thin supplies and militia going home or deserting.", site: "camp" },
+  { d: "Nov 25, 1780", md: "11-25", t: "Council of war", s: "Senior officers of the Southern Department meet at the camp to plan for Cornwallis's invasion.", site: "camp" },
+  { d: "Dec 2–3, 1780", md: "12-03", t: "Greene takes command", s: "Nathanael Greene arrives in Charlotte and relieves Gates.", site: "charlotte" },
+  { d: "Dec 4, 1780", md: "12-04", t: "The Quaker gun", s: "Washington's dragoons take Rugeley's Loyalists with a painted pine log.", site: "rugeley" },
+  { d: "Dec 17–20, 1780", md: "12-20", t: "Camp broken up", s: "The main army marches for Cheraw; Morgan heads west on Dec 21.", site: "camp" },
+  { d: "Dec 26, 1780", md: "12-26", t: "Camp of repose", s: "Greene's army reaches Hicks Creek near Cheraw.", site: "cheraw" },
+  { d: "Jan 17, 1781", md: "01-17", t: "Cowpens", s: "Morgan's light corps destroys Tarleton's Legion.", site: "cowpens" },
+  { d: "Feb 1, 1781", md: "02-01", t: "Cowan's Ford", s: "William Lee Davidson, founder of the New Providence camp, is killed defending the Catawba crossing.", site: null },
+  { d: "Mar 15, 1781", md: "03-15", t: "Guilford Courthouse", s: "Costly British victory that sends Cornwallis toward Yorktown.", site: "guilford" },
+  { d: "1862–1865", md: null, t: "Civil War Charlotte", s: "Navy yard, mint and hospitals; the Confederate cabinet's last full meetings in April 1865. No connection to the 1780 camp.", site: "navyyard", later: true },
+  { d: "2010", md: null, t: "Marker L-110 erected", s: "NC Office of Archives and History marks the camp on Providence Road.", site: "marker" },
+  { d: "2030", md: null, t: "250th anniversary", s: "Union County residents have asked the county to recognize a Camp New Providence Day for the semiquincentennial.", site: "camp" }
+];
+
+const PEOPLE = [
+  { n: "Horatio Gates", r: "Major General · commander, Southern Department", side: "us", site: "charlotte",
+    b: "The victor of Saratoga (1777) took the Southern command in July 1780 and lost most of it at Camden a month later. He rebuilt at Hillsborough, moved headquarters to Charlotte, and ran the army through the New Providence months while Congress arranged an inquiry into Camden. He handed over command to Greene on December 3, 1780; contemporaries noted that both men handled it with courtesy." },
+  { n: "Nathanael Greene", r: "Major General · took command Dec 3, 1780", side: "us", site: "charlotte",
+    b: "Washington's choice to save the South. Greene arrived in Charlotte on December 2 and found an army short of clothing, shoes, food and ammunition. He broke up the camp, split the army against all textbook advice (main body to Cheraw, Morgan to the west) and so made the countryside feed two smaller forces while threatening Cornwallis from two directions. He talked Davie into running the commissary and sent Kosciuszko to scout the rivers. In 1781 he summed up his campaign as: 'We fight, get beat, rise, and fight again.'" },
+  { n: "William Smallwood", r: "Maryland general · commanded the advance", side: "us", site: "camp",
+    b: "Commander of the Maryland Line and of the army's forward troops at New Providence. William Davie's November 1780 letters on supplies and militia desertion are addressed to him. Late in the year he left for Maryland to push for recruits and supplies for the Southern Army." },
+  { n: "Daniel Morgan", r: "Brigadier General · light corps", side: "us", site: "camp",
+    b: "The Virginia rifleman of Quebec and Saratoga came back from retirement after Camden and was made a brigadier in October 1780. At New Providence he commanded the light corps of picked Continental infantry, riflemen and Washington's dragoons, and ordered the raid on Rugeley's. On December 21 he marched west with it, and on January 17, 1781 he beat Tarleton at Cowpens." },
+  { n: "Otho Holland Williams", r: "Colonel · deputy adjutant general", side: "us", site: "camp",
+    b: "Marylander who kept the army's orders, returns and records. His narrative of the 1780 campaign is one of the main sources for Camden and its aftermath. In February 1781 he commanded the light troops that screened Greene's escape across the Dan." },
+  { n: "John Eager Howard", r: "Lieutenant Colonel · Maryland light infantry", side: "us", site: "camp",
+    b: "Led the Continental light infantry in Morgan's corps. At Cowpens his line's turn and counter-charge broke the British. He later served as governor of Maryland and a U.S. senator." },
+  { n: "William Washington", r: "Lieutenant Colonel · Continental light dragoons", side: "us", site: "rugeley",
+    b: "A distant cousin of George Washington and the army's leading cavalry officer in the South. From New Providence he rode to Rugeley's Mill and captured its garrison with a fake cannon made from a pine log. He charged at Cowpens, was wounded and captured at Eutaw Springs in 1781, and settled in Charleston after the war." },
+  { n: "Thaddeus Kosciuszko", r: "Colonel · chief engineer", side: "us", site: "cheraw",
+    b: "Polish engineer who had fortified the American lines at Saratoga and West Point. He came south as the army's chief engineer. Greene sent him from the Charlotte camps to survey the Pee Dee River for a site to rest and feed the army, which led to the camp near Cheraw. In 1794 he led Poland's uprising against Russia." },
+  { n: "William Lee Davidson", r: "Brigadier General · NC militia, Salisbury District", side: "nc", site: "camp",
+    b: "Continental veteran who took command of the western North Carolina militia in 1780, recovering from a wound received at Colson's Mill that summer. Local historians credit him with founding the camp at New Providence about October 20. He was killed on February 1, 1781 holding Cowan's Ford on the Catawba. Davidson College and Davidson County are named for him." },
+  { n: "William Richardson Davie", r: "Colonel · cavalry, then commissary general", side: "nc", site: "charlotte",
+    b: "Raised in the Waxhaws. His mounted men made the stand at the Charlotte courthouse on September 26. That November he wrote to Smallwood about scarce provisions and vanishing militia. Greene asked him to become commissary general, which he took on reluctantly. He later served as governor of North Carolina and is remembered as the father of the University of North Carolina." },
+  { n: "Charles, Earl Cornwallis", r: "Lieutenant General · British field army", side: "gb", site: "winnsboro",
+    b: "Won at Camden, occupied Charlotte, then fell back to Winnsboro after Kings Mountain. The council at New Providence was planning against his expected march north. He surrendered at Yorktown in October 1781." },
+  { n: "Banastre Tarleton", r: "Lieutenant Colonel · British Legion", side: "gb", site: "cowpens",
+    b: "Commander of the Loyalist British Legion, blamed for the slaughter at Waxhaws. Morgan's corps from New Providence destroyed his command at Cowpens." },
+  { n: "Henry Rugeley", r: "Loyalist colonel · Camden militia", side: "gb", site: "rugeley",
+    b: "Wealthy merchant and planter whose Clermont estate north of Camden was a British post. He surrendered his garrison to William Washington's painted log. Cornwallis is said to have joked that Rugeley would never rise to brigadier." },
+  { n: "The rank and file", r: "Continentals and militia", side: "nc", site: "camp",
+    b: "Most men at the camp left no letters, but many applied for federal pensions decades later and described their service under oath. Searching the transcribed Southern Campaign pension statements for 'New Providence' turns up first-hand memories of camp duty, foraging and guard posts here." }
+];
+
+const SOURCES = [
+  ["NC Dept. of Natural & Cultural Resources, “Camp New Providence (L-110)”", "https://www.dncr.nc.gov/blog/2024/01/16/camp-new-providence-l-110"],
+  ["NC DNCR, “Planning North Carolina’s Revolutionary War Defense” (council of Nov 25, 1780)", "https://www.dncr.nc.gov/blog/2016/11/25/planning-north-carolinas-revolutionary-war-defense"],
+  ["Historical Marker Database, Camp New Providence marker", "https://www.hmdb.org/m.asp?m=263275"],
+  ["“Camp New Providence” research paper (PDF)", "http://www.elehistory.com/amrev/CampNewProvidence.pdf"],
+  ["William R. Davie to Gen. Smallwood, Nov 11, 1780 (American Revolution Institute)", "https://collections.americanrevolutioninstitute.org/record/725"],
+  ["William R. Davie to Gen. Smallwood, Nov 15, 1780 (American Revolution Institute)", "https://collections.americanrevolutioninstitute.org/record/729"],
+  ["Maryland State Archives, Southern campaign narrative", "https://msa.maryland.gov/megafile/msa/speccol/sc5700/sc5796/000014/000000/000008/unrestricted/b6.htm"],
+  ["Southern Campaign Revolutionary War Pension Statements", "https://revwarapps.org/"],
+  ["American Battlefield Trust, Rugeley’s Mill", "https://www.battlefields.org/learn/revolutionary-war/battles/rugeleys-mill"],
+  ["Journal of the American Revolution, “Rugeley’s Mill & the Quaker Cannon”", "https://revolutionarywarjournal.com/rugeleys-mill-the-quaker-cannon/"],
+  ["Union County residents seek Camp New Providence Day", "https://citizenportal.ai/articles/10175495/North-Carolina/Union-County/Residents-urge-county-to-recognize-Camp-New-Providence-Day-during-250th-anniversary-year"],
+  ["Mecklenburg County Historic Landmarks, Providence Presbyterian Church", "https://hl.mecknc.gov/Properties/Designated-Historic-Landmarks/charlotte/south-middle/providence-presbyterian-church"],
+  ["Mecklenburg County Park and Recreation, greenways", "https://parkandrec.mecknc.gov/Places-to-Visit/greenways"],
+  ["NC General Statutes Ch. 70, Art. 2: Archaeological Resources Protection Act", "https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/ByArticle/Chapter_70/Article_2.html"],
+  ["NC General Statutes Ch. 70 (all articles, incl. unmarked burials)", "https://www.ncleg.gov/EnactedLegislation/Statutes/HTML/ByChapter/Chapter_70.html"],
+  ["NC DEQ, metal detectors", "https://deq.nc.gov/about/divisions/environmental-assistance-customer-service/a-z-topic-index/metal-detectors"],
+  ["NC State Parks rules (metal detectors)", "https://www.ncparks.gov/about-us/guidelines-park-rules-and-regulations"],
+  ["Charlotte Mecklenburg Story, Civil War exhibit", "https://www.cmstory.org/exhibits/us-civil-war-1861-1865?page=2"],
+  ["NC DNCR, Confederate Cabinet (L-3)", "https://www.dncr.nc.gov/blog/2024/01/11/confederate-cabinet-l-3"],
+  ["NC DNCR, Jefferson Davis (L-4)", "https://www.dncr.nc.gov/blog/2024/01/11/jefferson-davis-l-4"],
+  ["NC DNCR, Camp Greene (L-25)", "https://www.dncr.nc.gov/blog/2024/01/12/camp-greene-l-25"]
+];
+
+/* =====================================================================
+   MAP ENGINE (SVG, no tiles)
+   ===================================================================== */
+const NS = "http://www.w3.org/2000/svg";
+const K = Math.cos(35.05 * Math.PI / 180);
+const M_PER_DEG = 111320;
+const svg = document.getElementById("map");
+const wrap = document.getElementById("mapwrap");
+const view = { cx: 0, cy: 0, s: 10000 };
+const layers = { terrain: true, camp: true, sites: true, zones: false, modern: true, later: false, grid: true };
+let selected = null;
+let W = 800, H = 600;
+
+const world = (lat, lon) => [lon * K, -lat];
+const toScreen = (lat, lon) => { const [x, y] = world(lat, lon); return [(x - view.cx) * view.s + W / 2, (y - view.cy) * view.s + H / 2]; };
+const toLatLon = (sx, sy) => { const x = (sx - W / 2) / view.s + view.cx, y = (sy - H / 2) / view.s + view.cy; return [-y, x / K]; };
+const offset = (o, dx, dy) => [o.lat + dy / M_PER_DEG, o.lon + dx / (M_PER_DEG * K)];
+
+function el(tag, attrs, parent, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text != null) e.textContent = text;
+  if (parent) parent.appendChild(e);
+  return e;
+}
+const cssVar = (n) => `var(--${n})`;
+
+const PRESETS = {
+  camp: [35.008, -80.812, 35.050, -80.752],
+  charlotte: [35.218, -80.852, 35.240, -80.830],
+  campaign: [33.95, -82.05, 36.3, -78.95]
+};
+function fit(b, animate) {
+  const [la1, lo1, la2, lo2] = b;
+  const [x1, y1] = world(la2, lo1), [x2, y2] = world(la1, lo2);
+  const s = Math.min(W / (x2 - x1), H / (y2 - y1)) * 0.92;
+  flyTo((x1 + x2) / 2, (y1 + y2) / 2, s, animate);
+}
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let anim = null;
+function flyTo(cx, cy, s, animate = true) {
+  if (anim) cancelAnimationFrame(anim);
+  if (!animate || reduceMotion) { Object.assign(view, { cx, cy, s }); render(); return; }
+  const a = { ...view }, t0 = performance.now(), dur = 650;
+  const step = (t) => {
+    const k = Math.min(1, (t - t0) / dur), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+    view.cx = a.cx + (cx - a.cx) * e; view.cy = a.cy + (cy - a.cy) * e;
+    view.s = Math.exp(Math.log(a.s) + (Math.log(s) - Math.log(a.s)) * e);
+    render();
+    if (k < 1) anim = requestAnimationFrame(step); else anim = null;
+  };
+  anim = requestAnimationFrame(step);
+}
+function targetScale(st) {
+  if (st.layer === "later") return st.zl >= 25000 ? 45000 : 12000;
+  const nearCamp = Math.abs(st.lat - 35.03) < 0.08 && Math.abs(st.lon + 80.78) < 0.08;
+  if (nearCamp) return 12000;
+  if (st.id === "charlotte" || st.id === "mcintyre") return 4000;
+  return 900;
+}
+function flyToSite(st) {
+  const [x, y] = world(st.lat, st.lon);
+  flyTo(x, y, targetScale(st));
+}
+
+function pathD(pts) {
+  return pts.map((p, i) => { const [x, y] = toScreen(p[0], p[1]); return (i ? "L" : "M") + x.toFixed(1) + "," + y.toFixed(1); }).join("");
+}
+function lineLabel(g, line, cls) {
+  const i = Math.min(Math.max(1, line.li), line.pts.length - 2);
+  const [ax, ay] = toScreen(...line.pts[i - 1]), [bx, by] = toScreen(...line.pts[i + 1]), [px, py] = toScreen(...line.pts[i]);
+  let ang = Math.atan2(by - ay, bx - ax) * 180 / Math.PI;
+  if (ang > 90) ang -= 180; if (ang < -90) ang += 180;
+  if (px < -50 || px > W + 50 || py < -50 || py > H + 50) return;
+  el("text", { x: px, y: py - 6, transform: `rotate(${ang.toFixed(1)} ${px.toFixed(1)} ${py.toFixed(1)})`, "text-anchor": "middle", class: cls }, g, line.label);
+}
+
+function graticule(g) {
+  const steps = [2, 1, 0.5, 0.25, 0.1, 0.05, 0.02, 0.01, 0.005, 0.002, 0.001];
+  let step = steps[0];
+  for (const st of steps) { if (st * view.s >= 110) step = st; }
+  const [latTop, lonL] = toLatLon(0, 0), [latBot, lonR] = toLatLon(W, H);
+  const fmt = (v, pos, neg) => {
+    const a = Math.abs(v), d = Math.floor(a + 1e-9), m = (a - d) * 60;
+    const ms = step >= 1 / 60 - 1e-9 ? Math.round(m).toString().padStart(2, "0") + "′" : m.toFixed(2).padStart(5, "0") + "′";
+    return `${d}°${ms}${v >= 0 ? pos : neg}`;
+  };
+  for (let la = Math.ceil(latBot / step) * step; la <= latTop; la += step) {
+    const [, y] = toScreen(la, lonL);
+    el("line", { x1: 0, x2: W, y1: y, y2: y }, g);
+    el("text", { x: 6, y: y - 3 }, g, fmt(la, "N", "S"));
+  }
+  for (let lo = Math.ceil(lonL / step) * step; lo <= lonR; lo += step) {
+    const [x] = toScreen(latTop, lo);
+    el("line", { x1: x, x2: x, y1: 0, y2: H }, g);
+    el("text", { x: x + 3, y: H - 6 }, g, fmt(lo, "E", "W"));
+  }
+}
+
+const TYPE_STYLE = {
+  camp: { c: "continental", shape: "star" }, marker: { c: "buff", shape: "square" }, ford: { c: "water", shape: "diamond" },
+  church: { c: "ink", shape: "cross" }, town: { c: "ink", shape: "circle" }, park: { c: "low", shape: "circle" },
+  battle: { c: "militia", shape: "swords" }, enemy: { c: "militia", shape: "square" }, later: { c: "later", shape: "diamond" }
+};
+function marker(g, kind, col, r) {
+  const stroke = cssVar(col);
+  switch (kind) {
+    case "star": {
+      const p = []; for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * .45 : r * 1.25; p.push((Math.cos(a) * rr).toFixed(1) + "," + (Math.sin(a) * rr).toFixed(1)); }
+      el("polygon", { points: p.join(" "), class: "halo", "stroke-width": 6, stroke: "var(--paper)" }, g);
+      el("polygon", { points: p.join(" "), fill: stroke, class: "ring", stroke, "stroke-width": 1 }, g); break;
+    }
+    case "square":
+      el("rect", { x: -r * .8, y: -r * .8, width: r * 1.6, height: r * 1.6, class: "ring", fill: "var(--paper)", stroke, "stroke-width": 2 }, g);
+      el("rect", { x: -r * .35, y: -r * .35, width: r * .7, height: r * .7, fill: stroke }, g); break;
+    case "diamond":
+      el("rect", { x: -r * .75, y: -r * .75, width: r * 1.5, height: r * 1.5, transform: "rotate(45)", class: "ring", fill: "var(--paper)", stroke, "stroke-width": 2 }, g);
+      el("circle", { r: r * .3, fill: stroke }, g); break;
+    case "cross":
+      el("circle", { r: r, class: "ring", fill: "var(--paper)", stroke, "stroke-width": 1.5 }, g);
+      el("path", { d: `M0,${-r * .65}V${r * .65}M${-r * .45},${-r * .2}H${r * .45}`, stroke, "stroke-width": 1.8, fill: "none" }, g); break;
+    case "swords":
+      el("circle", { r: r, class: "ring", fill: "var(--paper)", stroke, "stroke-width": 2 }, g);
+      el("path", { d: `M${-r * .55},${-r * .55}L${r * .55},${r * .55}M${r * .55},${-r * .55}L${-r * .55},${r * .55}`, stroke, "stroke-width": 2, fill: "none" }, g); break;
+    default:
+      el("circle", { r: r, class: "ring", fill: "var(--paper)", stroke, "stroke-width": 2 }, g);
+      el("circle", { r: r * .4, fill: stroke }, g);
+  }
+}
+
+function render() {
+  W = wrap.clientWidth; H = wrap.clientHeight;
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.textContent = "";
+  const s = view.s;
+
+  if (layers.grid) graticule(el("g", { class: "grat" }, svg));
+
+  // zones (under everything else)
+  if (layers.zones && s > 2500) {
+    const g = el("g", {}, svg);
+    for (const z of ZONES) {
+      const [x, y] = toScreen(z.lat, z.lon), r = z.r * s / M_PER_DEG;
+      const c = cssVar(z.rating);
+      el("circle", { cx: x, cy: y, r, class: "zone", fill: c, stroke: c }, g);
+      if (s > 9000) el("text", { x, y: y - r - 4, "text-anchor": "middle", class: "zone-label", style: `fill:${c}` }, g, z.ratingText);
+    }
+  }
+
+  // terrain + modern lines
+  const gl = el("g", {}, svg), glab = el("g", {}, svg);
+  for (const key in LINES) {
+    const L = LINES[key];
+    if (!layers[L.layer]) continue;
+    if (s < (L.minS || 0) || (L.maxS && s > L.maxS)) continue;
+    const w = L.w ? Math.max(1, Math.min(L.w * 1.4, L.w * Math.sqrt(s / 6000))) : null;
+    const p = el("path", { d: pathD(L.pts), class: L.cls }, gl);
+    if (w) p.setAttribute("stroke-width", w.toFixed(2));
+    const lcls = L.cls === "river" ? "river-label" : L.cls === "border" ? "border-label" : L.cls === "road-old" ? "river-label old-label" : "road-label";
+    lineLabel(glab, L, lcls);
+  }
+
+  if (layers.modern) {
+    const g = el("g", {}, svg);
+    for (const t of TOWNS) {
+      if (s < t.minS) continue;
+      const [x, y] = toScreen(t.lat, t.lon);
+      el("circle", { cx: x, cy: y, r: 2.5, class: "town" }, g);
+      el("text", { x: x + 6, y: y + 4, class: "town-label" }, g, t.name);
+    }
+  }
+
+  // camp reconstruction
+  if (layers.camp && s > 7000) {
+    const g = el("g", {}, svg);
+    for (const b of CAMP_BLOCKS) {
+      const [la1, lo1] = offset(CAMP_ORIGIN, b.x, b.y + b.h), [la2, lo2] = offset(CAMP_ORIGIN, b.x + b.w, b.y);
+      const [x1, y1] = toScreen(la1, lo1), [x2, y2] = toScreen(la2, lo2);
+      const c = cssVar(b.color);
+      el("rect", { x: x1, y: y1, width: x2 - x1, height: y2 - y1, class: "camp-block", fill: c, stroke: c, rx: 1 }, g);
+      if (b.tents && x2 - x1 > 60) {
+        const n = b.tents, tw = (x2 - x1) / n;
+        for (let i = 0; i < n; i++) {
+          const tx = x1 + tw * (i + .5), th = Math.min(8, (y2 - y1) * .5);
+          el("path", { d: `M${tx - tw * .3},${y2 - 3}L${tx},${y2 - 3 - th}L${tx + tw * .3},${y2 - 3}Z`, class: "camp-tent", fill: c, opacity: .7 }, g);
+        }
+      }
+      if (s > 11000) el("text", { x: (x1 + x2) / 2, y: y1 - 4, "text-anchor": "middle", class: "camp-label", style: `fill:${c}` }, g, b.label);
+    }
+    for (const p of CAMP_PICKETS) {
+      const [la, lo] = offset(CAMP_ORIGIN, p.dx, p.dy), [x, y] = toScreen(la, lo);
+      el("path", { d: `M${x - 6},${y + 5}L${x},${y - 6}L${x + 6},${y + 5}Z`, fill: "none", stroke: "var(--ink)", "stroke-width": 1.5 }, g);
+      if (s > 11000) el("text", { x: x + 9, y: y + 4, class: "camp-label" }, g, p.label);
+    }
+    if (s > 9000) {
+      const [la, lo] = offset(CAMP_ORIGIN, -900, -1150), [x, y] = toScreen(la, lo);
+      el("text", { x, y, class: "camp-label", style: "fill:var(--ink-soft);font-size:11px" }, g, "Layout conjectural, after Steuben's 1779 Regulations");
+    }
+  }
+
+  // sites
+  const gs = el("g", {}, svg);
+  const drawSites = SITES.filter(st => (st.layer === "sites" && layers.sites) || (st.layer === "later" && layers.later) || (st.id === selected));
+  // draw selected last
+  drawSites.sort((a, b) => (a.id === selected) - (b.id === selected));
+  for (const st of drawSites) {
+    const [x, y] = toScreen(st.lat, st.lon);
+    if (x < -40 || x > W + 40 || y < -40 || y > H + 40) continue;
+    const sty = TYPE_STYLE[st.type] || TYPE_STYLE.town;
+    const g = el("g", { class: "site" + (st.id === selected ? " sel" : ""), transform: `translate(${x.toFixed(1)},${y.toFixed(1)})`, tabindex: 0, role: "button", "aria-label": st.name }, gs);
+    g.dataset.id = st.id;
+    if (st.id === selected) el("circle", { r: 14, class: "sel-ring" }, g);
+    marker(g, sty.shape, sty.c, st.type === "camp" ? 9 : 7);
+    const showLabel = s >= st.zl || st.id === selected;
+    if (showLabel) el("text", { x: 13, y: 5, class: "site-label" }, g, st.name);
+  }
+
+  // scale bar
+  const target = 90 / (s / M_PER_DEG); // metres in 90px
+  const nice = [10, 20, 50, 100, 200, 250, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000];
+  let m = nice[0]; for (const n of nice) if (n <= target) m = n;
+  const px = m * s / M_PER_DEG;
+  document.getElementById("scalebar").style.width = px.toFixed(0) + "px";
+  const mi = m / 1609.34;
+  document.getElementById("scaletxt").textContent = (m >= 1000 ? (m / 1000) + " km" : m + " m") + " · " + (mi >= 1 ? mi.toFixed(mi >= 10 ? 0 : 1) + " mi" : Math.round(m * 3.28084) + " ft");
+}
+
+/* ---------- interaction ---------- */
+const pointers = new Map();
+const pos = (e) => { const r = svg.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+let dragStart = null, moved = false, pinch0 = null;
+svg.addEventListener("pointerdown", (e) => {
+  svg.setPointerCapture(e.pointerId);
+  const [px, py] = pos(e);
+  pointers.set(e.pointerId, [px, py]);
+  moved = false;
+  if (pointers.size === 1) dragStart = { x: px, y: py, cx: view.cx, cy: view.cy, target: e.target };
+  if (pointers.size === 2) {
+    const [a, b] = [...pointers.values()];
+    pinch0 = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), s: view.s, mid: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], cx: view.cx, cy: view.cy };
+  }
+});
+svg.addEventListener("pointermove", (e) => {
+  const [px, py] = pos(e);
+  const [la, lo] = toLatLon(px, py);
+  document.getElementById("cursorpos").textContent = `${la.toFixed(4)}, ${lo.toFixed(4)}`;
+  if (!pointers.has(e.pointerId)) return;
+  pointers.set(e.pointerId, [px, py]);
+  if (anim) { cancelAnimationFrame(anim); anim = null; }
+  if (pointers.size === 2 && pinch0) {
+    const [a, b] = [...pointers.values()];
+    const d = Math.hypot(a[0] - b[0], a[1] - b[1]);
+    const ns = clampS(pinch0.s * d / pinch0.d);
+    const wx = (pinch0.mid[0] - W / 2) / pinch0.s + pinch0.cx, wy = (pinch0.mid[1] - H / 2) / pinch0.s + pinch0.cy;
+    const mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+    view.s = ns; view.cx = wx - (mid[0] - W / 2) / ns; view.cy = wy - (mid[1] - H / 2) / ns;
+    moved = true; render(); return;
+  }
+  if (dragStart) {
+    const dx = px - dragStart.x, dy = py - dragStart.y;
+    if (Math.abs(dx) + Math.abs(dy) > 4) { moved = true; svg.classList.add("dragging"); }
+    if (moved) { view.cx = dragStart.cx - dx / view.s; view.cy = dragStart.cy - dy / view.s; render(); }
+  }
+});
+function endPointer(e) {
+  const wasDrag = moved;
+  const tgt = dragStart && dragStart.target;
+  pointers.delete(e.pointerId);
+  if (pointers.size < 2) pinch0 = null;
+  if (pointers.size === 0) {
+    svg.classList.remove("dragging");
+    if (!wasDrag && tgt && e.type === "pointerup") {
+      const g = tgt.closest && tgt.closest(".site");
+      if (g) selectSite(g.dataset.id, true);
+    }
+    dragStart = null;
+  }
+}
+svg.addEventListener("pointerup", endPointer);
+svg.addEventListener("pointercancel", endPointer);
+svg.addEventListener("keydown", (e) => {
+  const g = e.target.closest && e.target.closest(".site");
+  if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); selectSite(g.dataset.id, true); }
+});
+const clampS = (s) => Math.min(400000, Math.max(120, s));
+function zoomAt(f, sx = W / 2, sy = H / 2) {
+  const ns = clampS(view.s * f);
+  const wx = (sx - W / 2) / view.s + view.cx, wy = (sy - H / 2) / view.s + view.cy;
+  view.s = ns; view.cx = wx - (sx - W / 2) / ns; view.cy = wy - (sy - H / 2) / ns;
+  render();
+}
+svg.addEventListener("wheel", (e) => { e.preventDefault(); if (anim) { cancelAnimationFrame(anim); anim = null; } zoomAt(Math.exp(-e.deltaY * (e.deltaMode ? 0.05 : 0.0018)), ...pos(e)); }, { passive: false });
+svg.addEventListener("dblclick", (e) => zoomAt(2, ...pos(e)));
+document.getElementById("zin").onclick = () => zoomAt(1.6);
+document.getElementById("zout").onclick = () => zoomAt(1 / 1.6);
+
+function setPreset(name) {
+  for (const n of ["camp", "charlotte", "campaign"]) document.getElementById("v-" + n).setAttribute("aria-pressed", n === name);
+  if (name === "charlotte" && !layers.later) { layers.later = true; document.getElementById("L-later").checked = true; }
+  fit(PRESETS[name], true);
+}
+for (const n of ["camp", "charlotte", "campaign"]) document.getElementById("v-" + n).onclick = () => setPreset(n);
+for (const k in layers) {
+  const box = document.getElementById("L-" + k);
+  box.checked = layers[k];
+  box.addEventListener("change", () => { layers[k] = box.checked; render(); if (k === "zones" && box.checked) showTab("detect"); });
+}
+new ResizeObserver(() => render()).observe(wrap);
+
+/* =====================================================================
+   PANEL
+   ===================================================================== */
+const pane = document.getElementById("pane");
+let currentTab = "site";
+const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const gmaps = (la, lo) => `https://www.google.com/maps/search/?api=1&query=${la.toFixed(5)},${lo.toFixed(5)}`;
+const statusChip = (st) => `<span class="chip st-${st.status}">${esc(st.statusText)}</span>`;
+const eraChip = (st) => st.era === "later" ? `<span class="chip era-later">Civil War &amp; later</span>` : `<span class="chip era-1780">${st.era === "1781" ? "1781" : "1780"}</span>`;
+
+function showTab(name) {
+  currentTab = name;
+  document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.tab === name));
+  ({ site: renderSite, story: renderStory, people: renderPeople, detect: renderDetect, visit: renderVisit, sources: renderSources })[name]();
+  pane.scrollTop = 0;
+}
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => showTab(t.dataset.tab)));
+
+function selectSite(id, fromMap) {
+  const st = SITES.find(s => s.id === id);
+  if (!st) return;
+  selected = id;
+  if (st.layer === "later" && !layers.later) { layers.later = true; document.getElementById("L-later").checked = true; }
+  if (!fromMap) flyToSite(st);
+  else render();
+  showTab("site");
+  if (location.hash !== "#" + id) { suppressHash = true; location.hash = id; }
+}
+let suppressHash = false;
+addEventListener("hashchange", () => {
+  if (suppressHash) { suppressHash = false; return; }
+  const id = location.hash.slice(1);
+  if (SITES.some(s => s.id === id)) selectSite(id, false);
+});
+
+function renderSite() {
+  const st = SITES.find(s => s.id === selected) || SITES[0];
+  if (!selected) selected = st.id;
+  pane.innerHTML = `
+    <h2>${esc(st.name)}</h2>
+    <div class="kicker">${esc(st.kind)}</div>
+    <div class="chips">${eraChip(st)}${statusChip(st)}</div>
+    ${st.history.map(p => `<p>${esc(p)}</p>`).join("")}
+    <h3>Today</h3><p>${esc(st.today)}</p>
+    <h3>Access</h3><p>${esc(st.access)}</p>
+    <h3>Detecting</h3><p>${esc(st.detect)}</p>
+    <div class="coord"><span>${st.lat.toFixed(4)}° N, ${Math.abs(st.lon).toFixed(4)}° W</span><span class="approx">approximate</span>
+      <button class="btn" id="copyc">Copy</button></div>
+    <div class="linkrow">
+      <a href="${gmaps(st.lat, st.lon)}" target="_blank" rel="noopener">Open in Google Maps ↗</a>
+      <a href="https://www.google.com/maps/@${st.lat.toFixed(5)},${st.lon.toFixed(5)},800m/data=!3m1!1e3" target="_blank" rel="noopener">Satellite view ↗</a>
+    </div>
+    <h3>Other places on the map</h3>
+    <ul class="list">${SITES.filter(s => s.id !== st.id && (s.layer === st.layer)).slice(0, 8).map(s => `
+      <li><button class="rowbtn" data-site="${s.id}"><span class="when">${esc(s.era === "later" ? "Later" : s.era)}</span><span class="what">${esc(s.name)}</span><span class="why">${esc(s.kind)}</span></button></li>`).join("")}</ul>`;
+  const btn = document.getElementById("copyc");
+  btn.onclick = () => copy(`${st.lat.toFixed(5)}, ${st.lon.toFixed(5)}`);
+  wireRows();
+}
+
+function wireRows() {
+  pane.querySelectorAll("[data-site]").forEach(b => b.addEventListener("click", () => selectSite(b.dataset.site, false)));
+  pane.querySelectorAll("[data-zone]").forEach(b => b.addEventListener("click", () => {
+    const z = ZONES.find(z => z.id === b.dataset.zone);
+    layers.zones = true; document.getElementById("L-zones").checked = true;
+    const [x, y] = world(z.lat, z.lon); flyTo(x, y, Math.max(view.s, 12000));
+  }));
+}
+
+function anniversary() {
+  const now = new Date();
+  const md = String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
+  const hit = TIMELINE.find(t => t.md === md);
+  if (hit) {
+    const yr = parseInt(hit.d.match(/\d{4}/)[0], 10);
+    return `<div class="callout ok"><b>On this day, ${now.getFullYear() - yr} years ago:</b> ${esc(hit.t)}. ${esc(hit.s)}</div>`;
+  }
+  return "";
+}
+
+function renderStory() {
+  const now = new Date();
+  const md = String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
+  pane.innerHTML = `
+    <h2>The fall of 1780</h2>
+    <div class="kicker">Select an entry to fly to its place on the map.</div>
+    ${anniversary()}
+    <p>For about two months in late 1780, Six Mile Creek at the Providence settlement was the front line of the American Revolution in the South. The army camped here was what remained after Camden: a few hundred Maryland and Delaware Continentals, Virginia and North Carolina militia who came and went, and Morgan's new light corps. It was short of food, shoes, blankets and powder, and it faced Cornwallis's army across the South Carolina line.</p>
+    <p>What happened next makes the camp matter. The officers here planned against Cornwallis's next move. Greene took command and split the army, and Morgan's half went on to win at Cowpens.</p>
+    <ul class="list">${TIMELINE.map(t => `
+      <li><button class="rowbtn${t.md === md ? " today" : ""}" ${t.site ? `data-site="${t.site}"` : "disabled"}>
+        <span class="when">${esc(t.d)}</span><span class="what">${t.later ? '<span class="dot" style="background:var(--later)"></span>' : ""}${esc(t.t)}</span><span class="why">${esc(t.s)}</span></button></li>`).join("")}</ul>
+    <h3>What camp life was like</h3>
+    <ul class="tight">
+      <li><b>Hunger.</b> The district had been stripped by both armies. Davie's November letters to Smallwood complain that supplies had gone forward or been eaten.</li>
+      <li><b>Turnover.</b> Militia served short tours, often a few months, and many simply went home. Camp strength swung between about 1,300 and 2,600.</li>
+      <li><b>Cold and wet.</b> Late-autumn rains and early cold delayed the army's departure in December.</li>
+      <li><b>Routine.</b> Guard mounting, picket duty on the roads, foraging parties, drill under Steuben's 1779 Regulations, and constant scouting toward Camden and Winnsboro.</li>
+    </ul>`;
+  wireRows();
+}
+
+function renderPeople() {
+  const sideChip = { us: '<span class="chip era-1780">Continental</span>', nc: '<span class="chip" style="color:var(--militia);border-color:var(--militia)">NC</span>', gb: '<span class="chip" style="color:var(--hi);border-color:var(--hi)">British</span>' };
+  pane.innerHTML = `
+    <h2>Important figures</h2>
+    <div class="kicker">Officers named on the state marker, the local commanders, and the men across the line.</div>
+    ${PEOPLE.map((p, i) => `
+      <details class="person" ${i === 0 ? "" : ""}>
+        <summary><span class="nm">${esc(p.n)}</span><span class="side">${sideChip[p.side]}</span><span class="rk">${esc(p.r)}</span></summary>
+        <div class="body"><p>${esc(p.b)}</p>${p.site ? `<button class="btn" data-site="${p.site}">Show on map</button>` : ""}</div>
+      </details>`).join("")}`;
+  wireRows();
+}
+
+/* Lead ball maths: sphere of lead, density 11.34 g/cm³. */
+const LEAD = 11.34, GR_PER_G = 15.4324, CM_PER_IN = 2.54;
+const ballGrains = (dIn) => (4 / 3) * Math.PI * Math.pow(dIn * CM_PER_IN / 2, 3) * LEAD * GR_PER_G;
+const ballDiam = (gr) => 2 * Math.cbrt((gr / GR_PER_G / LEAD) * 3 / (4 * Math.PI)) / CM_PER_IN;
+function attribution(d) {
+  if (d < 0.30) return "Buckshot or swan shot. Often loaded three to six at a time behind a musket ball ('buck and ball').";
+  if (d < 0.44) return "Pistol or small-bore rifle ball.";
+  if (d < 0.58) return "Rifle ball (backcountry long rifles were commonly .45–.58) or pistol ball.";
+  if (d < 0.67) return "Probably a ball for a .69-bore French Charleville musket (balls about .63–.65), the Continentals' standard arm by 1780. Could also be a carbine ball.";
+  if (d < 0.73) return "Probably a British Land Pattern ('Brown Bess', .75 bore) ball, about .68–.71. Americans used captured British muskets too, so this alone doesn't tell you which side lost it.";
+  return "Larger than standard musket balls: wall gun, blunderbuss, or a ball deformed by impact. Measure across the roundest axis.";
+}
+
+function renderDetect() {
+  const rating = { hi: "var(--hi)", mid: "var(--mid)", low: "var(--low)", off: "var(--off)" };
+  pane.innerHTML = `
+    <h2>Metal detecting</h2>
+    <div class="kicker">Where 1780 material is likely to be, and the rules that decide whether you can look.</div>
+    <div class="callout"><b>Read this first.</b> Nearly all of the camp lies on private residential land. You need the owner's permission, preferably in writing, for every property. Public roadsides, greenways, parks and cemeteries are off-limits. NC law requires a permit to dig for archaeological material on any state-owned or state-controlled land, and disturbing graves is a felony.</div>
+    <p>The zones below come from how 18th-century armies laid out camps: tents on dry ground near water, horses and wagons downstream, and guards on the roads. They are informed guesses, not reported finds. Turn on the <b>Detecting potential</b> layer to see them.</p>
+    ${ZONES.map(z => `
+      <div class="zonecard" style="border-left:4px solid ${rating[z.rating]}">
+        <div class="zh"><span class="zn">${esc(z.name)}</span><span class="zr" style="color:${rating[z.rating]}">${esc(z.ratingText)}</span></div>
+        <p>${esc(z.text)}</p>
+        <button class="btn" data-zone="${z.id}">Show on map</button>
+      </div>`).join("")}
+
+    <h3>What a 1780 camp leaves behind</h3>
+    <ul class="tight">
+      <li><b>Lead</b>: dropped musket and rifle balls (look for the mold seam and sprue), buckshot, chewed balls, melted lead and sprue waste from casting.</li>
+      <li><b>Buttons</b>: plain pewter and brass, regimental buttons, and the script 'USA' Continental buttons. Pewter buttons corrode badly in Piedmont red clay.</li>
+      <li><b>Buckles</b>: shoe, knee and stock buckles, often broken.</li>
+      <li><b>Arms parts</b>: gun-lock screws, ramrod pipes, trigger guards, bayonet fragments. Gunflints are stone and won't beep but often sit next to lead.</li>
+      <li><b>Camp iron</b>: kettle fragments, wrought nails, horseshoes and horseshoe nails, harness and wagon hardware, axe heads.</li>
+      <li><b>Coins</b>: Spanish silver reales and cut fractions, British and Irish halfpence, and counterfeits of both.</li>
+    </ul>
+    <p class="note">The ground has been farmed for 150 years and graded for subdivisions in the last 30, so artifacts may be scattered, buried under fill, or carted off in construction spoil.</p>
+
+    <h3>Musket ball calculator</h3>
+    <p class="note">Measure across the roundest axis with calipers, or weigh the ball. Fired or flattened balls weigh the same but measure differently, so use weight for those.</p>
+    <div class="calc">
+      <label for="cal-d">Diameter (inches)<input id="cal-d" inputmode="decimal" value="0.69"></label>
+      <label for="cal-g">Weight (grains)<input id="cal-g" inputmode="decimal"></label>
+    </div>
+    <div class="calc-out" id="cal-out"></div>
+    <div class="tablewrap"><table class="calib">
+      <thead><tr><th>Ball</th><th>Diameter</th><th>Weight</th><th>Typical arm</th></tr></thead>
+      <tbody>${[[0.31, "Buckshot"], [0.50, "Rifle"], [0.54, "Pistol / rifle"], [0.64, "French musket"], [0.69, "British musket"], [0.71, "British musket"]].map(([d, a]) =>
+        `<tr><td>${a}</td><td>${d.toFixed(2)}″ · ${(d * 25.4).toFixed(1)} mm</td><td>${Math.round(ballGrains(d))} gr · ${(ballGrains(d) / GR_PER_G).toFixed(1)} g</td><td>${esc(attribution(d).split(".")[0])}</td></tr>`).join("")}</tbody>
+    </table></div>
+
+    <h3>Doing it right</h3>
+    <ul class="tight">
+      <li>Use the parcel viewers (<a href="https://polaris3g.mecklenburgcountync.gov/" target="_blank" rel="noopener">Polaris 3G</a> for Mecklenburg, Union County's GIS for the south side) to find owners, then ask in person or by letter.</li>
+      <li>Check 1938 and later historic aerials and the free statewide lidar (<a href="https://sdd.nc.gov/" target="_blank" rel="noopener">NC Spatial Data Download</a>, <a href="https://www.nconemap.gov/" target="_blank" rel="noopener">NC OneMap</a>) for terraces and old roadbeds that construction hasn't flattened.</li>
+      <li>Record a GPS point and depth for every find. A plotted distribution can show where tent lines stood, which is the information that makes this camp historically important.</li>
+      <li>Report significant finds to the <a href="https://archaeology.ncdcr.gov/" target="_blank" rel="noopener">NC Office of State Archaeology</a>. If you find bone, stop, leave it, and call local law enforcement as NC's unmarked-burial law requires.</li>
+      <li>Consider working with an archaeology society or a university project. A documented survey of a 1780 Continental camp would be a real contribution.</li>
+    </ul>`;
+  const d = document.getElementById("cal-d"), g = document.getElementById("cal-g"), out = document.getElementById("cal-out");
+  const show = (dia, gr) => {
+    if (!(dia > 0.1 && dia < 1.5)) { out.innerHTML = "Enter a diameter between 0.10 and 1.50 inches, or a weight in grains."; return; }
+    out.innerHTML = `<b>${dia.toFixed(3)}″</b> (${(dia * 25.4).toFixed(1)} mm) · <b>${Math.round(gr)} gr</b> (${(gr / GR_PER_G).toFixed(1)} g) of pure lead<br>${esc(attribution(dia))}`;
+  };
+  d.addEventListener("input", () => { const v = parseFloat(d.value); if (v > 0) { const gr = ballGrains(v); g.value = Math.round(gr); show(v, gr); } else show(NaN); });
+  g.addEventListener("input", () => { const v = parseFloat(g.value); if (v > 0) { const dia = ballDiam(v); d.value = dia.toFixed(3); show(dia, v); } else show(NaN); });
+  d.dispatchEvent(new Event("input"));
+  wireRows();
+}
+
+function renderVisit() {
+  const tour = ["marker", "ford", "church", "greenway", "charlotte", "mcintyre"];
+  pane.innerHTML = `
+    <h2>Visit today</h2>
+    <div class="kicker">A half-day drive in south Charlotte and Union County. Nothing of the camp survives above ground, so this tour is about the setting.</div>
+    <ul class="list">${tour.map((id, i) => {
+      const s = SITES.find(x => x.id === id);
+      return `<li><button class="rowbtn" data-site="${s.id}"><span class="when">Stop ${i + 1}</span><span class="what">${esc(s.name)}</span><span class="why">${esc(s.today)}</span></button></li>`;
+    }).join("")}</ul>
+    <h3>Nearby, on the same story</h3>
+    <ul class="tight">
+      <li><b>Camden Battlefield</b> (1 h 30 min south): where this army was broken in August 1780.</li>
+      <li><b>Kings Mountain</b> and <b>Cowpens</b> (1 h and 1 h 30 min west): the two victories on either side of the camp's story. Both are National Park Service sites with visitor centers.</li>
+      <li><b>Hezekiah Alexander House</b> at the Charlotte Museum of History: Mecklenburg's oldest surviving house (1774), built by a local Patriot leader.</li>
+    </ul>
+    <h3>Notes</h3>
+    <ul class="tight">
+      <li>Map coordinates are approximate. Use the Google Maps links on each site to confirm before you drive.</li>
+      <li>The map's roads and creeks are hand-drawn and simplified. They show the lay of the land, not property lines.</li>
+      <li>2030 is the camp's 250th anniversary; Union County residents have asked the county to mark it.</li>
+    </ul>`;
+  wireRows();
+}
+
+function renderSources() {
+  pane.innerHTML = `
+    <h2>Sources</h2>
+    <div class="kicker">Where the history on this map comes from, and how sure it is.</div>
+    <p>Firm: the dates and place of the camp, its 1,300–2,600 strength, the November 25 council, the officers named on the marker, Greene's arrival, and the Cowpens and Rugeley's outcomes. Less firm: the October 20 founding date (local historians), the exact departure date (Dec 17 vs Dec 20), and the date of Rugeley's Mill (Dec 4 vs Nov 30). Conjectural: the camp layout and the detecting zones, which are drawn from how armies of the period camped.</p>
+    <ul class="src">${SOURCES.map(([t, u]) => `<li><a href="${u}" target="_blank" rel="noopener">${esc(t)}</a></li>`).join("")}</ul>
+    <h3>Ideas for going deeper</h3>
+    <ul class="tight">
+      <li>Search the pension statements at revwarapps.org for “New Providence” and “Six Mile Creek” to collect first-hand memories of the camp.</li>
+      <li>Read Greene's December 1780 letters in <i>The Papers of General Nathanael Greene</i>, vol. 6, for his view of the army he inherited.</li>
+      <li>Ask the NC Office of State Archaeology whether any site-file entries exist for the camp area.</li>
+    </ul>`;
+}
+
+function copy(text) {
+  const done = () => toast("Copied " + text);
+  try { navigator.clipboard.writeText(text).then(done, () => toast(text)); } catch { toast(text); }
+}
+let toastT;
+function toast(msg) {
+  let t = document.querySelector(".toast");
+  if (!t) { t = document.createElement("div"); t.className = "toast"; t.setAttribute("role", "status"); document.body.appendChild(t); }
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 2200);
+}
+
+/* ---------- boot ---------- */
+if (innerWidth < 900) document.getElementById("layers").open = false;
+W = wrap.clientWidth || 800; H = wrap.clientHeight || 600;
+const startId = location.hash.slice(1);
+if (SITES.some(s => s.id === startId)) {
+  selected = startId;
+  const st = SITES.find(s => s.id === startId);
+  if (st.layer === "later") { layers.later = true; document.getElementById("L-later").checked = true; }
+  const [x, y] = world(st.lat, st.lon); flyTo(x, y, targetScale(st), false);
+} else {
+  selected = "camp";
+  fit(PRESETS.camp, false);
+}
+showTab("site");
+</script>
+</body>
+</html>
