@@ -748,6 +748,7 @@ const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let anim = null;
 function flyTo(cx, cy, s, animate = true) {
   if (anim) cancelAnimationFrame(anim);
+  stopZoom();
   if (!animate || reduceMotion) { Object.assign(view, { cx, cy, s }); render(); return; }
   const a = { ...view }, t0 = performance.now(), dur = 650;
   const step = (t) => {
@@ -836,6 +837,12 @@ function marker(g, kind, col, r) {
   }
 }
 
+let rafPending = false;
+function requestRender() {
+  if (rafPending) return;
+  rafPending = true;
+  requestAnimationFrame(() => { rafPending = false; render(); });
+}
 function render() {
   W = wrap.clientWidth; H = wrap.clientHeight;
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
@@ -845,13 +852,14 @@ function render() {
   if (layers.grid) graticule(el("g", { class: "grat" }, svg));
 
   // zones (under everything else)
-  if (layers.zones && s > 2500) {
+  if (layers.zones) {
     const g = el("g", {}, svg);
     for (const z of ZONES) {
       const [x, y] = toScreen(z.lat, z.lon), r = z.r * s / M_PER_DEG;
+      if (r < 2.5) continue;
       const c = cssVar(z.rating);
       el("circle", { cx: x, cy: y, r, class: "zone", fill: c, stroke: c }, g);
-      if (s > 9000) el("text", { x, y: y - r - 4, "text-anchor": "middle", class: "zone-label", style: `fill:${c}` }, g, z.ratingText);
+      if (r > 28) el("text", { x, y: y - r - 4, "text-anchor": "middle", class: "zone-label", style: `fill:${c}` }, g, z.ratingText);
     }
   }
 
@@ -860,26 +868,26 @@ function render() {
   for (const key in LINES) {
     const L = LINES[key];
     if (!layers[L.layer]) continue;
-    if (s < (L.minS || 0) || (L.maxS && s > L.maxS)) continue;
     const w = L.w ? Math.max(1, Math.min(L.w * 1.4, L.w * Math.sqrt(s / 6000))) : null;
     const p = el("path", { d: pathD(L.pts), class: L.cls }, gl);
     if (w) p.setAttribute("stroke-width", w.toFixed(2));
     const lcls = L.cls === "river" ? "river-label" : L.cls === "border" ? "border-label" : L.cls === "road-old" ? "river-label old-label" : "road-label";
-    lineLabel(glab, L, lcls);
+    if (s >= (L.minS || 0) && !(L.maxS && s > L.maxS)) lineLabel(glab, L, lcls);
   }
 
+  const townLabels = [];
   if (layers.modern) {
     const g = el("g", {}, svg);
     for (const t of TOWNS) {
-      if (s < t.minS) continue;
       const [x, y] = toScreen(t.lat, t.lon);
+      if (x < -20 || x > W + 20 || y < -20 || y > H + 20) continue;
       el("circle", { cx: x, cy: y, r: 2.5, class: "town" }, g);
-      el("text", { x: x + 6, y: y + 4, class: "town-label" }, g, t.name);
+      townLabels.push({ x, y, t });
     }
   }
 
   // camp reconstruction
-  if (layers.camp && s > 7000) {
+  if (layers.camp && 420 * s / M_PER_DEG >= 6) {
     const g = el("g", {}, svg);
     for (const b of CAMP_BLOCKS) {
       const [la1, lo1] = offset(CAMP_ORIGIN, b.x, b.y + b.h), [la2, lo2] = offset(CAMP_ORIGIN, b.x + b.w, b.y);
@@ -893,7 +901,7 @@ function render() {
           el("path", { d: `M${tx - tw * .3},${y2 - 3}L${tx},${y2 - 3 - th}L${tx + tw * .3},${y2 - 3}Z`, class: "camp-tent", fill: c, opacity: .7 }, g);
         }
       }
-      if (s > 11000) el("text", { x: (x1 + x2) / 2, y: y1 - 4, "text-anchor": "middle", class: "camp-label", style: `fill:${c}` }, g, b.label);
+      if (x2 - x1 > 70 && s > 9000) el("text", { x: (x1 + x2) / 2, y: y1 - 4, "text-anchor": "middle", class: "camp-label", style: `fill:${c}` }, g, b.label);
     }
     for (const p of CAMP_PICKETS) {
       const [la, lo] = offset(CAMP_ORIGIN, p.dx, p.dy), [x, y] = toScreen(la, lo);
@@ -908,6 +916,7 @@ function render() {
 
   // sites
   const gs = el("g", {}, svg);
+  const labelQueue = [];
   const drawSites = SITES.filter(st => (st.layer === "sites" && layers.sites) || (st.layer === "later" && layers.later) || (st.id === selected));
   // draw selected last
   drawSites.sort((a, b) => (a.id === selected) - (b.id === selected));
@@ -919,8 +928,26 @@ function render() {
     g.dataset.id = st.id;
     if (st.id === selected) el("circle", { r: 14, class: "sel-ring" }, g);
     marker(g, sty.shape, sty.c, st.type === "camp" ? 9 : 7);
-    const showLabel = s >= st.zl || st.id === selected;
-    if (showLabel) el("text", { x: 13, y: 5, class: "site-label" }, g, st.name);
+    labelQueue.push({ g, x, y, st });
+  }
+  // Place labels by priority so nothing pops on/off at fixed zoom levels;
+  // a label is hidden only while it would collide with a more important one.
+  const boxes = labelQueue.map(q => ({ x: q.x - 10, y: q.y - 10, w: 20, h: 20 }));
+  const free = (b) => !boxes.some(o => b.x < o.x + o.w && b.x + b.w > o.x && b.y < o.y + o.h && b.y + b.h > o.y);
+  const prio = (st) => st.id === selected ? 1e6 : st.type === "camp" && st.id === "camp" ? 1e5 : 1e4 - st.zl / 10;
+  labelQueue.sort((a, b) => prio(b.st) - prio(a.st));
+  for (const q of labelQueue) {
+    const w = q.st.name.length * 7 + 4, h = 17;
+    const right = { x: q.x + 12, y: q.y - 10, w, h }, left = { x: q.x - 12 - w, y: q.y - 10, w, h };
+    if (free(right)) { boxes.push(right); el("text", { x: 13, y: 5, class: "site-label" }, q.g, q.st.name); }
+    else if (free(left)) { boxes.push(left); el("text", { x: -13, y: 5, "text-anchor": "end", class: "site-label" }, q.g, q.st.name); }
+  }
+  if (townLabels.length) {
+    const g = el("g", {}, svg);
+    for (const { x, y, t } of townLabels) {
+      const b = { x: x + 5, y: y - 8, w: t.name.length * 6.6 + 4, h: 15 };
+      if (free(b)) { boxes.push(b); el("text", { x: x + 6, y: y + 4, class: "town-label" }, g, t.name); }
+    }
   }
 
   // scale bar
@@ -938,12 +965,14 @@ const pointers = new Map();
 const pos = (e) => { const r = svg.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
 let dragStart = null, moved = false, pinch0 = null;
 svg.addEventListener("pointerdown", (e) => {
-  svg.setPointerCapture(e.pointerId);
+  try { svg.setPointerCapture(e.pointerId); } catch { /* pointer already gone */ }
   const [px, py] = pos(e);
   pointers.set(e.pointerId, [px, py]);
   moved = false;
+  stopZoom();
   if (pointers.size === 1) dragStart = { x: px, y: py, cx: view.cx, cy: view.cy, target: e.target };
   if (pointers.size === 2) {
+    dragStart = null; moved = true;
     const [a, b] = [...pointers.values()];
     pinch0 = { d: Math.hypot(a[0] - b[0], a[1] - b[1]), s: view.s, mid: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], cx: view.cx, cy: view.cy };
   }
@@ -962,12 +991,12 @@ svg.addEventListener("pointermove", (e) => {
     const wx = (pinch0.mid[0] - W / 2) / pinch0.s + pinch0.cx, wy = (pinch0.mid[1] - H / 2) / pinch0.s + pinch0.cy;
     const mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
     view.s = ns; view.cx = wx - (mid[0] - W / 2) / ns; view.cy = wy - (mid[1] - H / 2) / ns;
-    moved = true; render(); return;
+    moved = true; requestRender(); return;
   }
   if (dragStart) {
     const dx = px - dragStart.x, dy = py - dragStart.y;
     if (Math.abs(dx) + Math.abs(dy) > 4) { moved = true; svg.classList.add("dragging"); }
-    if (moved) { view.cx = dragStart.cx - dx / view.s; view.cy = dragStart.cy - dy / view.s; render(); }
+    if (moved) { view.cx = dragStart.cx - dx / view.s; view.cy = dragStart.cy - dy / view.s; requestRender(); }
   }
 });
 function endPointer(e) {
@@ -975,6 +1004,13 @@ function endPointer(e) {
   const tgt = dragStart && dragStart.target;
   pointers.delete(e.pointerId);
   if (pointers.size < 2) pinch0 = null;
+  if (pointers.size === 1) {
+    // One finger lifted after a pinch: continue panning from where the map is
+    // now, not from where the first finger went down (that caused the snap-back).
+    const [rx, ry] = [...pointers.values()][0];
+    dragStart = { x: rx, y: ry, cx: view.cx, cy: view.cy, target: null };
+    return;
+  }
   if (pointers.size === 0) {
     svg.classList.remove("dragging");
     if (!wasDrag && tgt && e.type === "pointerup") {
@@ -991,13 +1027,35 @@ svg.addEventListener("keydown", (e) => {
   if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); selectSite(g.dataset.id, true); }
 });
 const clampS = (s) => Math.min(400000, Math.max(120, s));
+/* Eased zoom. The world point under the anchor (cursor, pinch centre or map
+   centre) stays pinned under it for every frame, so features never slide. */
+const zs = { target: null, ax: 0, ay: 0, wx: 0, wy: 0, raf: 0 };
+function stopZoom() { if (zs.raf) cancelAnimationFrame(zs.raf); zs.raf = 0; zs.target = null; }
+function pinZoom(s) { view.s = s; view.cx = zs.wx - (zs.ax - W / 2) / s; view.cy = zs.wy - (zs.ay - H / 2) / s; }
 function zoomAt(f, sx = W / 2, sy = H / 2) {
-  const ns = clampS(view.s * f);
-  const wx = (sx - W / 2) / view.s + view.cx, wy = (sy - H / 2) / view.s + view.cy;
-  view.s = ns; view.cx = wx - (sx - W / 2) / ns; view.cy = wy - (sy - H / 2) / ns;
-  render();
+  if (anim) { cancelAnimationFrame(anim); anim = null; }
+  zs.target = clampS((zs.target ?? view.s) * f);
+  zs.ax = sx; zs.ay = sy;
+  zs.wx = (sx - W / 2) / view.s + view.cx; zs.wy = (sy - H / 2) / view.s + view.cy;
+  if (reduceMotion) { pinZoom(zs.target); zs.target = null; requestRender(); return; }
+  if (!zs.raf) zs.raf = requestAnimationFrame(zoomStep);
 }
-svg.addEventListener("wheel", (e) => { e.preventDefault(); if (anim) { cancelAnimationFrame(anim); anim = null; } zoomAt(Math.exp(-e.deltaY * (e.deltaMode ? 0.05 : 0.0018)), ...pos(e)); }, { passive: false });
+function zoomStep() {
+  const cur = Math.log(view.s), tgt = Math.log(zs.target);
+  const done = Math.abs(tgt - cur) < 0.003;
+  pinZoom(Math.exp(done ? tgt : cur + (tgt - cur) * 0.3));
+  render();
+  if (done) { zs.raf = 0; zs.target = null; } else zs.raf = requestAnimationFrame(zoomStep);
+}
+svg.addEventListener("wheel", (e) => {
+  e.preventDefault();
+  // Normalise lines/pages to pixels; trackpad pinch arrives as ctrl+wheel with small deltas.
+  const dy = e.deltaY * (e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? 400 : 1);
+  const f = Math.min(2, Math.max(0.5, Math.exp(-dy * (e.ctrlKey ? 0.012 : 0.0025))));
+  zoomAt(f, ...pos(e));
+}, { passive: false });
+// Stop Safari's own page-zoom gestures from fighting the map's pinch.
+for (const ev of ["gesturestart", "gesturechange", "gestureend"]) svg.addEventListener(ev, (e) => e.preventDefault());
 svg.addEventListener("dblclick", (e) => zoomAt(2, ...pos(e)));
 document.getElementById("zin").onclick = () => zoomAt(1.6);
 document.getElementById("zout").onclick = () => zoomAt(1 / 1.6);
@@ -1013,7 +1071,7 @@ for (const k in layers) {
   box.checked = layers[k];
   box.addEventListener("change", () => { layers[k] = box.checked; render(); if (k === "zones" && box.checked) showTab("detect"); });
 }
-new ResizeObserver(() => render()).observe(wrap);
+new ResizeObserver(() => requestRender()).observe(wrap);
 
 /* =====================================================================
    PANEL
