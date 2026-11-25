@@ -10,6 +10,18 @@ out to Google Maps for imagery.
 
 Contents:
 
+- **Two eras**: a toggle switches the map, story, people and tour between the
+  Revolutionary War (the 1780 camp and the Charlotte area) and Civil War Charlotte.
+- **Time slider** (Revolutionary War): April 20, 1780 to June 20, 1781, six months either
+  side of the camp. Ten forces move along dated waypoints with trails; battles pulse as
+  the date passes. Routes between waypoints are straight lines.
+- **Address lookup**: type any North Carolina address to drop a pin and see its distance
+  to the camp, the nearest site, and whether it sits on the camp ground. Uses the State's
+  AddressNC geocoder from the browser; where that is unreachable it searches the built-in
+  home addresses only.
+- **Portraits** load from Wikimedia Commons (public domain or freely licensed, credited
+  per image). People with no known or verified likeness get a lettered placeholder.
+
 - **Map views**: the camp vicinity, uptown Charlotte, and the 1780–81 Southern Campaign.
 - **Layers**: creeks and the 1780 road, a conjectural camp layout, campaign sites,
   metal-detecting potential zones, modern roads and towns, Civil War and later

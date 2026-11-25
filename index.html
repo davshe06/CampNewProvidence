@@ -83,7 +83,7 @@ button { font: inherit; color: inherit; }
 .brand h1 { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: 1.65rem; line-height: 1.1; letter-spacing: .01em; text-wrap: balance; }
 .brand .sub { font-size: .82rem; color: var(--ink-soft); }
 .notice {
-  margin-left: auto; max-width: 560px; font-size: .8rem; color: var(--ink-soft);
+  flex-basis: 100%; max-width: 560px; font-size: .8rem; color: var(--ink-soft);
   border-left: 3px solid var(--buff); padding: 2px 0 2px 10px;
 }
 .notice b { color: var(--ink); font-weight: 600; }
@@ -146,7 +146,7 @@ button { font: inherit; color: inherit; }
 .mapctl { position: absolute; display: flex; flex-direction: column; gap: 6px; z-index: 2; }
 .mapctl.tl { top: 12px; left: max(12px, env(safe-area-inset-left, 0px)); }
 .mapctl.tr { top: 12px; right: 12px; align-items: flex-end; }
-.mapctl.bl { bottom: 12px; left: max(12px, env(safe-area-inset-left, 0px)); }
+.mapctl.bl { bottom: 118px; left: max(12px, env(safe-area-inset-left, 0px)); }
 .btn {
   background: var(--panel); border: 1px solid var(--rule); border-radius: 3px;
   padding: 6px 10px; font-size: .82rem; cursor: pointer; line-height: 1.2;
@@ -171,7 +171,7 @@ button { font: inherit; color: inherit; }
 .scalebox { background: color-mix(in srgb, var(--panel) 85%, transparent); border: 1px solid var(--rule); border-radius: 3px; padding: 5px 8px; font-family: var(--f-mono); font-size: 10.5px; color: var(--ink-soft); }
 .scalebar { height: 6px; border: 1.5px solid var(--ink); border-top: 0; margin-top: 3px; }
 .cursor-pos { margin-top: 3px; }
-.compass { position: absolute; right: 14px; bottom: 14px; width: 74px; height: 74px; pointer-events: none; z-index: 1; opacity: .85; }
+.compass { position: absolute; right: 14px; top: 96px; width: 74px; height: 74px; pointer-events: none; z-index: 1; opacity: .85; }
 .compass * { stroke: var(--ink); fill: none; }
 .compass .fill { fill: var(--ink); }
 .compass text { fill: var(--ink); stroke: none; font-family: var(--f-display); font-size: 13px; }
@@ -271,6 +271,63 @@ ul.tight li { margin: 3px 0; }
 .homepop .warn { font-size: .74rem; color: var(--ink-soft); border-top: 1px solid var(--rule); margin-top: 8px; padding-top: 6px; }
 .search { display: grid; gap: 4px; margin: 8px 0; }
 .search input { font: inherit; padding: 7px 9px; border: 1px solid var(--rule); border-radius: 3px; background: var(--panel); color: var(--ink); width: 100%; }
+/* time slider */
+:root { --fx-gb: #b03a2e; --fx-legion: #2f6b3f; --fx-loyal: #7a4f8a; --fx-over: #7a5a32; --fx-sc: #2b7473; --fx-davie: #5c7d22; --fx-drag: #4659a0; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --fx-gb: #ec7a5e; --fx-legion: #86c497; --fx-loyal: #c79be0; --fx-over: #cfa97a; --fx-sc: #7cc7c7; --fx-davie: #b0d470; --fx-drag: #a9b8ef; } }
+:root[data-theme="dark"] { --fx-gb: #ec7a5e; --fx-legion: #86c497; --fx-loyal: #c79be0; --fx-over: #cfa97a; --fx-sc: #7cc7c7; --fx-davie: #b0d470; --fx-drag: #a9b8ef; }
+.timebar {
+  position: absolute; z-index: 2; left: max(12px, env(safe-area-inset-left, 0px)); right: 12px; bottom: 12px;
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: start;
+  background: color-mix(in srgb, var(--panel) 94%, transparent); border: 1px solid var(--rule); border-radius: 4px;
+  padding: 8px 12px 9px 8px;
+}
+.timebar .btn.sq { margin-top: 2px; }
+.trow { display: flex; gap: 6px 12px; align-items: baseline; flex-wrap: wrap; }
+.tdate { font-family: var(--f-display); font-size: 1.15rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.tphase { font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
+.tphase.at { color: var(--continental); }
+.ttrack { position: relative; height: 24px; margin-top: 2px; }
+.ttrack input { position: absolute; inset: 0; width: 100%; margin: 0; background: transparent; accent-color: var(--continental); z-index: 2; }
+.tband { position: absolute; top: 9px; height: 6px; background: color-mix(in srgb, var(--continental) 30%, transparent); border-radius: 3px; pointer-events: none; }
+.ttick { position: absolute; top: 3px; width: 2px; height: 18px; margin-left: -1px; background: color-mix(in srgb, var(--militia) 55%, transparent); pointer-events: none; }
+.tlabels { display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: .66rem; color: var(--ink-soft); }
+.tcap { font-size: .8rem; min-height: 1.3em; margin-top: 3px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tcap b { font-weight: 600; }
+#map .trail { fill: none; stroke-width: 2; stroke-dasharray: 5 4; opacity: .7; stroke-linecap: round; }
+#map .force { cursor: pointer; }
+#map .force circle { stroke: var(--paper); stroke-width: 2; }
+#map .force .ab { font-family: var(--f-body); font-size: 8.5px; font-weight: 700; fill: var(--paper); stroke: none; }
+#map .force-label { font-family: var(--f-body); font-size: 11px; font-weight: 600; }
+#map .evt { fill: none; stroke: var(--militia); stroke-width: 2.5; }
+@media (prefers-reduced-motion: no-preference) {
+  #map .evt { animation: pulse 1.4s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+}
+@media (max-width: 900px) { .tcap { white-space: normal; } .mapctl.bl { display: none; } }
+.factcheck { border: 1px solid var(--rule); border-left: 4px solid var(--buff); border-radius: 4px; padding: 10px 12px; margin: 12px 0; font-size: .88rem; }
+.factcheck h4 { margin: 0 0 6px; font-size: .95rem; }
+.factcheck ul { margin: 0; padding-left: 18px; }
+.factcheck li { margin: 4px 0; }
+.storyhead { font-family: var(--f-display); font-size: 1.15rem; margin: 22px 0 4px; }
+.era { margin-left: auto; }
+.era .btn { padding: 7px 12px; font-weight: 600; }
+.addr { display: flex; gap: 4px; width: 236px; max-width: calc(100vw - 40px); }
+.addr input { flex: 1; min-width: 0; font: inherit; font-size: .82rem; padding: 6px 8px; border: 1px solid var(--rule); border-radius: 3px; background: var(--panel); color: var(--ink); }
+#map .pin path { fill: var(--hi); stroke: var(--paper); stroke-width: 1.5; }
+#map .pin circle { fill: var(--paper); }
+.avatar { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; object-position: 50% 18%; background: var(--chip); border: 1px solid var(--rule); flex: none; }
+.mono { display: grid; place-items: center; font-family: var(--f-display); font-size: 1.05rem; color: var(--ink-soft); }
+.person summary { grid-template-columns: auto 1fr auto; align-items: center; gap: 0 12px; }
+.person .avatar { grid-row: 1 / span 2; }
+.person .nm { grid-column: 2; }
+.person .rk { grid-column: 2; }
+.person .side { grid-column: 3; grid-row: 1 / span 2; }
+.portrait { display: grid; grid-template-columns: 120px 1fr; gap: 12px; align-items: start; }
+.portrait img, .portrait .mono { width: 120px; height: 150px; border-radius: 3px; object-fit: cover; object-position: 50% 15%; background: var(--chip); border: 1px solid var(--rule); }
+.portrait .mono { font-size: 2rem; }
+.credit { font-size: .7rem; color: var(--ink-soft); margin-top: 4px; }
+@media (max-width: 420px) { .portrait { grid-template-columns: 1fr; } }
+.tlabels { position: relative; height: 1.3em; display: block; }
+.tlabels span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
 .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--panel); padding: 7px 14px; border-radius: 3px; font-size: .82rem; z-index: 20; }
 </style>
 </head>
@@ -279,9 +336,13 @@ ul.tight li { margin: 3px 0; }
 <header class="top">
   <div class="brand">
     <h1>Camp New Providence</h1>
-    <span class="sub">Southern Continental Army encampment · Six Mile Creek, Mecklenburg–Union line · Oct–Dec 1780</span>
+    <span class="sub" id="subtitle">Southern Continental Army encampment · Six Mile Creek, Mecklenburg–Union line · Oct–Dec 1780</span>
   </div>
-  <p class="notice"><b>A Revolutionary War camp, not a Civil War one.</b> The state marker and NC Archives date it to the fall of 1780; some online listings label it Civil War in error. Charlotte's Civil War sites are on the map as a separate layer.</p>
+  <div class="seg era" role="group" aria-label="Which war">
+    <button class="btn" id="era-rev" aria-pressed="true">Revolutionary War</button>
+    <button class="btn" id="era-cw" aria-pressed="false">Civil War</button>
+  </div>
+  <p class="notice" id="notice"><b>A Revolutionary War camp, not a Civil War one.</b> The state marker and NC Archives date it to the fall of 1780; some online listings label it Civil War in error. Charlotte's Civil War sites are on the map as a separate layer.</p>
 </header>
 
 <div class="main">
@@ -291,9 +352,13 @@ ul.tight li { margin: 3px 0; }
     <div class="mapctl tl">
       <div class="seg" role="group" aria-label="Map view">
         <button class="btn" id="v-camp" aria-pressed="true">Camp</button>
-        <button class="btn" id="v-charlotte" aria-pressed="false">Charlotte</button>
+        <button class="btn" id="v-charlotte" aria-pressed="false">Charlotte area</button>
         <button class="btn" id="v-campaign" aria-pressed="false">Campaign</button>
       </div>
+      <form class="addr" id="addrform" role="search">
+        <input id="addr-q" placeholder="Find a modern address" aria-label="Find a modern address" autocomplete="street-address">
+        <button class="btn" type="submit">Go</button>
+      </form>
       <details class="layers" id="layers" open>
         <summary>Layers</summary>
         <label><input type="checkbox" id="L-terrain" checked> <span class="sw" style="background:var(--water)"></span>Creeks, rivers &amp; 1780 road</label>
@@ -303,6 +368,7 @@ ul.tight li { margin: 3px 0; }
         <label><input type="checkbox" id="L-modern" checked> <span class="sw" style="background:var(--modern)"></span>Modern roads &amp; towns</label>
         <label><input type="checkbox" id="L-homes" checked> <span class="sw" style="background:var(--modern);height:8px;width:8px"></span>Homes on the camp ground</label>
         <label><input type="checkbox" id="L-later"> <span class="sw" style="background:var(--later)"></span>Civil War &amp; later</label>
+        <label><input type="checkbox" id="L-moves" checked> <span class="sw" style="background:var(--fx-gb)"></span>Army movements (slider)</label>
         <label><input type="checkbox" id="L-grid" checked> <span class="sw" style="background:var(--ink-soft)"></span>Lat/long graticule</label>
       </details>
     </div>
@@ -314,6 +380,18 @@ ul.tight li { margin: 3px 0; }
       <div class="scalebox"><span id="scaletxt">1 km</span><div class="scalebar" id="scalebar" style="width:80px"></div><div class="cursor-pos" id="cursorpos">—</div></div>
     </div>
     <div class="homepop" id="homepop" hidden role="dialog" aria-label="Home details"></div>
+    <div class="timebar" id="timebar">
+      <button class="btn sq" id="tplay" aria-label="Play the campaign">▶</button>
+      <div>
+        <div class="trow"><span class="tdate" id="tdate">—</span><span class="tphase" id="tphase"></span></div>
+        <div class="ttrack" id="ttrack">
+          <div class="tband" id="tband"></div>
+          <input type="range" id="tslider" min="0" max="426" step="1" aria-label="Date, April 1780 to June 1781">
+        </div>
+        <div class="tlabels" id="tlabels"></div>
+        <div class="tcap" id="tcap"></div>
+      </div>
+    </div>
     <svg class="compass" viewBox="-40 -40 80 80" aria-hidden="true">
       <circle r="24" stroke-width="1"/><circle r="20" stroke-width=".6"/>
       <path class="fill" d="M0,-30 L5,0 L0,4 L-5,0Z"/><path d="M0,30 L5,0 L0,-4 L-5,0Z" stroke-width="1"/>
@@ -356,7 +434,7 @@ const HOMES_RAW = [[-277,-748,"3021 Kings Manor Dr","","",2007,"","U","",[-246,-
 
 const SITES = [
   // ---------- the camp itself ----------
-  { id: "camp", layer: "sites", era: "1780", type: "camp", lat: 35.0350, lon: -80.7752, zl: 0,
+  { id: "camp", date: "1780-11-25", layer: "sites", era: "1780", type: "camp", lat: 35.0350, lon: -80.7752, zl: 0,
     name: "Camp New Providence", kind: "Encampment · c. Oct 20 – Dec 1780",
     status: "private", statusText: "Private land",
     history: [
@@ -391,7 +469,7 @@ const SITES = [
     access: "Highway bridge and right-of-way. Not a place to stop.",
     detect: "Off-limits. NCDOT right-of-way is state-controlled land, where digging for archaeological material needs a permit under NC law." },
 
-  { id: "church", layer: "sites", era: "1780", type: "church", lat: 35.0710, lon: -80.7720, zl: 6000,
+  { id: "church", layer: "sites", era: "1780", type: "church", lat: 35.0719, lon: -80.7726, zl: 6000,
     name: "Providence Presbyterian Church", kind: "Congregation founded 1767 · NRHP-listed",
     status: "limited", statusText: "Active church, cemetery",
     history: [
@@ -402,7 +480,7 @@ const SITES = [
     access: "Active church. Be respectful; ask the church office before walking the cemetery.",
     detect: "Never. Cemeteries and churchyards are off-limits, and disturbing graves is a felony in North Carolina." },
 
-  { id: "charlotte", layer: "sites", era: "1780", type: "town", lat: 35.2271, lon: -80.8431, zl: 0,
+  { id: "charlotte", date: "1780-09-26", layer: "sites", era: "1780", type: "town", lat: 35.2265, lon: -80.8433, zl: 0,
     name: "Charlotte", kind: "Headquarters town · 1780",
     status: "public", statusText: "Public streets",
     history: [
@@ -425,7 +503,7 @@ const SITES = [
     detect: "Treat as no. County park rules restrict digging and ground disturbance. Ask Park and Recreation in writing before bringing a detector." },
 
   // ---------- campaign sites ----------
-  { id: "waxhaws", layer: "sites", era: "1780", type: "battle", lat: 34.7860, lon: -80.6430, zl: 600,
+  { id: "waxhaws", date: "1780-05-29", layer: "sites", era: "1780", type: "battle", lat: 34.7860, lon: -80.6430, zl: 600,
     name: "Waxhaws (Buford's defeat)", kind: "Battle · May 29, 1780",
     status: "public", statusText: "Memorial site",
     history: [
@@ -435,7 +513,7 @@ const SITES = [
     access: "Public memorial site.",
     detect: "No. It is a grave site and protected." },
 
-  { id: "camden", layer: "sites", era: "1780", type: "battle", lat: 34.3190, lon: -80.6020, zl: 600,
+  { id: "camden", date: "1780-08-16", layer: "sites", era: "1780", type: "battle", lat: 34.3190, lon: -80.6020, zl: 600,
     name: "Camden", kind: "Battle · August 16, 1780",
     status: "public", statusText: "Battlefield preserve",
     history: [
@@ -456,7 +534,7 @@ const SITES = [
     access: "Public streets and sites.",
     detect: "No." },
 
-  { id: "mcintyre", layer: "sites", era: "1780", type: "battle", lat: 35.3316, lon: -80.8877, zl: 3000,
+  { id: "mcintyre", date: "1780-10-03", layer: "sites", era: "1780", type: "battle", lat: 35.3316, lon: -80.8877, zl: 3000,
     name: "McIntyre's Farm", kind: "Skirmish · October 3, 1780",
     status: "public", statusText: "County historic site",
     history: [
@@ -466,7 +544,7 @@ const SITES = [
     access: "Public historic site.",
     detect: "No. County park property." },
 
-  { id: "kings", layer: "sites", era: "1780", type: "battle", lat: 35.1414, lon: -81.3770, zl: 600,
+  { id: "kings", date: "1780-10-07", layer: "sites", era: "1780", type: "battle", lat: 35.1414, lon: -81.3770, zl: 600,
     name: "Kings Mountain", kind: "Battle · October 7, 1780",
     status: "public", statusText: "National Military Park",
     history: [
@@ -486,7 +564,7 @@ const SITES = [
     access: "Public streets.",
     detect: "No." },
 
-  { id: "rugeley", layer: "sites", era: "1780", type: "battle", lat: 34.4180, lon: -80.5900, zl: 600,
+  { id: "rugeley", date: "1780-12-04", layer: "sites", era: "1780", type: "battle", lat: 34.4180, lon: -80.5900, zl: 600,
     name: "Rugeley's Mill (Clermont)", kind: "Ruse · December 4, 1780 (some say Nov 30)",
     status: "private", statusText: "Private land",
     history: [
@@ -497,7 +575,7 @@ const SITES = [
     access: "Private.",
     detect: "Only with landowner permission." },
 
-  { id: "cheraw", layer: "sites", era: "1780", type: "camp", lat: 34.6680, lon: -79.8890, zl: 600,
+  { id: "cheraw", date: "1780-12-26", layer: "sites", era: "1780", type: "camp", lat: 34.6680, lon: -79.8890, zl: 600,
     name: "Cheraw 'camp of repose'", kind: "Greene's camp · Dec 26, 1780 – Jan 1781",
     status: "public", statusText: "Historic town",
     history: [
@@ -507,7 +585,7 @@ const SITES = [
     access: "Public streets.",
     detect: "No." },
 
-  { id: "cowpens", layer: "sites", era: "1781", type: "battle", lat: 35.1370, lon: -81.8175, zl: 600,
+  { id: "cowpens", date: "1781-01-17", layer: "sites", era: "1781", type: "battle", lat: 35.1370, lon: -81.8175, zl: 600,
     name: "Cowpens", kind: "Battle · January 17, 1781",
     status: "public", statusText: "National Battlefield",
     history: [
@@ -517,7 +595,7 @@ const SITES = [
     access: "Open daily.",
     detect: "Illegal. Federal land." },
 
-  { id: "guilford", layer: "sites", era: "1781", type: "battle", lat: 36.1314, lon: -79.8430, zl: 600,
+  { id: "guilford", date: "1781-03-15", layer: "sites", era: "1781", type: "battle", lat: 36.1314, lon: -79.8430, zl: 600,
     name: "Guilford Courthouse", kind: "Battle · March 15, 1781",
     status: "public", statusText: "National Military Park",
     history: [
@@ -527,8 +605,128 @@ const SITES = [
     access: "Open daily.",
     detect: "Illegal. Federal land." },
 
+  // ---------- more of the 1780-81 campaign ----------
+  { id: "charleston", date: "1780-05-12", layer: "sites", era: "1780", type: "battle", lat: 32.7765, lon: -79.9311, zl: 600,
+    name: "Charleston", kind: "Siege and surrender · May 12, 1780", status: "public", statusText: "City",
+    history: ["After a six-week siege, Gen. Benjamin Lincoln surrendered the city and about 5,000 Continentals and militia, the worst American defeat of the war. The South was left without an army, which is why de Kalb's Maryland and Delaware regiments were already marching south, and why Congress sent Gates."],
+    today: "Charleston, SC. A fragment of the American hornwork survives in Marion Square.", access: "Public city.", detect: "No." },
+  { id: "ramsour", date: "1780-06-20", layer: "sites", era: "1780", type: "battle", lat: 35.4745, lon: -81.2700, zl: 600,
+    name: "Ramsour's Mill", kind: "Battle · June 20, 1780", status: "public", statusText: "Battlefield markers",
+    history: ["Patriot militia broke up a large gathering of Loyalists near present Lincolnton, a fight between neighbors with few uniforms on either side. In January 1781 Cornwallis camped here and burned his own baggage wagons so his army could chase Greene and Morgan faster."],
+    today: "Ramsour's Mill battlefield, Lincolnton, NC, with markers and a mass grave.", access: "Public site.", detect: "No. Graves on site." },
+  { id: "huck", date: "1780-07-12", layer: "sites", era: "1780", type: "battle", lat: 34.8660, lon: -81.1700, zl: 600,
+    name: "Huck's Defeat", kind: "Battle · July 12, 1780", status: "public", statusText: "Historic site",
+    history: ["Backcountry militia surprised Capt. Christian Huck's Loyalists and British Legion troopers at dawn at Williamson's Plantation. It was the first Patriot win after Charleston and brought men out to join Sumter."],
+    today: "Historic Brattonsville, York County, SC.", access: "Open to visitors.", detect: "No." },
+  { id: "colson", date: "1780-07-21", layer: "sites", era: "1780", type: "battle", lat: 35.1500, lon: -80.0700, zl: 600,
+    name: "Colson's Mill", kind: "Skirmish · July 21, 1780", status: "private", statusText: "Private land",
+    history: ["William Lee Davidson led Rowan and Mecklenburg militia against Loyalists near the mouth of the Rocky River and was shot through the body. He recovered in time to command the Salisbury District militia that fall and found the camp at New Providence."],
+    today: "Rural private land near the Rocky River and Pee Dee confluence.", access: "Private.", detect: "Only with landowner permission." },
+  { id: "rockymount", date: "1780-07-30", layer: "sites", era: "1780", type: "battle", lat: 34.5600, lon: -80.8900, zl: 600,
+    name: "Rocky Mount", kind: "Attack · July 30 – Aug 1, 1780", status: "private", statusText: "Marker",
+    history: ["Thomas Sumter's militia attacked a fortified British post on the Catawba and failed to take it."],
+    today: "Near Great Falls, Chester County, SC.", access: "Marker only.", detect: "No." },
+  { id: "hangingrock", date: "1780-08-06", layer: "sites", era: "1780", type: "battle", lat: 34.5600, lon: -80.6500, zl: 600,
+    name: "Hanging Rock", kind: "Battle · August 6, 1780", status: "public", statusText: "Battlefield markers",
+    history: ["Sumter and Davie drove Loyalist and provincial troops out of part of their camp before the attack fell apart in plunder. Thirteen-year-old Andrew Jackson rode with Davie's men in this campaign."],
+    today: "Hanging Rock battlefield site, Lancaster County, SC.", access: "Public markers.", detect: "No." },
+  { id: "fishingcreek", date: "1780-08-18", layer: "sites", era: "1780", type: "battle", lat: 34.6300, lon: -80.9000, zl: 600,
+    name: "Fishing Creek", kind: "Surprise · August 18, 1780", status: "public", statusText: "Marker",
+    history: ["Two days after Camden, Tarleton caught Sumter's men resting by the Catawba, killing or capturing about 450. Sumter escaped. For a few weeks there was no organized Patriot force left in the Carolinas."],
+    today: "Near Fishing Creek Reservoir, Chester County, SC.", access: "Marker.", detect: "No." },
+  { id: "musgrove", date: "1780-08-19", layer: "sites", era: "1780", type: "battle", lat: 34.5950, lon: -81.8530, zl: 600,
+    name: "Musgrove Mill", kind: "Battle · August 19, 1780", status: "public", statusText: "State historic site",
+    history: ["Isaac Shelby, Elijah Clarke and James Williams lured Loyalists and provincials into an ambush on the Enoree. Several of these leaders turned up again at Kings Mountain."],
+    today: "Musgrove Mill State Historic Site, near Clinton, SC.", access: "Open to visitors.", detect: "No. State park." },
+  { id: "wahab", date: "1780-09-21", layer: "sites", era: "1780", type: "battle", lat: 34.9300, lon: -80.7600, zl: 600,
+    name: "Wahab's Plantation", kind: "Raid · September 21, 1780", status: "private", statusText: "Private land",
+    history: ["As Cornwallis advanced on Charlotte, Davie's horsemen surprised Loyalist and Legion troops camped at Wahab's in the Waxhaws and carried off horses and weapons. Five days later the same men stood at the Charlotte courthouse."],
+    today: "Rural land in the Waxhaws near the NC–SC line. Location approximate.", access: "Private.", detect: "Only with landowner permission." },
+  { id: "sycamore", date: "1780-09-25", layer: "sites", era: "1780", type: "camp", lat: 36.3430, lon: -82.2520, zl: 600,
+    name: "Sycamore Shoals", kind: "Muster · September 25, 1780", status: "public", statusText: "State park",
+    history: ["Overmountain militia from present-day Tennessee and southwest Virginia gathered here under Campbell, Shelby and Sevier after Ferguson threatened to 'lay their country waste'. Twelve days later they destroyed him at Kings Mountain."],
+    today: "Sycamore Shoals State Historic Park, Elizabethton, TN.", access: "Open to visitors.", detect: "No." },
+  { id: "fishdam", date: "1780-11-09", layer: "sites", era: "1780", type: "battle", lat: 34.6000, lon: -81.4000, zl: 600,
+    name: "Fishdam Ford", kind: "Night attack · November 9, 1780", status: "public", statusText: "Marker",
+    history: ["Maj. James Wemyss tried to surprise Sumter's camp on the Broad River at night and was wounded and captured."],
+    today: "Broad River, Chester County, SC.", access: "Marker.", detect: "No." },
+  { id: "blackstock", date: "1780-11-20", layer: "sites", era: "1780", type: "battle", lat: 34.6760, lon: -81.8170, zl: 600,
+    name: "Blackstock's Farm", kind: "Battle · November 20, 1780", status: "public", statusText: "Battlefield site",
+    history: ["Sumter held a hilltop farm against Tarleton and was badly wounded. With Sumter out of action, the South Carolina backcountry looked to Morgan's light corps from New Providence."],
+    today: "Blackstock's Battlefield, Union County, SC, with a walking trail.", access: "Open to visitors.", detect: "No." },
+  { id: "hammond", date: "1780-12-30", layer: "sites", era: "1780", type: "battle", lat: 34.4300, lon: -81.9500, zl: 600,
+    name: "Hammond's Store", kind: "Raid · December 30, 1780", status: "private", statusText: "Rural land",
+    history: ["Nine days after leaving New Providence, Washington's dragoons rode down a band of Georgia Loyalists. The raid alarmed Cornwallis and helped send Tarleton after Morgan, which set up Cowpens."],
+    today: "Rural Laurens County, SC. Location approximate.", access: "Private.", detect: "Only with landowner permission." },
+  { id: "grindal", date: "1780-12-25", layer: "sites", era: "1780", type: "camp", lat: 34.9400, lon: -81.6600, zl: 600,
+    name: "Grindal Shoals", kind: "Morgan's camp · Dec 25, 1780 – Jan 1781", status: "private", statusText: "Rural land",
+    history: ["Morgan's light corps camped on the Pacolet River after its march from New Providence, drawing in South Carolina militia under Andrew Pickens."],
+    today: "Pacolet River, Union and Cherokee counties, SC.", access: "Private.", detect: "Only with landowner permission." },
+  { id: "cowansford", date: "1781-02-01", layer: "sites", era: "1781", type: "battle", lat: 35.4330, lon: -80.9580, zl: 600,
+    name: "Cowan's Ford", kind: "Battle · February 1, 1781", status: "public", statusText: "Under Lake Norman",
+    history: ["Cornwallis forced a crossing of the flooded Catawba at dawn. William Lee Davidson, who had set up the camp at New Providence, was shot dead while rallying the militia. He is buried at Hopewell Presbyterian Church."],
+    today: "The ford lies under Lake Norman near Cowans Ford Dam. Markers are nearby.", access: "Public markers.", detect: "No." },
+  { id: "dan", date: "1781-02-14", layer: "sites", era: "1781", type: "ford", lat: 36.7000, lon: -78.9000, zl: 600,
+    name: "Crossing of the Dan", kind: "Race to the Dan · February 14, 1781", status: "public", statusText: "River crossing",
+    history: ["Greene's army escaped into Virginia at Boyd's and Irwin's ferries on boats that Edward Carrington had been ordered to locate back in December. Otho Williams's light troops screened the retreat. Cornwallis reached the river with no way across."],
+    today: "Dan River near South Boston, VA.", access: "Public riverside.", detect: "No." },
+  { id: "hobkirk", date: "1781-04-25", layer: "sites", era: "1781", type: "battle", lat: 34.2650, lon: -80.6050, zl: 600,
+    name: "Hobkirk's Hill", kind: "Battle · April 25, 1781", status: "public", statusText: "Neighborhood markers",
+    history: ["Lord Rawdon attacked Greene's camp north of Camden. The veteran 1st Maryland lost its order and Greene fell back, but within weeks the British gave up Camden anyway."],
+    today: "Residential Camden, SC, with markers.", access: "Public streets.", detect: "No." },
+  { id: "ninetysix", date: "1781-05-22", layer: "sites", era: "1781", type: "battle", lat: 34.1460, lon: -82.0240, zl: 600,
+    name: "Ninety Six", kind: "Siege · May 22 – June 19, 1781", status: "public", statusText: "National Historic Site",
+    history: ["Greene besieged the Loyalist Star Fort for four weeks, with Kosciuszko directing the siege trenches. He lifted the siege as Rawdon's relief column approached, but the British soon abandoned the post and the backcountry."],
+    today: "Ninety Six National Historic Site (NPS). Kosciuszko's siege lines are still visible.", access: "Open daily.", detect: "Illegal. Federal land." },
+  { id: "coxes", date: "1780-07-25", layer: "sites", era: "1780", type: "camp", lat: 35.7100, lon: -79.6800, zl: 600,
+    name: "Coxe's Mill", kind: "De Kalb's camp · July 1780", status: "private", statusText: "Rural land",
+    history: ["De Kalb's hungry Maryland and Delaware regiments waited here on Deep River for supplies. Horatio Gates took command on July 25 and marched them straight toward Camden through barren country."],
+    today: "Deep River, Randolph County, NC. Location approximate.", access: "Private.", detect: "Only with landowner permission." },
+  { id: "wilmington", date: "1781-04-07", layer: "sites", era: "1781", type: "enemy", lat: 34.2360, lon: -77.9460, zl: 600,
+    name: "Wilmington", kind: "British base · April 1781", status: "public", statusText: "City",
+    history: ["Cornwallis's battered army rested and refitted here after Guilford Courthouse, then marched north into Virginia on April 25."],
+    today: "Wilmington, NC.", access: "Public city.", detect: "No." },
+
+  // ---------- Revolutionary Charlotte area ----------
+  { id: "hezekiah", layer: "sites", era: "1780", type: "house", lat: 35.2335, lon: -80.7665, zl: 3000,
+    name: "Hezekiah Alexander House", kind: "Stone house · 1774", status: "public", statusText: "Museum",
+    history: ["Mecklenburg's oldest surviving house, built of local stone by Hezekiah Alexander, a blacksmith, planter and member of the county committee that adopted the Mecklenburg Resolves in 1775. He later helped draft North Carolina's first constitution."],
+    today: "The Charlotte Museum of History, 3500 Shamrock Drive, Charlotte.", access: "Open to visitors.", detect: "No. Museum grounds." },
+  { id: "sugarcreek", layer: "sites", era: "1780", type: "church", lat: 35.2591, lon: -80.7959, zl: 3000,
+    name: "Sugar Creek Presbyterian Church", kind: "Congregation founded 1755", status: "limited", statusText: "Active church, cemetery",
+    history: ["Mecklenburg's oldest congregation. Its minister Alexander Craighead preached resistance to the Crown years before the Revolution and is buried here. Many of the county's militiamen came from congregations like this one."],
+    today: "101 W. Sugar Creek Road, Charlotte.", access: "Active church; ask before visiting the cemetery.", detect: "Never. Cemetery." },
+  { id: "steelecreek", layer: "sites", era: "1780", type: "church", lat: 35.1832, lon: -80.9553, zl: 3000,
+    name: "Steele Creek Presbyterian Church", kind: "Congregation c. 1760", status: "limited", statusText: "Active church, cemetery",
+    history: ["A colonial congregation in western Mecklenburg whose large cemetery holds Revolutionary War veterans from the Steele Creek settlement."],
+    today: "7407 Steele Creek Road, Charlotte.", access: "Active church.", detect: "Never. Cemetery." },
+  { id: "hopewell", layer: "sites", era: "1781", type: "church", lat: 35.3662, lon: -80.8976, zl: 3000,
+    name: "Hopewell Presbyterian Church", kind: "Congregation c. 1762 · Davidson's grave", status: "limited", statusText: "Active church, cemetery",
+    history: ["Gen. William Lee Davidson, who set up the camp at New Providence, was buried here after he was killed at Cowan's Ford on February 1, 1781. The churchyard holds many Revolutionary-era families of northern Mecklenburg."],
+    today: "10500 Beatties Ford Road, Huntersville.", access: "Active church.", detect: "Never. Cemetery." },
+  { id: "ruralhill", layer: "sites", era: "1780", type: "house", lat: 35.3858, lon: -80.9458, zl: 3000,
+    name: "Rural Hill", kind: "Davidson family plantation", status: "public", statusText: "Historic site",
+    history: ["Maj. John Davidson, a militia officer and member of the 1775 county committee, settled here near the Catawba. His 1788 house burned in 1886; its ruins and the later farm buildings survive."],
+    today: "4431 Neck Road, Huntersville.", access: "Open to visitors; nature preserve and events.", detect: "No." },
+  { id: "settlers", layer: "sites", era: "1780", type: "church", lat: 35.2297, lon: -80.8431, zl: 9000,
+    name: "Settlers' Cemetery", kind: "Burying ground · 1776 onward", status: "public", statusText: "City cemetery",
+    history: ["Charlotte's first public burying ground. Thomas Polk, militia colonel, commissary of the army in 1780 and owner of the house Cornwallis used as headquarters, is buried here."],
+    today: "200 W. 5th Street, uptown Charlotte.", access: "Open daytime.", detect: "Never. Cemetery." },
+  { id: "torrence", date: "1781-02-01", layer: "sites", era: "1781", type: "battle", lat: 35.5200, lon: -80.8600, zl: 3000,
+    name: "Torrence's Tavern", kind: "Skirmish · February 1, 1781", status: "private", statusText: "Marker",
+    history: ["Hours after Cowan's Ford, Tarleton's cavalry caught militia regrouping at Torrence's Tavern and scattered them. Location approximate."],
+    today: "Near Mount Mourne, Iredell County.", access: "Marker only.", detect: "Only with landowner permission." },
+  { id: "davidsoncollege", layer: "sites", era: "1781", type: "town", lat: 35.5047, lon: -80.8373, zl: 3000,
+    name: "Davidson College", kind: "Named for Gen. William Lee Davidson · 1837", status: "public", statusText: "College campus",
+    history: ["Presbyterians founded the college in 1837 and named it for the general killed at Cowan's Ford, a few miles away. Its land came from his son."],
+    today: "Davidson, NC.", access: "Campus open to visitors.", detect: "No." },
+  { id: "jackson", layer: "sites", era: "1780", type: "house", lat: 34.8436, lon: -80.8064, zl: 3000,
+    name: "Andrew Jackson State Park", kind: "Waxhaws · Jackson's boyhood", status: "public", statusText: "State park",
+    history: ["The future president grew up in the Waxhaws. At thirteen he rode with Davie's men, was captured in 1781, and was slashed by a British officer when he refused to clean his boots. His mother and both brothers died during the war."],
+    today: "Lancaster County, SC. Location approximate.", access: "State park.", detect: "No." },
+
   // ---------- Civil War and later ----------
-  { id: "navyyard", layer: "later", era: "later", type: "later", lat: 35.2292, lon: -80.8382, zl: 25000,
+  { id: "navyyard", date: "1864-01-07", layer: "later", era: "later", type: "later", lat: 35.2292, lon: -80.8382, zl: 25000,
     name: "Confederate Navy Yard", kind: "Civil War · 1862–1865",
     status: "public", statusText: "Site only",
     history: [
@@ -537,7 +735,7 @@ const SITES = [
     today: "East Trade Street near the railroad underpass. The building was torn down in 1959.",
     access: "Public sidewalks.", detect: "No." },
 
-  { id: "phifer", layer: "later", era: "later", type: "later", lat: 35.2335, lon: -80.8372, zl: 25000,
+  { id: "phifer", date: "1865-04-26", layer: "later", era: "later", type: "later", lat: 35.2317, lon: -80.8355, zl: 25000,
     name: "Phifer House site", kind: "Civil War · April 1865",
     status: "public", statusText: "Site only",
     history: [
@@ -546,7 +744,7 @@ const SITES = [
     today: "700 block of North Tryon Street. The house is gone; a highway marker stands nearby.",
     access: "Public sidewalks.", detect: "No." },
 
-  { id: "bates", layer: "later", era: "later", type: "later", lat: 35.2250, lon: -80.8452, zl: 25000,
+  { id: "bates", date: "1865-04-19", layer: "later", era: "later", type: "later", lat: 35.2250, lon: -80.8452, zl: 25000,
     name: "Where Davis learned of Lincoln's death", kind: "Civil War · April 19, 1865",
     status: "public", statusText: "Marker",
     history: [
@@ -555,7 +753,7 @@ const SITES = [
     today: "South Tryon Street, uptown, marked by a state highway marker and a plaque.",
     access: "Public sidewalks.", detect: "No." },
 
-  { id: "mint", layer: "later", era: "later", type: "later", lat: 35.2262, lon: -80.8465, zl: 25000,
+  { id: "mint", date: "1861-04-20", layer: "later", era: "later", type: "later", lat: 35.2262, lon: -80.8465, zl: 25000,
     name: "Charlotte Mint (original site)", kind: "U.S. branch mint 1837 · seized 1861",
     status: "public", statusText: "Site only",
     history: [
@@ -564,6 +762,22 @@ const SITES = [
     today: "West Trade Street. The building itself now stands at 2730 Randolph Road as Mint Museum Randolph.",
     access: "Museum open to the public.", detect: "No." },
 
+  { id: "elmwood", layer: "later", era: "later", type: "church", lat: 35.2341, lon: -80.8473, zl: 9000,
+    name: "Elmwood Cemetery", kind: "City cemetery · 1853", status: "public", statusText: "City cemetery",
+    history: ["Charlotte's main 19th-century cemetery, with a Confederate section and the graves of many of the men and women who ran the town's wartime industries and hospitals."],
+    today: "700 W. 6th Street, uptown Charlotte.", access: "Open daytime.", detect: "Never. Cemetery." },
+  { id: "ncmi", layer: "later", era: "later", type: "later", lat: 35.2153, lon: -80.8548, zl: 9000,
+    name: "North Carolina Military Institute", kind: "Military school · 1859–1861", status: "public", statusText: "Site only",
+    history: ["A military academy run by Daniel Harvey Hill. In 1861 its cadets became drillmasters for North Carolina's new regiments, and Hill went on to become a Confederate general."],
+    today: "Near South Boulevard and Morehead Street. Location approximate.", access: "Public streets.", detect: "No." },
+  { id: "salisbury", date: "1865-04-12", layer: "later", era: "later", type: "later", lat: 35.6676, lon: -80.4746, zl: 2000,
+    name: "Salisbury Prison", kind: "Confederate prison · 1861–1865", status: "public", statusText: "National Cemetery",
+    history: ["An old cotton factory turned prison. By late 1864 it held about 10,000 Union prisoners, and thousands died. Union cavalry under George Stoneman captured Salisbury on April 12, 1865 and burned the prison."],
+    today: "Salisbury National Cemetery, with trenches holding the prison dead.", access: "Open daily.", detect: "Never. National cemetery." },
+  { id: "fortmill", date: "1865-04-27", layer: "later", era: "later", type: "later", lat: 35.0070, lon: -80.9440, zl: 2000,
+    name: "White Homestead, Fort Mill", kind: "Confederate cabinet · April 26–27, 1865", status: "private", statusText: "Historic house",
+    history: ["After leaving Charlotte, Jefferson Davis and his cabinet stopped here. Treasury Secretary George Trenholm resigned, and the Confederate government continued to break apart as it fled south."],
+    today: "Fort Mill, SC. Location approximate.", access: "Private.", detect: "No." },
   { id: "campgreene", layer: "later", era: "later", type: "later", lat: 35.2340, lon: -80.8880, zl: 9000,
     name: "Camp Greene", kind: "World War I training camp · 1917–1919",
     status: "public", statusText: "Neighborhood & marker",
@@ -639,7 +853,7 @@ const ZONES = [
   { id: "z-ford", lat: 35.0363, lon: -80.7676, r: 200, rating: "off", ratingText: "Off-limits · state ROW",
     name: "Road crossing and guard posts",
     text: "Guard and picket posts on the road would have left concentrated losses, but the modern highway corridor is NCDOT right-of-way. Detecting it needs a state permit." },
-  { id: "z-church", lat: 35.0710, lon: -80.7720, r: 160, rating: "off", ratingText: "Never · cemetery",
+  { id: "z-church", lat: 35.0719, lon: -80.7726, r: 160, rating: "off", ratingText: "Never · cemetery",
     name: "Providence churchyard",
     text: "Burial ground. Do not detect, probe or dig." }
 ];
@@ -660,60 +874,270 @@ const CAMP_PICKETS = [
   { label: "Picket (south road)", dx: 905, dy: -700 }
 ];
 
+/* phase: 0 before the camp, 1 at the camp, 2 after. iso drives the slider. */
 const TIMELINE = [
-  { d: "1767", md: null, t: "Providence meeting house built", s: "First log church of the Providence congregation, which names the road and the settlement.", site: "church" },
-  { d: "May 31, 1775", md: "05-31", t: "Mecklenburg Resolves", s: "Mecklenburg's committee declares royal commissions void. Three men tied to the county's independence resolutions lie in the Providence churchyard.", site: "charlotte" },
-  { d: "May 29, 1780", md: "05-29", t: "Waxhaws", s: "Tarleton cuts down Buford's Virginians. 'Tarleton's quarter' rallies the backcountry.", site: "waxhaws" },
-  { d: "Aug 16, 1780", md: "08-16", t: "Disaster at Camden", s: "Gates's army is routed. Maryland and Delaware survivors will form the core of the New Providence army.", site: "camden" },
-  { d: "Sept 26, 1780", md: "09-26", t: "Battle of Charlotte", s: "Davie's men fight Cornwallis's advance at the courthouse.", site: "charlotte" },
-  { d: "Oct 3, 1780", md: "10-03", t: "McIntyre's Farm", s: "Militia ambush British foragers north of Charlotte.", site: "mcintyre" },
-  { d: "Oct 7, 1780", md: "10-07", t: "Kings Mountain", s: "Ferguson's Loyalists destroyed; Cornwallis's left flank collapses.", site: "kings" },
-  { d: "Mid-Oct 1780", md: null, t: "British leave Charlotte", s: "Cornwallis withdraws to winter quarters at Winnsboro, SC.", site: "winnsboro" },
-  { d: "c. Oct 20, 1780", md: "10-20", t: "Camp established", s: "Davidson's NC militia occupy Six Mile Creek at Providence; Continentals and Morgan's light corps follow.", site: "camp" },
-  { d: "Nov 11–15, 1780", md: null, t: "Davie writes to Smallwood", s: "Letters from William R. Davie report thin supplies and militia going home or deserting.", site: "camp" },
-  { d: "Nov 25, 1780", md: "11-25", t: "Council of war", s: "Senior officers of the Southern Department meet at the camp to plan for Cornwallis's invasion.", site: "camp" },
-  { d: "Dec 2–3, 1780", md: "12-03", t: "Greene takes command", s: "Nathanael Greene arrives in Charlotte and relieves Gates.", site: "charlotte" },
-  { d: "Dec 4, 1780", md: "12-04", t: "The Quaker gun", s: "Washington's dragoons take Rugeley's Loyalists with a painted pine log.", site: "rugeley" },
-  { d: "Dec 17–20, 1780", md: "12-20", t: "Camp broken up", s: "The main army marches for Cheraw; Morgan heads west on Dec 21.", site: "camp" },
-  { d: "Dec 26, 1780", md: "12-26", t: "Camp of repose", s: "Greene's army reaches Hicks Creek near Cheraw.", site: "cheraw" },
-  { d: "Jan 17, 1781", md: "01-17", t: "Cowpens", s: "Morgan's light corps destroys Tarleton's Legion.", site: "cowpens" },
-  { d: "Feb 1, 1781", md: "02-01", t: "Cowan's Ford", s: "William Lee Davidson, founder of the New Providence camp, is killed defending the Catawba crossing.", site: null },
-  { d: "Mar 15, 1781", md: "03-15", t: "Guilford Courthouse", s: "Costly British victory that sends Cornwallis toward Yorktown.", site: "guilford" },
-  { d: "1862–1865", md: null, t: "Civil War Charlotte", s: "Navy yard, mint and hospitals; the Confederate cabinet's last full meetings in April 1865. No connection to the 1780 camp.", site: "navyyard", later: true },
-  { d: "2010", md: null, t: "Marker L-110 erected", s: "NC Office of Archives and History marks the camp on Providence Road.", site: "marker" },
-  { d: "2030", md: null, t: "250th anniversary", s: "Union County residents have asked the county to recognize a Camp New Providence Day for the semiquincentennial.", site: "camp" }
+  { iso: null, d: "1767", t: "Providence meeting house built", s: "First log church of the Providence congregation, which names the road and the settlement.", site: "church", ph: 0 },
+  { iso: null, d: "May 31, 1775", md: "05-31", t: "Mecklenburg Resolves", s: "Mecklenburg's committee declares royal commissions void. Three men tied to the county's independence resolutions lie in the Providence churchyard.", site: "charlotte", ph: 0 },
+  { iso: "1780-04-20", d: "Apr 1780", t: "De Kalb marches south", s: "The Maryland and Delaware Continentals leave the main army in New Jersey to relieve Charleston. These are the regiments that will camp at New Providence.", site: null, ph: 0 },
+  { iso: "1780-05-12", d: "May 12, 1780", md: "05-12", t: "Charleston surrenders", s: "Lincoln gives up the city and about 5,000 men. The South has no army.", site: "charleston", ph: 0 },
+  { iso: "1780-05-29", d: "May 29, 1780", md: "05-29", t: "Waxhaws", s: "Tarleton cuts down Buford's Virginians. 'Tarleton's quarter' rallies the backcountry.", site: "waxhaws", ph: 0 },
+  { iso: "1780-06-20", d: "June 20, 1780", md: "06-20", t: "Ramsour's Mill", s: "North Carolina militia scatter a Loyalist rising near Lincolnton.", site: "ramsour", ph: 0 },
+  { iso: "1780-07-12", d: "July 12, 1780", md: "07-12", t: "Huck's Defeat", s: "First Patriot victory after Charleston.", site: "huck", ph: 0 },
+  { iso: "1780-07-21", d: "July 21, 1780", md: "07-21", t: "Colson's Mill", s: "William Lee Davidson badly wounded leading militia.", site: "colson", ph: 0 },
+  { iso: "1780-07-25", d: "July 25, 1780", md: "07-25", t: "Gates takes command", s: "At Coxe's Mill, Gates orders the hungry army straight toward Camden.", site: "coxes", ph: 0 },
+  { iso: "1780-08-06", d: "Aug 6, 1780", md: "08-06", t: "Hanging Rock", s: "Sumter and Davie hit a British camp; young Andrew Jackson rides with Davie.", site: "hangingrock", ph: 0 },
+  { iso: "1780-08-16", d: "Aug 16, 1780", md: "08-16", t: "Disaster at Camden", s: "Gates's army is routed. Maryland and Delaware survivors will form the core of the New Providence army.", site: "camden", ph: 0 },
+  { iso: "1780-08-18", d: "Aug 18, 1780", md: "08-18", t: "Fishing Creek", s: "Tarleton surprises Sumter. No organized Patriot force is left in the field.", site: "fishingcreek", ph: 0 },
+  { iso: "1780-08-19", d: "Aug 19, 1780", md: "08-19", t: "Musgrove Mill", s: "Shelby, Clarke and Williams win on the Enoree.", site: "musgrove", ph: 0 },
+  { iso: "1780-09-06", d: "Sept 1780", t: "Rebuilding at Hillsborough", s: "Camden survivors are consolidated into a Maryland regiment; Davidson takes over the Salisbury District militia.", site: "hillsborough", ph: 0 },
+  { iso: "1780-09-21", d: "Sept 21, 1780", md: "09-21", t: "Wahab's Plantation", s: "Davie raids Cornwallis's advance in the Waxhaws.", site: "wahab", ph: 0 },
+  { iso: "1780-09-25", d: "Sept 25, 1780", md: "09-25", t: "Overmountain muster", s: "Campbell, Shelby and Sevier gather at Sycamore Shoals.", site: "sycamore", ph: 0 },
+  { iso: "1780-09-26", d: "Sept 26, 1780", md: "09-26", t: "Battle of Charlotte", s: "Davie's men fight Cornwallis's advance at the courthouse.", site: "charlotte", ph: 0 },
+  { iso: "1780-10-03", d: "Oct 3, 1780", md: "10-03", t: "McIntyre's Farm", s: "Militia ambush British foragers north of Charlotte.", site: "mcintyre", ph: 0 },
+  { iso: "1780-10-07", d: "Oct 7, 1780", md: "10-07", t: "Kings Mountain", s: "Overmountain and Carolina militia destroy Ferguson's Loyalists. No Continentals fight here.", site: "kings", ph: 0 },
+  { iso: "1780-10-13", d: "Oct 13, 1780", md: "10-13", t: "Morgan's light corps", s: "Daniel Morgan, newly a brigadier, forms a corps of light infantry, riflemen and dragoons at Hillsborough.", site: "hillsborough", ph: 0 },
+  { iso: "1780-10-14", d: "Oct 14, 1780", md: "10-14", t: "British leave Charlotte", s: "Cornwallis withdraws toward winter quarters at Winnsboro, SC.", site: "winnsboro", ph: 0 },
+  { iso: "1780-10-20", d: "c. Oct 20, 1780", md: "10-20", t: "Camp established", s: "Davidson's NC militia occupy Six Mile Creek at Providence; Continentals and Morgan's light corps follow.", site: "camp", ph: 1 },
+  { iso: "1780-11-09", d: "Nov 9, 1780", md: "11-09", t: "Fishdam Ford", s: "Sumter beats off a British night attack.", site: "fishdam", ph: 1 },
+  { iso: "1780-11-13", d: "Nov 11–15, 1780", t: "Davie writes to Smallwood", s: "Letters report thin supplies and militia going home or deserting.", site: "camp", ph: 1 },
+  { iso: "1780-11-20", d: "Nov 20, 1780", md: "11-20", t: "Blackstock's Farm", s: "Sumter holds off Tarleton but is badly wounded.", site: "blackstock", ph: 1 },
+  { iso: "1780-11-25", d: "Nov 25, 1780", md: "11-25", t: "Council of war", s: "Senior officers of the Southern Department meet at the camp to plan for Cornwallis's invasion.", site: "camp", ph: 1 },
+  { iso: "1780-12-03", d: "Dec 2–3, 1780", md: "12-03", t: "Greene takes command", s: "Nathanael Greene arrives in Charlotte and relieves Gates. He sends Kosciuszko to scout the Pee Dee and Carrington to find boats on the Dan.", site: "charlotte", ph: 1 },
+  { iso: "1780-12-04", d: "Dec 4, 1780", md: "12-04", t: "The Quaker gun", s: "Washington's dragoons take Rugeley's Loyalists with a painted pine log.", site: "rugeley", ph: 1 },
+  { iso: "1780-12-20", d: "Dec 20, 1780", md: "12-20", t: "Camp broken up", s: "The main army marches for the Pee Dee; Morgan's corps heads west the next day.", site: "camp", ph: 1 },
+  { iso: "1780-12-25", d: "Dec 25, 1780", md: "12-25", t: "Morgan at Grindal Shoals", s: "The light corps camps on the Pacolet and gathers Pickens's militia.", site: "grindal", ph: 2 },
+  { iso: "1780-12-26", d: "Dec 26, 1780", md: "12-26", t: "Camp of repose", s: "Greene's army reaches Hicks Creek near Cheraw.", site: "cheraw", ph: 2 },
+  { iso: "1780-12-30", d: "Dec 30, 1780", md: "12-30", t: "Hammond's Store", s: "Washington's dragoons rout Georgia Loyalists. Cornwallis sends Tarleton after Morgan.", site: "hammond", ph: 2 },
+  { iso: "1781-01-17", d: "Jan 17, 1781", md: "01-17", t: "Cowpens", s: "Morgan's light corps from New Providence destroys Tarleton's Legion.", site: "cowpens", ph: 2 },
+  { iso: "1781-01-25", d: "Jan 25, 1781", md: "01-25", t: "Cornwallis burns his baggage", s: "At Ramsour's Mill, to chase Morgan and Greene faster.", site: "ramsour", ph: 2 },
+  { iso: "1781-02-01", d: "Feb 1, 1781", md: "02-01", t: "Cowan's Ford", s: "William Lee Davidson, founder of the New Providence camp, is killed defending the Catawba.", site: "cowansford", ph: 2 },
+  { iso: "1781-02-14", d: "Feb 14, 1781", md: "02-14", t: "Race to the Dan", s: "Greene escapes into Virginia on the boats Carrington gathered.", site: "dan", ph: 2 },
+  { iso: "1781-03-15", d: "Mar 15, 1781", md: "03-15", t: "Guilford Courthouse", s: "Costly British victory that sends Cornwallis toward Wilmington and Virginia.", site: "guilford", ph: 2 },
+  { iso: "1781-04-25", d: "Apr 25, 1781", md: "04-25", t: "Hobkirk's Hill", s: "Rawdon attacks Greene outside Camden. Cornwallis leaves Wilmington for Virginia the same day.", site: "hobkirk", ph: 2 },
+  { iso: "1781-05-22", d: "May 22, 1781", md: "05-22", t: "Siege of Ninety Six", s: "Greene and Kosciuszko besiege the Star Fort for four weeks.", site: "ninetysix", ph: 2 },
+  { iso: "1781-06-19", d: "June 19, 1781", md: "06-19", t: "Siege lifted", s: "Greene withdraws; the British soon abandon Ninety Six. Yorktown follows in October.", site: "ninetysix", ph: 2 },
+  { iso: null, d: "1862–1865", t: "Civil War Charlotte", s: "Navy yard, mint and hospitals; the Confederate cabinet's last full meetings in April 1865. No connection to the 1780 camp.", site: "navyyard", later: true, ph: 3 },
+  { iso: null, d: "2010", t: "Marker L-110 erected", s: "NC Office of Archives and History marks the camp on Providence Road.", site: "marker", ph: 3 },
+  { iso: null, d: "2030", t: "250th anniversary", s: "Union County residents have asked the county to recognize a Camp New Providence Day for the semiquincentennial.", site: "camp", ph: 3 }
 ];
 
+/* Armies on the move. Waypoints: [iso date, lat, lon, what happened]. Positions between
+   waypoints are interpolated in a straight line, so routes are schematic. */
+const FORCES = [
+  { id: "mdde", name: "Maryland & Delaware Continentals", ab: "MD", c: "continental", side: "us",
+    desc: "The Continental core of the Southern Army: sent south under de Kalb, broken at Camden, rebuilt at Hillsborough, camped at New Providence, then Greene's main body.",
+    wp: [["1780-04-20", 39.60, -75.83, "Embark at Head of Elk, Maryland, under de Kalb to relieve Charleston"],
+         ["1780-05-25", 37.23, -77.40, "Land at Petersburg, Virginia; Charleston has already fallen"],
+         ["1780-06-22", 36.075, -79.10, "Reach Hillsborough"],
+         ["1780-07-06", 35.71, -79.68, "Camp hungry at Coxe's Mill on Deep River"],
+         ["1780-07-27", 35.71, -79.68, "Gates marches them toward Camden"],
+         ["1780-08-13", 34.418, -80.59, "Reach Rugeley's Mill"],
+         ["1780-08-16", 34.319, -80.602, "Camden: fight on after the militia break; de Kalb mortally wounded"],
+         ["1780-08-25", 35.67, -80.47, "Survivors straggle north through Charlotte and Salisbury"],
+         ["1780-09-06", 36.075, -79.10, "Consolidated into one Maryland regiment at Hillsborough"],
+         ["1780-11-01", 36.075, -79.10, "March south"],
+         ["1780-11-12", 35.67, -80.47, "Pass through Salisbury"],
+         ["1780-11-22", 35.035, -80.7752, "In camp at New Providence (arrival date approximate)"],
+         ["1780-12-20", 35.035, -80.7752, "Break camp and march for the Pee Dee"],
+         ["1780-12-26", 34.668, -79.889, "Camp of repose near Cheraw"],
+         ["1781-01-28", 34.668, -79.889, "Leave Cheraw after Cowpens"],
+         ["1781-02-07", 36.131, -79.843, "Reunite with Morgan at Guilford Courthouse"],
+         ["1781-02-14", 36.70, -78.90, "Cross the Dan into Virginia"],
+         ["1781-02-22", 36.70, -78.90, "Recross into North Carolina"],
+         ["1781-03-15", 36.131, -79.843, "Guilford Courthouse"],
+         ["1781-03-28", 35.56, -79.30, "Ramsey's Mill on Deep River"],
+         ["1781-04-06", 35.56, -79.30, "Turn south for South Carolina"],
+         ["1781-04-25", 34.265, -80.605, "Hobkirk's Hill"],
+         ["1781-05-22", 34.146, -82.024, "Siege of Ninety Six"],
+         ["1781-06-19", 34.146, -82.024, "Siege lifted"],
+         ["1781-06-20", 34.22, -81.90, "Withdraw north"]] },
+  { id: "light", name: "Morgan's light corps", ab: "LC", c: "buff", side: "us",
+    desc: "Picked Continental light infantry under John Eager Howard, riflemen and dragoons. Posted forward at New Providence, then detached west to win Cowpens.",
+    wp: [["1780-10-13", 36.075, -79.10, "Formed at Hillsborough under Daniel Morgan"],
+         ["1780-10-28", 35.67, -80.47, "Move south ahead of the army"],
+         ["1780-11-05", 35.035, -80.7752, "Take post at New Providence (date approximate)"],
+         ["1780-12-21", 35.035, -80.7752, "Detached west by Greene"],
+         ["1780-12-25", 34.94, -81.66, "Camp at Grindal Shoals on the Pacolet"],
+         ["1781-01-16", 35.10, -81.75, "Fall back to the Cowpens with Tarleton close behind"],
+         ["1781-01-17", 35.137, -81.8175, "Cowpens: Tarleton's Legion destroyed"],
+         ["1781-01-23", 35.62, -81.05, "Reach Sherrald's Ford on the Catawba with 600 prisoners"],
+         ["1781-02-07", 36.131, -79.843, "Rejoin Greene at Guilford Courthouse; Morgan leaves days later with sciatica"]] },
+  { id: "dragoons", name: "Washington's dragoons", ab: "WD", c: "fx-drag", side: "us",
+    desc: "The 1st and 3rd Continental Light Dragoons under Lt. Col. William Washington.",
+    wp: [["1780-10-28", 35.67, -80.47, "Join Morgan's corps"],
+         ["1780-11-08", 35.035, -80.7752, "At New Providence"],
+         ["1780-12-04", 34.418, -80.59, "Rugeley's Mill: the Quaker gun"],
+         ["1780-12-08", 35.035, -80.7752, "Back in camp"],
+         ["1780-12-21", 35.035, -80.7752, "March west with Morgan"],
+         ["1780-12-30", 34.43, -81.95, "Hammond's Store: rout Georgia Loyalists"],
+         ["1781-01-17", 35.137, -81.8175, "Cowpens: charge the British right; cross swords with Tarleton"],
+         ["1781-02-07", 36.131, -79.843, "With Greene's army"],
+         ["1781-03-15", 36.131, -79.843, "Guilford Courthouse"],
+         ["1781-04-25", 34.265, -80.605, "Hobkirk's Hill"],
+         ["1781-06-19", 34.146, -82.024, "Ninety Six"]] },
+  { id: "davidson", name: "Davidson's NC militia", ab: "NC", c: "militia", side: "nc",
+    desc: "Salisbury District militia (Rowan, Mecklenburg and neighboring counties) under William Lee Davidson, who set up the camp.",
+    wp: [["1780-07-21", 35.15, -80.07, "Colson's Mill: Davidson badly wounded"],
+         ["1780-09-20", 35.30, -80.80, "Davidson, now a brigadier, gathers militia north of Charlotte"],
+         ["1780-10-20", 35.035, -80.7752, "Establish the camp at New Providence"],
+         ["1780-12-20", 35.035, -80.7752, "Stay on to guard the Catawba crossings as the army leaves"],
+         ["1781-01-25", 35.40, -80.98, "Guarding Beattie's and Cowan's fords"],
+         ["1781-02-01", 35.433, -80.958, "Cowan's Ford: Davidson killed"]] },
+  { id: "davie", name: "Davie's horsemen", ab: "DV", c: "fx-davie", side: "nc",
+    desc: "William R. Davie's mounted militia from the Waxhaws and Mecklenburg.",
+    wp: [["1780-07-01", 34.90, -80.75, "Raising mounted troops in the Waxhaws"],
+         ["1780-08-06", 34.56, -80.65, "Hanging Rock with Sumter"],
+         ["1780-09-21", 34.93, -80.76, "Wahab's Plantation raid"],
+         ["1780-09-26", 35.2271, -80.8431, "Hold the Charlotte courthouse"],
+         ["1780-10-20", 35.035, -80.7752, "Scouting from New Providence"],
+         ["1780-12-10", 35.2271, -80.8431, "Davie becomes Greene's commissary general at Charlotte"]] },
+  { id: "sumter", name: "Sumter's SC militia", ab: "SU", c: "fx-sc", side: "nc",
+    desc: "Thomas Sumter's South Carolina partisans.",
+    wp: [["1780-07-30", 34.56, -80.89, "Rocky Mount: attack fails"],
+         ["1780-08-06", 34.56, -80.65, "Hanging Rock"],
+         ["1780-08-18", 34.63, -80.90, "Fishing Creek: surprised by Tarleton"],
+         ["1780-11-09", 34.60, -81.40, "Fishdam Ford: beat off a night attack"],
+         ["1780-11-20", 34.676, -81.817, "Blackstock's: Sumter wounded"],
+         ["1780-12-10", 34.68, -81.70, "Out of action while Sumter recovers"]] },
+  { id: "over", name: "Overmountain men", ab: "OM", c: "fx-over", side: "nc",
+    desc: "Militia from present-day Tennessee and southwest Virginia under Campbell, Shelby and Sevier, joined by Carolina militia. They won Kings Mountain and went home. They were not at New Providence.",
+    wp: [["1780-09-25", 36.343, -82.252, "Muster at Sycamore Shoals"],
+         ["1780-09-30", 35.75, -81.71, "Join Cleveland and McDowell at Quaker Meadows"],
+         ["1780-10-06", 35.137, -81.8175, "Camp at the Cowpens; choose the best-mounted 900"],
+         ["1780-10-07", 35.1414, -81.377, "Kings Mountain: Ferguson killed"],
+         ["1780-10-14", 35.37, -81.89, "Biggerstaff's: Loyalist prisoners tried and nine hanged"],
+         ["1780-10-22", 35.75, -81.71, "Most disperse to their homes"]] },
+  { id: "corn", name: "Cornwallis's army", ab: "CW", c: "fx-gb", side: "gb",
+    desc: "The British field army under Charles, Earl Cornwallis.",
+    wp: [["1780-05-12", 32.776, -79.931, "Charleston surrenders"],
+         ["1780-06-01", 34.247, -80.607, "British post established at Camden"],
+         ["1780-08-16", 34.319, -80.602, "Victory at Camden"],
+         ["1780-09-08", 34.247, -80.607, "Leave Camden to invade North Carolina"],
+         ["1780-09-20", 34.86, -80.80, "In the Waxhaws"],
+         ["1780-09-26", 35.2271, -80.8431, "Occupy Charlotte"],
+         ["1780-10-14", 35.2271, -80.8431, "Abandon Charlotte after Kings Mountain"],
+         ["1780-10-29", 34.3807, -81.0865, "Winter quarters at Winnsboro"],
+         ["1781-01-08", 34.3807, -81.0865, "March north after Morgan"],
+         ["1781-01-18", 34.85, -81.40, "At Turkey Creek: Leslie's reinforcements join, Tarleton's survivors arrive"],
+         ["1781-01-25", 35.4745, -81.27, "Ramsour's Mill: burn the baggage"],
+         ["1781-02-01", 35.433, -80.958, "Force Cowan's Ford"],
+         ["1781-02-14", 36.66, -79.00, "Reach the Dan too late"],
+         ["1781-02-20", 36.075, -79.10, "Raise the royal standard at Hillsborough"],
+         ["1781-03-15", 36.131, -79.843, "Guilford Courthouse: hold the field, lose a quarter of the army"],
+         ["1781-04-01", 35.05, -78.88, "Cross Creek (Fayetteville)"],
+         ["1781-04-07", 34.236, -77.946, "Rest at Wilmington"],
+         ["1781-04-25", 34.236, -77.946, "March for Virginia"],
+         ["1781-05-20", 37.227, -77.402, "Join British forces at Petersburg, Virginia"],
+         ["1781-06-20", 37.54, -77.44, "Operating around Richmond. Yorktown follows in October"]] },
+  { id: "legion", name: "Tarleton's British Legion", ab: "BL", c: "fx-legion", side: "gb",
+    desc: "Banastre Tarleton's Loyalist cavalry and infantry in green coats.",
+    wp: [["1780-05-12", 32.95, -80.02, "Charleston campaign"],
+         ["1780-05-29", 34.786, -80.643, "Waxhaws: Buford's command cut down"],
+         ["1780-08-16", 34.319, -80.602, "Camden"],
+         ["1780-08-18", 34.63, -80.90, "Fishing Creek: surprise Sumter"],
+         ["1780-09-26", 35.2271, -80.8431, "With Cornwallis at Charlotte"],
+         ["1780-10-29", 34.3807, -81.0865, "Winnsboro"],
+         ["1780-11-20", 34.676, -81.817, "Blackstock's: checked by Sumter"],
+         ["1781-01-02", 34.45, -81.40, "Sent after Morgan"],
+         ["1781-01-17", 35.137, -81.8175, "Destroyed at Cowpens; Tarleton escapes"],
+         ["1781-01-18", 34.85, -81.40, "Rejoin Cornwallis"],
+         ["1781-01-25", 35.4745, -81.27, "Ramsour's Mill"],
+         ["1781-03-15", 36.131, -79.843, "Guilford Courthouse"],
+         ["1781-04-07", 34.236, -77.946, "Wilmington"],
+         ["1781-05-20", 37.227, -77.402, "Virginia"]] },
+  { id: "ferguson", name: "Ferguson's Loyalists", ab: "PF", c: "fx-loyal", side: "gb",
+    desc: "Loyalist militia organized by Maj. Patrick Ferguson to guard Cornwallis's western flank.",
+    wp: [["1780-06-10", 34.146, -82.024, "Organize Loyalist militia around Ninety Six"],
+         ["1780-09-07", 35.37, -81.89, "Advance to Gilbert Town and threaten the Overmountain settlements"],
+         ["1780-10-04", 35.22, -81.60, "Fall back toward Charlotte"],
+         ["1780-10-07", 35.1414, -81.377, "Destroyed at Kings Mountain"]] }
+];
+const DAY0 = Date.UTC(1780, 3, 20), DAYS = 426;
+const dayOf = (iso) => (Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) - DAY0) / 864e5;
+const isoOf = (d) => new Date(DAY0 + Math.round(d) * 864e5);
+const fmtDay = (d) => isoOf(d).toLocaleDateString("en-US", { timeZone: "UTC", day: "numeric", month: "short", year: "numeric" });
+for (const f of FORCES) f.days = f.wp.map(w => dayOf(w[0]));
+let tDay = dayOf("1780-11-25");
+let selForce = null;
+function forceAt(f, t) {
+  const D = f.days;
+  if (t < D[0] || t > D[D.length - 1] + 0.5) return null;
+  let i = 0; while (i < D.length - 1 && D[i + 1] <= t) i++;
+  const a = f.wp[i], b = f.wp[Math.min(i + 1, D.length - 1)];
+  const k = i + 1 < D.length && D[i + 1] > D[i] ? Math.min(1, (t - D[i]) / (D[i + 1] - D[i])) : 0;
+  return { lat: a[1] + (b[1] - a[1]) * k, lon: a[2] + (b[2] - a[2]) * k, i, note: a[3], moving: k > 0 && k < 1 && (a[1] !== b[1] || a[2] !== b[2]) };
+}
+
 const PEOPLE = [
-  { n: "Horatio Gates", r: "Major General · commander, Southern Department", side: "us", site: "charlotte",
+  { n: "Horatio Gates", r: "Major General · commander, Southern Department", side: "us", site: "charlotte", img: 'HoratioGatesByStuart.jpeg', credit: 'Gilbert Stuart, c. 1793',
     b: "The victor of Saratoga (1777) took the Southern command in July 1780 and lost most of it at Camden a month later. He rebuilt at Hillsborough, moved headquarters to Charlotte, and ran the army through the New Providence months while Congress arranged an inquiry into Camden. He handed over command to Greene on December 3, 1780; contemporaries noted that both men handled it with courtesy." },
-  { n: "Nathanael Greene", r: "Major General · took command Dec 3, 1780", side: "us", site: "charlotte",
+  { n: "Nathanael Greene", r: "Major General · took command Dec 3, 1780", side: "us", site: "charlotte", img: 'Nathanael_Greene_by_Charles_Willson_Peale.jpg', credit: 'Charles Willson Peale',
     b: "Washington's choice to save the South. Greene arrived in Charlotte on December 2 and found an army short of clothing, shoes, food and ammunition. He broke up the camp, split the army against all textbook advice (main body to Cheraw, Morgan to the west) and so made the countryside feed two smaller forces while threatening Cornwallis from two directions. He talked Davie into running the commissary and sent Kosciuszko to scout the rivers. In 1781 he summed up his campaign as: 'We fight, get beat, rise, and fight again.'" },
-  { n: "William Smallwood", r: "Maryland general · commanded the advance", side: "us", site: "camp",
+  { n: "William Smallwood", r: "Maryland general · commanded the advance", side: "us", site: "camp", img: 'William_smallwood.jpg', credit: 'Charles Willson Peale',
     b: "Commander of the Maryland Line and of the army's forward troops at New Providence. William Davie's November 1780 letters on supplies and militia desertion are addressed to him. Late in the year he left for Maryland to push for recruits and supplies for the Southern Army." },
-  { n: "Daniel Morgan", r: "Brigadier General · light corps", side: "us", site: "camp",
+  { n: "Daniel Morgan", r: "Brigadier General · light corps", side: "us", site: "camp", img: 'DanielMorgan.jpeg', credit: 'Charles Willson Peale, c. 1794',
     b: "The Virginia rifleman of Quebec and Saratoga came back from retirement after Camden and was made a brigadier in October 1780. At New Providence he commanded the light corps of picked Continental infantry, riflemen and Washington's dragoons, and ordered the raid on Rugeley's. On December 21 he marched west with it, and on January 17, 1781 he beat Tarleton at Cowpens." },
   { n: "Otho Holland Williams", r: "Colonel · deputy adjutant general", side: "us", site: "camp",
     b: "Marylander who kept the army's orders, returns and records. His narrative of the 1780 campaign is one of the main sources for Camden and its aftermath. In February 1781 he commanded the light troops that screened Greene's escape across the Dan." },
-  { n: "John Eager Howard", r: "Lieutenant Colonel · Maryland light infantry", side: "us", site: "camp",
+  { n: "John Eager Howard", r: "Lieutenant Colonel · Maryland light infantry", side: "us", site: "camp", img: 'John_Eager_Howard_Uniform.jpg', credit: 'Charles Willson Peale',
     b: "Led the Continental light infantry in Morgan's corps. At Cowpens his line's turn and counter-charge broke the British. He later served as governor of Maryland and a U.S. senator." },
   { n: "William Washington", r: "Lieutenant Colonel · Continental light dragoons", side: "us", site: "rugeley",
     b: "A distant cousin of George Washington and the army's leading cavalry officer in the South. From New Providence he rode to Rugeley's Mill and captured its garrison with a fake cannon made from a pine log. He charged at Cowpens, was wounded and captured at Eutaw Springs in 1781, and settled in Charleston after the war." },
-  { n: "Thaddeus Kosciuszko", r: "Colonel · chief engineer", side: "us", site: "cheraw",
+  { n: "Thaddeus Kosciuszko", r: "Colonel · chief engineer", side: "us", site: "cheraw", img: 'Karl_G_Schweikart_-_Tadeusz_Kościuszko_(ÖaL).jpg', credit: 'Karl Gottlieb Schweikart, after 1802',
     b: "Polish engineer who had fortified the American lines at Saratoga and West Point. He came south as the army's chief engineer. Greene sent him from the Charlotte camps to survey the Pee Dee River for a site to rest and feed the army, which led to the camp near Cheraw. In 1794 he led Poland's uprising against Russia." },
-  { n: "William Lee Davidson", r: "Brigadier General · NC militia, Salisbury District", side: "nc", site: "camp",
+  { n: "William Lee Davidson", r: "Brigadier General · NC militia, Salisbury District", side: "nc", site: "camp", nolike: true,
     b: "Continental veteran who took command of the western North Carolina militia in 1780, recovering from a wound received at Colson's Mill that summer. Local historians credit him with founding the camp at New Providence about October 20. He was killed on February 1, 1781 holding Cowan's Ford on the Catawba. Davidson College and Davidson County are named for him." },
-  { n: "William Richardson Davie", r: "Colonel · cavalry, then commissary general", side: "nc", site: "charlotte",
+  { n: "William Richardson Davie", r: "Colonel · cavalry, then commissary general", side: "nc", site: "charlotte", img: 'WilliamRichardsonDavieByCharlesWillsonPeale.jpg', credit: 'after Charles Willson Peale',
     b: "Raised in the Waxhaws. His mounted men made the stand at the Charlotte courthouse on September 26. That November he wrote to Smallwood about scarce provisions and vanishing militia. Greene asked him to become commissary general, which he took on reluctantly. He later served as governor of North Carolina and is remembered as the father of the University of North Carolina." },
-  { n: "Charles, Earl Cornwallis", r: "Lieutenant General · British field army", side: "gb", site: "winnsboro",
+  { n: "Charles, Earl Cornwallis", r: "Lieutenant General · British field army", side: "gb", site: "winnsboro", img: 'Thomas_Gainsborough_(1727-88)_-_Charles,_Second_Earl_and_First_Marquess_Cornwallis_(1738-1805)_-_RCIN_400748_-_Royal_Collection.jpg', credit: 'Thomas Gainsborough, Royal Collection',
     b: "Won at Camden, occupied Charlotte, then fell back to Winnsboro after Kings Mountain. The council at New Providence was planning against his expected march north. He surrendered at Yorktown in October 1781." },
-  { n: "Banastre Tarleton", r: "Lieutenant Colonel · British Legion", side: "gb", site: "cowpens",
+  { n: "Banastre Tarleton", r: "Lieutenant Colonel · British Legion", side: "gb", site: "cowpens", img: 'Banastre-Tarleton-by-Joshua-Reynolds.jpg', credit: 'Joshua Reynolds, 1782',
     b: "Commander of the Loyalist British Legion, blamed for the slaughter at Waxhaws. Morgan's corps from New Providence destroyed his command at Cowpens." },
-  { n: "Henry Rugeley", r: "Loyalist colonel · Camden militia", side: "gb", site: "rugeley",
+  { n: "Henry Rugeley", r: "Loyalist colonel · Camden militia", side: "gb", site: "rugeley", nolike: true,
     b: "Wealthy merchant and planter whose Clermont estate north of Camden was a British post. He surrendered his garrison to William Washington's painted log. Cornwallis is said to have joked that Rugeley would never rise to brigadier." },
-  { n: "The rank and file", r: "Continentals and militia", side: "nc", site: "camp",
+  { n: "Johann de Kalb", r: "Major General · Maryland & Delaware division", side: "us", site: "camden", img: 'Johann_de_Kalb.jpg', credit: 'Charles Willson Peale',
+    b: "Bavarian-born veteran of the French army who marched the Maryland and Delaware Continentals south from New Jersey in spring 1780. He stayed with them when the militia fled at Camden and died of his wounds three days later. His regiments became the core of the army at New Providence." },
+  { n: "Robert Kirkwood", r: "Captain · Delaware Continentals", side: "us", site: "cowpens", nolike: true,
+    b: "Led the last remnant of the Delaware Regiment, about one company after Camden, as light infantry in Morgan's corps. His men fought at Cowpens, Guilford, Hobkirk's Hill and Ninety Six, and his journal is a key record of the march." },
+  { n: "Edward Carrington", r: "Lieutenant Colonel · quartermaster", side: "us", site: "dan",
+    b: "A Virginia artillery officer whom Greene made quartermaster in December 1780 and sent to survey the Dan and gather boats. Those boats carried the army to safety in the Race to the Dan in February 1781." },
+  { n: "Joseph McDowell", r: "Major · Burke County NC militia", side: "nc", site: "kings", nolike: true,
+    b: "One of the links between Kings Mountain and Cowpens. He led North Carolina militia at Kings Mountain in October 1780 and commanded militia riflemen in Morgan's front line at Cowpens in January 1781." },
+  { n: "Isaac Shelby", r: "Colonel · Sullivan County militia", side: "nc", site: "sycamore",
+    b: "Overmountain leader who fought at Musgrove Mill and helped raise the force that destroyed Ferguson at Kings Mountain. He later became Kentucky's first governor." },
+  { n: "Thomas Sumter", r: "Brigadier General · SC militia", side: "nc", site: "blackstock", img: 'ThomasSumterByRembrandtPeale.jpg', credit: 'attributed to Rembrandt Peale, c. 1796',
+    b: "The 'Gamecock'. His partisans fought at Rocky Mount, Hanging Rock, Fishing Creek, Fishdam Ford and Blackstock's in 1780. His wounding at Blackstock's left the backcountry to Morgan's corps." },
+  { n: "Andrew Pickens", r: "Brigadier General · SC militia", side: "nc", site: "cowpens", img: 'Andrew_Pickens.jpg', credit: 'photo of portrait at Fort Hill, CC BY-SA 2.5',
+    b: "Gave up his parole after Loyalists plundered his home, and joined Morgan with South Carolina militia. He commanded the militia line at Cowpens, whose two planned volleys opened the battle." },
+  { n: "Patrick Ferguson", r: "Major · Inspector of Loyalist militia", side: "gb", site: "kings", nolike: true,
+    b: "Scottish officer who organized Loyalist militia to cover Cornwallis's western flank. His threat to the Overmountain settlements brought out the men who killed him at Kings Mountain." },
+  { n: "Francis, Lord Rawdon", r: "Lieutenant Colonel · British commander at Camden", side: "gb", site: "hobkirk", img: 'Sir_Joshua_Reynolds_-_Francis_Rawdon-Hastings_(1754-1826),_Second_Earl_of_Moira_and_First_Marquess_of_Hastings_-_Google_Art_Project.jpg', credit: 'Joshua Reynolds, c. 1789',
+    b: "Held South Carolina after Cornwallis left for Virginia. He beat Greene at Hobkirk's Hill and relieved Ninety Six, but abandoned both posts within weeks." },
+  { n: "The rank and file", r: "Continentals and militia", side: "nc", site: "camp", nolike: true,
     b: "Most men at the camp left no letters, but many applied for federal pensions decades later and described their service under oath. Searching the transcribed Southern Campaign pension statements for 'New Providence' turns up first-hand memories of camp duty, foraging and guard posts here." }
-];
+,
+  // ---------- Revolutionary Charlotte ----------
+  { n: "Thomas Polk", r: "Colonel · Mecklenburg militia and commissary", side: "nc", site: "settlers",
+    b: "Leading Charlotte merchant and surveyor whose house at Trade and Tryon became Cornwallis's headquarters in September 1780. As commissary he struggled to feed the army at New Providence and resigned in December, when Greene turned to Davie. He is buried in Settlers' Cemetery." },
+  { n: "Hezekiah Alexander", r: "County committee member · 1775", side: "nc", site: "hezekiah",
+    b: "Blacksmith and planter whose 1774 stone house is the oldest in the county. He sat on the committee that adopted the Mecklenburg Resolves and helped write North Carolina's 1776 constitution." },
+  { n: "Andrew Jackson", r: "Waxhaws boy, later 7th U.S. President", side: "nc", site: "jackson", img: "Andrew_jackson_head.jpg", credit: "c. 1835, White House collection",
+    b: "Grew up in the Waxhaws south of the camp. He rode with Davie's men as a teenager, was captured in 1781 and scarred by a British officer's sword, and lost his mother and both brothers to the war." },
+  // ---------- Civil War Charlotte ----------
+  { n: "Jefferson Davis", r: "President of the Confederacy", side: "cs", site: "bates", era: "cw",
+    b: "Fled Richmond in April 1865 and reached Charlotte on April 18. He learned of Lincoln's assassination on April 19 while speaking from the Bates house, and held the last meetings of his full cabinet in Charlotte before leaving on April 26. Union cavalry captured him in Georgia on May 10." },
+  { n: "Judah P. Benjamin", r: "Confederate Secretary of State", side: "cs", site: "phifer", era: "cw", img: "Judah_P_Benjamin_crop.jpg", credit: "Library of Congress",
+    b: "Davis's closest adviser, who travelled with him to Charlotte. He slipped away from the fleeing government in May 1865, escaped to Britain, and became a leading London barrister." },
+  { n: "John C. Breckinridge", r: "Confederate Secretary of War", side: "cs", site: "phifer", era: "cw", img: "John_C_Breckinridge-04775-restored.jpg", credit: "Library of Congress, restored",
+    b: "Former U.S. vice president. In the Charlotte cabinet meetings he pressed Davis to accept that the war was lost. He later escaped to Cuba." },
+  { n: "George Trenholm", r: "Confederate Secretary of the Treasury", side: "cs", site: "fortmill", era: "cw",
+    b: "Charleston shipping magnate who financed blockade running. Ill and exhausted, he resigned from the cabinet at Fort Mill on April 27, 1865." },
+  { n: "Daniel Harvey Hill", r: "Superintendent, NC Military Institute; Confederate general", side: "cs", site: "ncmi", era: "cw",
+    b: "Ran the North Carolina Military Institute in Charlotte before the war. His cadets drilled the state's first volunteers, and he became a Confederate major general. He settled in Charlotte after the war and published a magazine there." },
+  { n: "Zebulon Vance", r: "Governor of North Carolina", side: "cs", site: "bates", era: "cw",
+    b: "North Carolina's wartime governor. He met Davis in Charlotte in April 1865 as the Confederacy collapsed." },
+  { n: "George Stoneman", r: "Union cavalry general", side: "un", site: "salisbury", era: "cw",
+    b: "Led the last great Union cavalry raid of the war through western North Carolina in spring 1865, capturing Salisbury on April 12 and burning its prison." }];
 
 const SOURCES = [
   ["NC Dept. of Natural & Cultural Resources, “Camp New Providence (L-110)”", "https://www.dncr.nc.gov/blog/2024/01/16/camp-new-providence-l-110"],
@@ -749,7 +1173,7 @@ const M_PER_DEG = 111320;
 const svg = document.getElementById("map");
 const wrap = document.getElementById("mapwrap");
 const view = { cx: 0, cy: 0, s: 10000 };
-const layers = { terrain: true, camp: true, sites: true, zones: false, modern: true, homes: true, later: false, grid: true };
+const layers = { terrain: true, camp: true, sites: true, zones: false, modern: true, homes: true, moves: true, later: false, grid: true };
 let selected = null;
 let W = 800, H = 600;
 
@@ -764,7 +1188,9 @@ const HOMES = HOMES_RAW.map((r, i) => {
   const [wx, wy] = toW(r[0], r[1]);
   return { i, wx, wy, addr: r[2], city: r[3], zip: r[4], year: r[5], sub: r[6], county: r[7] === "M" ? "Mecklenburg" : "Union", zone: r[8], lot };
 });
-let selHome = null;
+let selHome = null, popAt = null, pin = null;
+let era = "rev";
+try { if (localStorage.getItem("cnp-era") === "cw") era = "cw"; } catch { /* storage unavailable */ }
 function el(tag, attrs, parent, text) {
   const e = document.createElementNS(NS, tag);
   for (const k in attrs) e.setAttribute(k, attrs[k]);
@@ -776,8 +1202,9 @@ const cssVar = (n) => `var(--${n})`;
 
 const PRESETS = {
   camp: [35.022, -80.795, 35.048, -80.757],
-  charlotte: [35.218, -80.852, 35.240, -80.830],
-  campaign: [33.95, -82.05, 36.3, -78.95]
+  charlotte: [35.03, -80.98, 35.53, -80.60],
+  cw: [34.98, -80.99, 35.70, -80.44],
+  campaign: [32.7, -82.6, 37.3, -77.3]
 };
 function fit(b, animate) {
   const [la1, lo1, la2, lo2] = b;
@@ -849,7 +1276,7 @@ function graticule(g) {
 
 const TYPE_STYLE = {
   camp: { c: "continental", shape: "star" }, marker: { c: "buff", shape: "square" }, ford: { c: "water", shape: "diamond" },
-  church: { c: "ink", shape: "cross" }, town: { c: "ink", shape: "circle" }, park: { c: "low", shape: "circle" },
+  church: { c: "ink", shape: "cross" }, house: { c: "continental", shape: "square" }, town: { c: "ink", shape: "circle" }, park: { c: "low", shape: "circle" },
   battle: { c: "militia", shape: "swords" }, enemy: { c: "militia", shape: "square" }, later: { c: "later", shape: "diamond" }
 };
 function marker(g, kind, col, r) {
@@ -975,6 +1402,7 @@ function render() {
     const g = el("g", { class: "site" + (st.id === selected ? " sel" : ""), transform: `translate(${x.toFixed(1)},${y.toFixed(1)})`, tabindex: 0, role: "button", "aria-label": st.name }, gs);
     g.dataset.id = st.id;
     if (st.id === selected) el("circle", { r: 14, class: "sel-ring" }, g);
+    if (layers.moves && st.date && Math.abs(dayOf(st.date) - tDay) <= 4) el("circle", { r: 13, class: "evt" }, g);
     marker(g, sty.shape, sty.c, st.type === "camp" ? 9 : 7);
     labelQueue.push({ g, x, y, st });
   }
@@ -997,6 +1425,9 @@ function render() {
       if (free(b)) { boxes.push(b); el("text", { x: x + 6, y: y + 4, class: "town-label" }, g, t.name); }
     }
   }
+
+  if (layers.moves) drawForces(boxes, free);
+  drawPin();
 
   // scale bar
   const target = 90 / (s / M_PER_DEG); // metres in 90px
@@ -1057,7 +1488,7 @@ const ZONE_NAMES = { "": "Inside the conjectural camp layout" };
 const pop = document.getElementById("homepop");
 function homeFull(hm) { return hm.addr + ", " + (hm.city || hm.county + " County") + ", NC" + (hm.zip ? " " + hm.zip : ""); }
 function openHome(hm, fly) {
-  selHome = hm;
+  selHome = hm; popAt = hm;
   const zn = hm.zone ? (ZONES.find(z => z.id === hm.zone) || {}).name : ZONE_NAMES[""];
   const [la, lo] = [-hm.wy, hm.wx / K];
   pop.innerHTML = `
@@ -1079,11 +1510,11 @@ function openHome(hm, fly) {
   pop.hidden = false;
   if (fly) { flyTo(hm.wx, hm.wy, Math.max(view.s, 30000)); } else render();
 }
-function closeHome() { selHome = null; pop.hidden = true; render(); }
+function closeHome() { selHome = null; popAt = null; pop.hidden = true; render(); }
 function placePop() {
-  if (!selHome || pop.hidden) return;
-  if (!(layers.homes && layers.modern)) { pop.hidden = true; return; }
-  const x = sx_(selHome.wx), y = sy_(selHome.wy);
+  if (!popAt || pop.hidden) return;
+  if (popAt === selHome && !(layers.homes && layers.modern)) { pop.hidden = true; return; }
+  const x = sx_(popAt.wx), y = sy_(popAt.wy);
   const pw = pop.offsetWidth, ph = pop.offsetHeight;
   if (x < 0 || x > W || y < 0 || y > H) { pop.style.visibility = "hidden"; return; }
   pop.style.visibility = "";
@@ -1095,7 +1526,199 @@ function placePop() {
   pop.style.setProperty("--tip", Math.min(pw - 14, Math.max(14, x - left)) + "px");
 }
 pop.addEventListener("pointerdown", (e) => e.stopPropagation());
-addEventListener("keydown", (e) => { if (e.key === "Escape" && selHome) closeHome(); });
+addEventListener("keydown", (e) => { if (e.key === "Escape" && popAt) closeHome(); });
+
+/* ---------- modern address lookup ----------
+   Uses the State of North Carolina's AddressNC geocoder from the viewer's browser.
+   Where the page cannot reach it (offline, or a sandboxed preview), it falls back
+   to the home addresses built into the page. */
+const GEOCODER = "https://services.gis.nc.gov/secure/rest/services/AddressNC/AddressNC_geocoder/GeocodeServer/findAddressCandidates";
+const kmBetween = (a1, o1, a2, o2) => { const R = 6371, r = Math.PI / 180, dA = (a2 - a1) * r, dO = (o2 - o1) * r;
+  const h = Math.sin(dA / 2) ** 2 + Math.cos(a1 * r) * Math.cos(a2 * r) * Math.sin(dO / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); };
+const distTxt = (km) => km < 1 ? `${Math.round(km * 1000)} m (${Math.round(km * 3280.84)} ft)` : `${km.toFixed(1)} km (${(km / 1.609).toFixed(1)} mi)`;
+async function geocode(q) {
+  if (!/\b(NC|N\.C\.|North Carolina)\b/i.test(q)) q += ", NC";
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 9000);
+  try {
+    const r = await fetch(GEOCODER + "?" + new URLSearchParams({ SingleLine: q, outSR: 4326, maxLocations: 1, f: "json" }), { signal: ctl.signal });
+    const j = await r.json(), c = j.candidates && j.candidates[0];
+    return c && c.score >= 75 ? { lat: c.location.y, lon: c.location.x, label: c.address, score: c.score } : null;
+  } finally { clearTimeout(t); }
+}
+function openPin(g) {
+  const [wx, wy] = world(g.lat, g.lon);
+  pin = { ...g, wx, wy }; popAt = pin; selHome = null;
+  const mk = SITES.find(x => x.id === "marker");
+  const dCamp = kmBetween(g.lat, g.lon, mk.lat, mk.lon);
+  const near = SITES.filter(x => (x.layer === "later") === (era === "cw"))
+    .map(x => ({ x, d: kmBetween(g.lat, g.lon, x.lat, x.lon) })).sort((a, b) => a.d - b.d)[0];
+  const zone = ZONES.find(z => kmBetween(g.lat, g.lon, z.lat, z.lon) * 1000 <= z.r);
+  const lot = HOMES.find(hm => { let c = false; const r = hm.lot;
+    for (let i = 0, j = r.length - 1; i < r.length; j = i++) if ((r[i][1] > wy) !== (r[j][1] > wy) && wx < (r[j][0] - r[i][0]) * (wy - r[i][1]) / (r[j][1] - r[i][1]) + r[i][0]) c = !c; return c; });
+  pop.innerHTML = `
+    <button class="x" aria-label="Close">×</button>
+    <div class="addr">${esc(g.label)}</div>
+    <div class="meta">${g.lat.toFixed(5)}, ${g.lon.toFixed(5)}</div>
+    <dl>
+      <dt>To the camp marker</dt><dd>${distTxt(dCamp)}</dd>
+      <dt>Nearest site</dt><dd>${esc(near.x.name)}, ${distTxt(near.d)}</dd>
+      ${zone ? `<dt>Camp area</dt><dd>${esc(zone.name)}</dd>` : ""}
+      ${lot ? `<dt>On the camp ground</dt><dd>Yes. Built ${lot.year}</dd>` : ""}
+    </dl>
+    <div class="acts"><a href="${gmaps(g.lat, g.lon)}" target="_blank" rel="noopener">Map ↗</a></div>`;
+  pop.querySelector(".x").onclick = () => { pin = null; closeHome(); };
+  pop.hidden = false;
+  flyTo(wx, wy, Math.max(Math.min(view.s, 60000), dCamp < 3 ? 30000 : 9000));
+}
+document.getElementById("addrform").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const q = document.getElementById("addr-q").value.trim();
+  if (!q) return;
+  const local = HOMES.find(h => homeFull(h).toLowerCase().startsWith(q.toLowerCase()) || h.addr.toLowerCase() === q.toLowerCase());
+  try {
+    const g = await geocode(q);
+    if (g) return openPin(g);
+    if (local) return openHome(local, true);
+    toast("No North Carolina address matched. Try adding the city.");
+  } catch {
+    if (local) return openHome(local, true);
+    toast("The address service didn't answer. Only homes on the camp ground can be searched right now.");
+  }
+});
+function drawPin() {
+  if (!pin) return;
+  const x = sx_(pin.wx), y = sy_(pin.wy);
+  const g = el("g", { class: "pin", transform: `translate(${x.toFixed(1)},${y.toFixed(1)})` }, svg);
+  el("path", { d: "M0,0 C-3,-7 -9,-11 -9,-17 A9,9 0 1 1 9,-17 C9,-11 3,-7 0,0Z" }, g);
+  el("circle", { cy: -17, r: 3.5 }, g);
+}
+
+/* ---------- era toggle ---------- */
+const ERA = {
+  rev: { sub: "Southern Continental Army encampment · Six Mile Creek, Mecklenburg–Union line · Oct–Dec 1780",
+         note: "<b>A Revolutionary War camp, not a Civil War one.</b> The state marker and NC Archives date it to the fall of 1780; some online listings label it Civil War in error. Switch to Civil War for Charlotte's 1861–65 history." },
+  cw:  { sub: "Civil War Charlotte · navy yard, mint, hospitals and the Confederacy's last days · 1861–1865",
+         note: "<b>Charlotte's Civil War history.</b> Camp New Providence itself is a 1780 Revolutionary War site. Homes, roads and address search work in both views." }
+};
+function setEra(e, quiet) {
+  era = e;
+  const rev = e === "rev";
+  document.getElementById("era-rev").setAttribute("aria-pressed", rev);
+  document.getElementById("era-cw").setAttribute("aria-pressed", !rev);
+  document.getElementById("subtitle").textContent = ERA[e].sub;
+  document.getElementById("notice").innerHTML = ERA[e].note;
+  Object.assign(layers, rev ? { sites: true, later: false, camp: true, moves: true } : { sites: false, later: true, camp: false, moves: false, zones: false });
+  for (const k of ["sites", "later", "camp", "moves", "zones"]) {
+    const b = document.getElementById("L-" + k); b.checked = layers[k];
+    b.closest("label").hidden = rev ? k === "later" : k !== "later";
+  }
+  document.getElementById("timebar").hidden = !layers.moves; stopPlay();
+  document.getElementById("v-campaign").hidden = !rev; document.getElementById("v-camp").hidden = !rev;
+  selForce = null; selected = rev ? "camp" : "bates";
+  if (popAt) { popAt = null; selHome = null; pop.hidden = true; }
+  try { localStorage.setItem("cnp-era", e); } catch { /* storage unavailable */ }
+  if (!quiet) { if (rev) setPreset("camp"); else fit(PRESETS.cw, true); showTab(currentTab === "detect" && !rev ? "site" : currentTab); }
+}
+document.getElementById("era-rev").addEventListener("click", () => era !== "rev" && setEra("rev"));
+document.getElementById("era-cw").addEventListener("click", () => era !== "cw" && setEra("cw"));
+
+function drawForces(boxes, free) {
+  const g = el("g", {}, svg), marks = [];
+  for (const f of FORCES) {
+    const at = forceAt(f, tDay);
+    if (!at) continue;
+    const pts = f.wp.slice(0, at.i + 1).map(w => [w[1], w[2]]).concat([[at.lat, at.lon]]);
+    el("path", { d: pathD(pts), class: "trail", stroke: cssVar(f.c) }, g);
+    const [x, y] = toScreen(at.lat, at.lon);
+    marks.push({ f, at, x, y });
+  }
+  // fan out forces that share a spot (e.g. everyone at New Providence in November 1780)
+  const used = new Set();
+  for (let i = 0; i < marks.length; i++) {
+    if (used.has(i)) continue;
+    const grp = [i];
+    for (let j = i + 1; j < marks.length; j++) if (!used.has(j) && Math.hypot(marks[j].x - marks[i].x, marks[j].y - marks[i].y) < 16) grp.push(j);
+    grp.forEach(k => used.add(k));
+    if (grp.length > 1) grp.forEach((k, n) => {
+      const a = -Math.PI / 2 + n * 2 * Math.PI / grp.length, r = 11 + grp.length * 2;
+      marks[k].x += Math.cos(a) * r; marks[k].y += Math.sin(a) * r;
+    });
+  }
+  for (const m of marks) {
+    const fg = el("g", { class: "force", transform: `translate(${m.x.toFixed(1)},${m.y.toFixed(1)})`, tabindex: 0, role: "button", "aria-label": m.f.name }, g);
+    fg.dataset.id = m.f.id;
+    el("circle", { r: 9, fill: cssVar(m.f.c) }, fg);
+    el("text", { class: "ab", "text-anchor": "middle", y: 3 }, fg, m.f.ab);
+    if (selForce === m.f.id) el("circle", { r: 13, class: "sel-ring" }, fg);
+    const w = m.f.name.length * 6.1 + 4, b = { x: m.x + 11, y: m.y - 8, w, h: 15 };
+    if (free(b)) { boxes.push(b); el("text", { x: 12, y: 4, class: "force-label", style: `fill:${cssVar(m.f.c)}` }, fg, m.f.name); }
+  }
+}
+
+/* ---------- time slider ---------- */
+const tslider = document.getElementById("tslider");
+tslider.max = DAYS;
+const pct = (d) => (100 * d / DAYS).toFixed(2) + "%";
+document.getElementById("tband").style.cssText = `left:${pct(dayOf("1780-10-20"))};width:${pct(dayOf("1780-12-20") - dayOf("1780-10-20"))}`;
+const ttrack = document.getElementById("ttrack");
+document.getElementById("tlabels").innerHTML = [["1780-04-20", "Apr 1780", "translateX(0)"], ["1780-07-01", "Jul"], ["1780-10-01", "Oct"], ["1781-01-01", "Jan 1781"], ["1781-04-01", "Apr"], ["1781-06-20", "Jun 1781", "translateX(-100%)"]]
+  .map(([d, l, tf]) => `<span style="left:${pct(dayOf(d))}${tf ? ";transform:" + tf : ""}">${l}</span>`).join("");
+for (const t of TIMELINE) if (t.iso && SITES.some(s => s.id === t.site && s.type === "battle")) {
+  const tk = document.createElement("div"); tk.className = "ttick"; tk.style.left = pct(dayOf(t.iso)); tk.title = t.d + ": " + t.t; ttrack.appendChild(tk);
+}
+function setDay(d, quiet) {
+  tDay = Math.max(0, Math.min(DAYS, d));
+  tslider.value = Math.round(tDay);
+  document.getElementById("tdate").textContent = fmtDay(tDay);
+  const ph = document.getElementById("tphase");
+  const a = dayOf("1780-10-20"), b = dayOf("1780-12-20");
+  ph.textContent = tDay < a ? `${Math.ceil(a - tDay)} days before the camp` : tDay <= b ? "Camp New Providence occupied" : `${Math.floor(tDay - b)} days after the camp`;
+  ph.classList.toggle("at", tDay >= a && tDay <= b);
+  let ev = null;
+  for (const t of TIMELINE) if (t.iso && dayOf(t.iso) <= tDay + 0.5 && tDay - dayOf(t.iso) <= 12) ev = t;
+  document.getElementById("tcap").innerHTML = ev ? `<b>${esc(ev.d)}: ${esc(ev.t)}.</b> ${esc(ev.s)}` : "";
+  if (!quiet) requestRender();
+  if (selForce && currentTab === "site") renderForce();
+}
+tslider.addEventListener("input", () => { stopPlay(); setDay(+tslider.value); });
+let playT = 0;
+const playBtn = document.getElementById("tplay");
+function stopPlay() { if (playT) { clearInterval(playT); playT = 0; playBtn.textContent = "▶"; playBtn.setAttribute("aria-label", "Play the campaign"); } }
+playBtn.addEventListener("click", () => {
+  if (playT) return stopPlay();
+  if (tDay >= DAYS) setDay(0);
+  if (!layers.moves) { layers.moves = true; document.getElementById("L-moves").checked = true; }
+  if (view.s > 3000) setPreset("campaign");
+  playBtn.textContent = "❚❚"; playBtn.setAttribute("aria-label", "Pause");
+  playT = setInterval(() => { if (tDay >= DAYS) return stopPlay(); setDay(tDay + 1); }, reduceMotion ? 160 : 70);
+});
+function goToDay(iso, siteId) {
+  stopPlay();
+  if (!layers.moves) { layers.moves = true; document.getElementById("L-moves").checked = true; }
+  setDay(dayOf(iso), true);
+  const st = siteId && SITES.find(s => s.id === siteId);
+  if (st) { selected = st.id; flyToSite(st); } else render();
+}
+function selectForce(id) {
+  selForce = id; selected = null;
+  showTab("site"); render();
+}
+function renderForce() {
+  const f = FORCES.find(x => x.id === selForce);
+  const at = forceAt(f, tDay);
+  pane.innerHTML = `
+    <h2>${esc(f.name)}</h2>
+    <div class="kicker">${esc(f.desc)}</div>
+    <div class="callout ${at ? "ok" : "warn"}"><b>${esc(fmtDay(tDay))}:</b> ${at ? esc((at.moving ? "On the march after: " : "") + at.note) : "Not in the field on this date. Pick a date below."}</div>
+    <h3>Route</h3>
+    <ul class="list">${f.wp.map((w, i) => `
+      <li><button class="rowbtn" data-fday="${w[0]}" data-fi="${i}"><span class="when">${esc(fmtDay(dayOf(w[0])))}</span><span class="what">${esc(w[3])}</span></button></li>`).join("")}</ul>
+    <p class="note">Routes between dated points are drawn as straight lines.</p>`;
+  pane.querySelectorAll("[data-fday]").forEach(b => b.addEventListener("click", () => {
+    const w = f.wp[+b.dataset.fi]; stopPlay(); setDay(dayOf(w[0]), true);
+    const [x, y] = world(w[1], w[2]); flyTo(x, y, Math.max(Math.min(view.s, 3000), 700));
+  }));
+}
 
 /* ---------- interaction ---------- */
 const pointers = new Map();
@@ -1151,8 +1774,10 @@ function endPointer(e) {
   if (pointers.size === 0) {
     svg.classList.remove("dragging");
     if (!wasDrag && tgt && e.type === "pointerup") {
-      const g = tgt.closest && tgt.closest(".site");
-      if (g) selectSite(g.dataset.id, true);
+      const fgEl = tgt.closest && tgt.closest(".force");
+      const g = !fgEl && tgt.closest && tgt.closest(".site");
+      if (fgEl) selectForce(fgEl.dataset.id);
+      else if (g) selectSite(g.dataset.id, true);
       else {
         const [px, py] = pos(e), hm = pickHome(px, py);
         if (hm) openHome(hm, false); else if (selHome) closeHome();
@@ -1166,6 +1791,8 @@ svg.addEventListener("pointercancel", endPointer);
 svg.addEventListener("keydown", (e) => {
   const g = e.target.closest && e.target.closest(".site");
   if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); selectSite(g.dataset.id, true); }
+  const fk = e.target.closest && e.target.closest(".force");
+  if (fk && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); selectForce(fk.dataset.id); }
 });
 const clampS = (s) => Math.min(400000, Math.max(120, s));
 /* Eased zoom. The world point under the anchor (cursor, pinch centre or map
@@ -1203,14 +1830,13 @@ document.getElementById("zout").onclick = () => zoomAt(1 / 1.6);
 
 function setPreset(name) {
   for (const n of ["camp", "charlotte", "campaign"]) document.getElementById("v-" + n).setAttribute("aria-pressed", n === name);
-  if (name === "charlotte" && !layers.later) { layers.later = true; document.getElementById("L-later").checked = true; }
   fit(PRESETS[name], true);
 }
 for (const n of ["camp", "charlotte", "campaign"]) document.getElementById("v-" + n).onclick = () => setPreset(n);
 for (const k in layers) {
   const box = document.getElementById("L-" + k);
   box.checked = layers[k];
-  box.addEventListener("change", () => { layers[k] = box.checked; render(); if (k === "zones" && box.checked) showTab("detect"); });
+  box.addEventListener("change", () => { layers[k] = box.checked; if (k === "moves") { document.getElementById("timebar").hidden = !box.checked; if (!box.checked) stopPlay(); } render(); if (k === "zones" && box.checked) showTab("detect"); });
 }
 new ResizeObserver(() => requestRender()).observe(wrap);
 
@@ -1235,8 +1861,8 @@ document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () =>
 function selectSite(id, fromMap) {
   const st = SITES.find(s => s.id === id);
   if (!st) return;
-  selected = id;
-  if (st.layer === "later" && !layers.later) { layers.later = true; document.getElementById("L-later").checked = true; }
+  selected = id; selForce = null;
+  if ((st.layer === "later") !== (era === "cw")) setEra(st.layer === "later" ? "cw" : "rev", true);
   if (!fromMap) flyToSite(st);
   else render();
   showTab("site");
@@ -1250,6 +1876,7 @@ addEventListener("hashchange", () => {
 });
 
 function renderSite() {
+  if (selForce) return renderForce();
   const st = SITES.find(s => s.id === selected) || SITES[0];
   if (!selected) selected = st.id;
   pane.innerHTML = `
@@ -1294,37 +1921,114 @@ function anniversary() {
   return "";
 }
 
-function renderStory() {
+const CW_TIMELINE = [
+  { d: "1837", t: "Charlotte Mint opens", s: "A U.S. branch mint for the gold from the Carolina gold rush.", site: "mint" },
+  { d: "1852", t: "The railroad arrives", s: "The Charlotte & South Carolina Railroad reaches town. By 1861 Charlotte is a rail junction, which is why the Confederacy later puts industry here.", site: null },
+  { d: "1859", t: "NC Military Institute", s: "Daniel Harvey Hill opens a military school in Charlotte.", site: "ncmi" },
+  { d: "Spring 1861", t: "Mint seized", s: "North Carolina takes over the mint; the Confederacy uses it for offices and as a hospital.", site: "mint" },
+  { d: "May 20, 1861", md: "05-20", t: "North Carolina secedes", s: "Cadets from the Military Institute become drillmasters for the state's new regiments.", site: "ncmi" },
+  { d: "1862", t: "Navy Yard moves to Charlotte", s: "With Norfolk about to fall, the Confederate navy moves its ordnance works inland to Charlotte.", site: "navyyard" },
+  { d: "Jan 1864", t: "Fire at the Navy Yard", s: "An explosion and fire badly damage the works.", site: "navyyard" },
+  { d: "Late 1864", t: "Salisbury Prison overcrowded", s: "About 10,000 Union prisoners are held 40 miles north of Charlotte; thousands die.", site: "salisbury" },
+  { d: "Apr 12, 1865", md: "04-12", t: "Stoneman takes Salisbury", s: "Union cavalry capture the town and burn the prison.", site: "salisbury" },
+  { d: "Apr 18–19, 1865", md: "04-19", t: "Davis reaches Charlotte", s: "Jefferson Davis learns of Lincoln's assassination while speaking from the Bates house.", site: "bates" },
+  { d: "Apr 22–26, 1865", md: "04-26", t: "The last full cabinet", s: "Davis meets his cabinet in Charlotte, including at the Phifer house.", site: "phifer" },
+  { d: "Apr 27, 1865", md: "04-27", t: "Fort Mill", s: "Treasury Secretary Trenholm resigns as the government flees south.", site: "fortmill" },
+  { d: "May 10, 1865", t: "Davis captured", s: "Union cavalry capture Davis at Irwinville, Georgia.", site: null },
+  { d: "1917–1919", t: "Camp Greene", s: "A World War I training camp, named for Nathanael Greene, rises west of uptown.", site: "campgreene" }
+];
+function renderStoryCW() {
   const now = new Date();
   const md = String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
   pane.innerHTML = `
-    <h2>The fall of 1780</h2>
+    <h2>Civil War Charlotte</h2>
     <div class="kicker">Select an entry to fly to its place on the map.</div>
-    ${anniversary()}
-    <p>For about two months in late 1780, Six Mile Creek at the Providence settlement was the front line of the American Revolution in the South. The army camped here was what remained after Camden: a few hundred Maryland and Delaware Continentals, Virginia and North Carolina militia who came and went, and Morgan's new light corps. It was short of food, shoes, blankets and powder, and it faced Cornwallis's army across the South Carolina line.</p>
-    <p>What happened next makes the camp matter. The officers here planned against Cornwallis's next move. Greene took command and split the army, and Morgan's half went on to win at Cowpens.</p>
-    <ul class="list">${TIMELINE.map(t => `
+    <p>Charlotte saw no battle in the Civil War. It mattered because of its railroads: the Confederacy moved its naval ordnance works here from Norfolk, used the old mint as offices and a hospital, and ran hospitals for wounded men arriving by train. In April 1865 the town briefly hosted the collapsing Confederate government.</p>
+    <div class="callout warn">Camp New Providence is a 1780 Revolutionary War site, unrelated to the Civil War. Use the toggle at the top to switch back.</div>
+    <ul class="list">${CW_TIMELINE.map(t => `
       <li><button class="rowbtn${t.md === md ? " today" : ""}" ${t.site ? `data-site="${t.site}"` : "disabled"}>
-        <span class="when">${esc(t.d)}</span><span class="what">${t.later ? '<span class="dot" style="background:var(--later)"></span>' : ""}${esc(t.t)}</span><span class="why">${esc(t.s)}</span></button></li>`).join("")}</ul>
+        <span class="when">${esc(t.d)}</span><span class="what">${esc(t.t)}</span><span class="why">${esc(t.s)}</span></button></li>`).join("")}</ul>`;
+  wireRows();
+}
+function renderStory() {
+  if (era === "cw") return renderStoryCW();
+  const now = new Date();
+  const md = String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
+  const row = (t) => `
+      <li><button class="rowbtn${t.md === md ? " today" : ""}" ${t.iso ? `data-iso="${t.iso}"` : ""} ${t.site ? `data-st="${t.site}"` : ""} ${!t.iso && !t.site ? "disabled" : ""}>
+        <span class="when">${esc(t.d)}</span><span class="what">${t.later ? '<span class="dot" style="background:var(--later)"></span>' : ""}${esc(t.t)}</span><span class="why">${esc(t.s)}</span></button></li>`;
+  const part = (ph) => `<ul class="list">${TIMELINE.filter(t => t.ph === ph).map(row).join("")}</ul>`;
+  pane.innerHTML = `
+    <h2>The fall of 1780</h2>
+    <div class="kicker">Select an entry to move the slider to that date and fly to its place on the map.</div>
+    ${anniversary()}
+    <p>For about two months in late 1780, Six Mile Creek at the Providence settlement was the front line of the Revolution in the South. The army camped here was what remained after Camden: a few hundred Maryland and Delaware Continentals, Virginia and North Carolina militia who came and went, and Morgan's new light corps. It was short of food, shoes, blankets and powder, and it faced Cornwallis's army across the South Carolina line.</p>
+
+    <div class="factcheck">
+      <h4>Did the men come from Kings Mountain and go on to Cowpens?</h4>
+      <ul>
+        <li><b>Kings Mountain: mostly no.</b> It was a militia battle. Overmountain men from present-day Tennessee and southwest Virginia under Campbell, Shelby and Sevier fought alongside Carolina militia under Cleveland, McDowell, Williams and Lacey. No Continental unit fought there, and most of the victors went home within two weeks. Its effect on the camp was indirect but decisive: it drove Cornwallis out of Charlotte on October 14, which let the Americans move forward to Six Mile Creek.</li>
+        <li><b>Where the camp's Continentals came from:</b> the other direction. They were the Maryland and Delaware regiments de Kalb marched south from New Jersey, broken at Camden and rebuilt at Hillsborough.</li>
+        <li><b>Cowpens: yes.</b> Morgan's light corps, posted at New Providence, marched west on December 21 and won Cowpens on January 17, 1781. Howard's Maryland and Delaware light infantry and Washington's dragoons were its Continental core.</li>
+        <li><b>The overlap:</b> some Kings Mountain veterans did fight at Cowpens. Maj. Joseph McDowell led North Carolina militia at both, and the Overmountain men had camped on the Cowpens pasture the night before Kings Mountain.</li>
+        <li><b>Everyone else:</b> the rest of the camp's Continentals went with Greene to Cheraw, then Guilford Courthouse, Hobkirk's Hill and Ninety Six. Davidson's militia stayed to guard the Catawba, where he was killed at Cowan's Ford.</li>
+      </ul>
+    </div>
+
+    <div class="storyhead">Before the camp · April – October 1780</div>
+    <p class="note">Charleston falls, the backcountry rises, and the second Southern Army is destroyed at Camden. Kings Mountain turns the tide.</p>
+    ${part(0)}
+    <div class="storyhead">At New Providence · October 20 – December 20, 1780</div>
+    ${part(1)}
+    <h3>How each side prepared</h3>
+    <ul class="tight">
+      <li><b>A striking force.</b> Morgan's light corps of picked light infantry, riflemen and dragoons was built to move fast and fight away from the main army. It was posted forward at New Providence.</li>
+      <li><b>Food.</b> Greene talked Davie into becoming commissary general and organized the collection of grain and cattle, because the Charlotte district had been stripped by both armies.</li>
+      <li><b>Scouting the rivers.</b> Greene sent Kosciuszko to survey the Pee Dee for a camp and Edward Carrington to survey the Dan and find boats. The boats saved the army in February.</li>
+      <li><b>Splitting the army.</b> Against the textbook, Greene divided his small army so two forces could feed themselves and threaten Cornwallis from two sides.</li>
+      <li><b>The British side.</b> Cornwallis waited at Winnsboro, recovering from fever, for Gen. Alexander Leslie's reinforcements from Virginia. They reached him on January 18, 1781, the day after Cowpens.</li>
+    </ul>
     <h3>What camp life was like</h3>
     <ul class="tight">
-      <li><b>Hunger.</b> The district had been stripped by both armies. Davie's November letters to Smallwood complain that supplies had gone forward or been eaten.</li>
+      <li><b>Hunger.</b> Davie's November letters to Smallwood complain that supplies had gone forward or been eaten.</li>
       <li><b>Turnover.</b> Militia served short tours, often a few months, and many simply went home. Camp strength swung between about 1,300 and 2,600.</li>
       <li><b>Cold and wet.</b> Late-autumn rains and early cold delayed the army's departure in December.</li>
       <li><b>Routine.</b> Guard mounting, picket duty on the roads, foraging parties, drill under Steuben's 1779 Regulations, and constant scouting toward Camden and Winnsboro.</li>
-    </ul>`;
+    </ul>
+    <div class="storyhead">After the camp · December 1780 – June 1781</div>
+    <p class="note">The light corps wins Cowpens, the reunited army runs for the Dan, and Greene turns Cornwallis's victory at Guilford into a British retreat from the Carolinas.</p>
+    ${part(2)}
+    <div class="storyhead">Later</div>
+    ${TIMELINE.some(t => t.ph === 3) ? part(3) : ""}`;
+  pane.querySelectorAll(".rowbtn[data-iso], .rowbtn[data-st]").forEach(b => b.addEventListener("click", () => {
+    if (b.dataset.iso) goToDay(b.dataset.iso, b.dataset.st);
+    else selectSite(b.dataset.st, false);
+  }));
   wireRows();
 }
 
+const commons = (f, w) => "https://commons.wikimedia.org/wiki/Special:FilePath/" + encodeURIComponent(f) + "?width=" + w;
+const initials = (n) => n.replace(/^(The|Charles,|Francis,)\s+/, "").split(/\s+/).filter(w => /^[A-Z]/.test(w)).slice(0, 2).map(w => w[0]).join("");
+function portraitHTML(p, big) {
+  if (!p.img) return big ? `<div class="mono" role="img" aria-label="No portrait">${esc(initials(p.n))}</div>` : `<span class="avatar mono" aria-hidden="true">${esc(initials(p.n))}</span>`;
+  const fb = `this.outerHTML='<span class=&quot;${big ? "mono" : "avatar mono"}&quot;>${esc(initials(p.n))}</span>'`;
+  return `<img class="${big ? "" : "avatar"}" src="${commons(p.img, big ? 260 : 96)}" alt="${big ? "Portrait of " + esc(p.n) : ""}" loading="lazy" referrerpolicy="no-referrer" onerror="${fb}">`;
+}
 function renderPeople() {
-  const sideChip = { us: '<span class="chip era-1780">Continental</span>', nc: '<span class="chip" style="color:var(--militia);border-color:var(--militia)">NC</span>', gb: '<span class="chip" style="color:var(--hi);border-color:var(--hi)">British</span>' };
+  const sideChip = { us: '<span class="chip era-1780">Continental</span>', nc: '<span class="chip" style="color:var(--militia);border-color:var(--militia)">Patriot militia</span>', gb: '<span class="chip" style="color:var(--hi);border-color:var(--hi)">British</span>', cs: '<span class="chip" style="color:var(--later);border-color:var(--later)">Confederate</span>', un: '<span class="chip era-1780">Union</span>' };
+  const list = PEOPLE.filter(p => (p.era || "rev") === era);
   pane.innerHTML = `
-    <h2>Important figures</h2>
-    <div class="kicker">Officers named on the state marker, the local commanders, and the men across the line.</div>
-    ${PEOPLE.map((p, i) => `
-      <details class="person" ${i === 0 ? "" : ""}>
-        <summary><span class="nm">${esc(p.n)}</span><span class="side">${sideChip[p.side]}</span><span class="rk">${esc(p.r)}</span></summary>
-        <div class="body"><p>${esc(p.b)}</p>${p.site ? `<button class="btn" data-site="${p.site}">Show on map</button>` : ""}</div>
+    <h2>${era === "rev" ? "Important figures" : "Civil War Charlotte"}</h2>
+    <div class="kicker">${era === "rev" ? "Officers named on the state marker, the local commanders, Charlotte's Revolutionary leaders, and the men across the line." : "The people behind Charlotte's wartime industries and the Confederacy's last days."} Portraits load from Wikimedia Commons.</div>
+    ${list.map(p => `
+      <details class="person">
+        <summary>${portraitHTML(p, false)}<span class="nm">${esc(p.n)}</span><span class="side">${sideChip[p.side]}</span><span class="rk">${esc(p.r)}</span></summary>
+        <div class="body">
+          <div class="portrait">
+            <div>${portraitHTML(p, true)}<div class="credit">${p.img ? `${esc(p.credit || "")} · <a href="https://commons.wikimedia.org/wiki/File:${encodeURIComponent(p.img)}" target="_blank" rel="noopener">Commons</a>` : p.nolike ? "No portrait from life is known." : "No verified portrait on file yet."}</div></div>
+            <div><p>${esc(p.b)}</p>${p.site ? `<button class="btn" data-site="${p.site}">Show on map</button>` : ""}</div>
+          </div>
+        </div>
       </details>`).join("")}`;
   wireRows();
 }
@@ -1414,7 +2118,16 @@ function renderDetect() {
 }
 
 function renderVisit() {
-  const tour = ["marker", "ford", "church", "greenway", "charlotte", "mcintyre"];
+  if (era === "cw") {
+    pane.innerHTML = `
+      <h2>Visit today</h2>
+      <div class="kicker">An uptown walk of about a mile, plus two drives. Most Civil War buildings are gone; markers show where they stood.</div>
+      <ul class="list">${["bates", "phifer", "navyyard", "mint", "elmwood", "ncmi", "salisbury", "fortmill"].map((id, i) => {
+        const s = SITES.find(x => x.id === id);
+        return `<li><button class="rowbtn" data-site="${s.id}"><span class="when">Stop ${i + 1}</span><span class="what">${esc(s.name)}</span><span class="why">${esc(s.today)}</span></button></li>`; }).join("")}</ul>`;
+    return wireRows();
+  }
+  const tour = ["marker", "ford", "church", "greenway", "charlotte", "settlers", "hezekiah", "sugarcreek", "mcintyre", "hopewell"];
   pane.innerHTML = `
     <h2>Visit today</h2>
     <div class="kicker">A half-day drive in south Charlotte and Union County. Nothing of the camp survives above ground, so this tour is about the setting.</div>
@@ -1465,6 +2178,8 @@ function toast(msg) {
 
 /* ---------- boot ---------- */
 if (innerWidth < 900) document.getElementById("layers").open = false;
+setDay(tDay, true);
+setEra(era, true);
 W = wrap.clientWidth || 800; H = wrap.clientHeight || 600;
 const startId = location.hash.slice(1);
 if (SITES.some(s => s.id === startId)) {
@@ -1472,6 +2187,8 @@ if (SITES.some(s => s.id === startId)) {
   const st = SITES.find(s => s.id === startId);
   if (st.layer === "later") { layers.later = true; document.getElementById("L-later").checked = true; }
   const [x, y] = world(st.lat, st.lon); flyTo(x, y, targetScale(st), false);
+} else if (era === "cw") {
+  fit(PRESETS.cw, false);
 } else {
   selected = "camp";
   fit(PRESETS.camp, false);
