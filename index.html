@@ -389,6 +389,15 @@ ul.tight li { margin: 3px 0; }
   .addr { width: 200px; }
   .layers { max-width: 200px; }
 }
+.flag { display: inline-block; vertical-align: -2px; border-radius: 1px; box-shadow: 0 0 0 .5px rgba(0,0,0,.45); }
+.sides { display: grid; gap: 4px; margin: 10px 0 4px; font-size: .86rem; }
+.sides .row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.sides .vs { color: var(--ink-soft); font-size: .78rem; }
+.sides .res { font-weight: 600; }
+.flagkey { display: grid; gap: 4px; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--rule); font-size: .76rem; }
+.flagkey b { font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
+.flagkey span { display: flex; align-items: center; gap: 6px; }
+#map .flagpole { stroke: var(--ink); stroke-width: 1.2; }
 .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--panel); padding: 7px 14px; border-radius: 3px; font-size: .82rem; z-index: 20; }
 </style>
 </head>
@@ -440,6 +449,7 @@ ul.tight li { margin: 3px 0; }
         <label><input type="checkbox" id="L-later"> <span class="sw" style="background:var(--later)"></span>Civil War &amp; later</label>
         <label><input type="checkbox" id="L-moves" checked> <span class="sw" style="background:var(--fx-gb)"></span>Army &amp; ship movements (slider)</label>
         <label><input type="checkbox" id="L-grid" checked> <span class="sw" style="background:var(--ink-soft)"></span>Lat/long graticule</label>
+        <div class="flagkey" id="flagkey"></div>
       </details>
     </div>
     <div class="mapctl tr">
@@ -1371,6 +1381,74 @@ const CLT_REV_FORCES = [
          ["1780-10-04", 35.22, -81.60, "Fall back toward Charlotte"],
          ["1780-10-07", 35.1414, -81.377, "Destroyed at Kings Mountain"]] }
 ];
+/* ======================= FLAGS AND SIDES =======================
+   Period flags drawn as small inline SVGs (viewBox 30x20) so they need no images:
+   us = Stars and Stripes (1777; also the Union 1861-65), pm = Moultrie "Liberty" flag (1775),
+   gb = Union Flag of 1707 (before the 1801 St Patrick's cross), cs = First National "Stars and Bars". */
+const FLAG_ART = {
+  us: (() => { let r = '<rect width="30" height="20" fill="#fff"/>';
+    for (let i = 0; i < 13; i += 2) r += `<rect y="${(i * 20 / 13).toFixed(2)}" width="30" height="${(20 / 13).toFixed(2)}" fill="#b22234"/>`;
+    r += '<rect width="12.5" height="10.77" fill="#3c3b6e"/>';
+    for (const [x, y] of [[3, 2.6], [6.2, 2.6], [9.4, 2.6], [4.6, 5.4], [7.8, 5.4], [3, 8.2], [6.2, 8.2], [9.4, 8.2]]) r += `<circle cx="${x}" cy="${y}" r=".85" fill="#fff"/>`;
+    return r; })(),
+  gb: '<rect width="30" height="20" fill="#1c3f94"/><path d="M0,0 L30,20 M30,0 L0,20" stroke="#fff" stroke-width="4"/>' +
+      '<rect y="6.5" width="30" height="7" fill="#fff"/><rect x="11.5" width="7" height="20" fill="#fff"/>' +
+      '<rect y="8" width="30" height="4" fill="#c8102e"/><rect x="13" width="4" height="20" fill="#c8102e"/>',
+  pm: '<rect width="30" height="20" fill="#1f3f7a"/><circle cx="8.5" cy="6.5" r="4.2" fill="#fff"/><circle cx="10.2" cy="5.3" r="3.8" fill="#1f3f7a"/>',
+  cs: (() => { let r = '<rect width="30" height="20" fill="#fff"/><rect width="30" height="6.67" fill="#b0262c"/><rect y="13.33" width="30" height="6.67" fill="#b0262c"/>' +
+    '<rect width="12.5" height="13.33" fill="#1f3a7a"/>';
+    for (let i = 0; i < 7; i++) { const a = -Math.PI / 2 + i * 2 * Math.PI / 7; r += `<circle cx="${(6.25 + Math.cos(a) * 3.6).toFixed(2)}" cy="${(6.67 + Math.sin(a) * 3.6).toFixed(2)}" r=".95" fill="#fff"/>`; }
+    return r; })()
+};
+const SIDE_INFO = {
+  us: { flag: "us", name: "Continental Army" }, pm: { flag: "pm", name: "Patriot militia" },
+  gb: { flag: "gb", name: "British forces" },   lo: { flag: "gb", name: "Loyalists" },
+  un: { flag: "us", name: "Union" },            cs: { flag: "cs", name: "Confederate" }
+};
+const sideKey = (side) => side === "nc" ? "pm" : side;   // forces and people use "nc" for Patriot militia
+const flagHTML = (side, w = 21) => `<svg class="flag" width="${w}" height="${Math.round(w * 2 / 3)}" viewBox="0 0 30 20" aria-hidden="true">${FLAG_ART[(SIDE_INFO[sideKey(side)] || SIDE_INFO.us).flag]}</svg>`;
+/* Who fought at each site: [side A forces, side B forces, result]. One-sided posts list one side. */
+const SITE_SIDES = {
+  camp: [["us", "pm"], [], "American camp"], charlotte: [["pm"], ["gb"], "British take the town after a sharp fight"],
+  waxhaws: [["us"], ["lo"], "British Legion victory; massacre of surrendering men"], camden: [["us", "pm"], ["gb", "lo"], "British victory"],
+  hillsborough: [["us"], [], "American army rebuilds"], mcintyre: [["pm"], ["gb"], "Militia drive off British foragers"],
+  kings: [["pm"], ["lo"], "Patriot victory"], winnsboro: [["gb"], [], "British winter quarters"], rugeley: [["us"], ["lo"], "American victory without a shot"],
+  cheraw: [["us"], [], "American camp"], cowpens: [["us", "pm"], ["gb", "lo"], "American victory"], guilford: [["us", "pm"], ["gb"], "British hold the field at heavy cost"],
+  charleston: [["us", "pm"], ["gb"], "British victory; city surrenders"], ramsour: [["pm"], ["lo"], "Patriot victory"], huck: [["pm"], ["lo", "gb"], "Patriot victory"],
+  colson: [["pm"], ["lo"], "Patriot victory"], rockymount: [["pm"], ["lo"], "Loyalist post holds"], hangingrock: [["pm"], ["lo", "gb"], "Patriot attack, unfinished"],
+  fishingcreek: [["gb", "lo"], ["pm"], "British victory"], musgrove: [["pm"], ["lo", "gb"], "Patriot victory"], wahab: [["pm"], ["lo", "gb"], "Patriot raid succeeds"],
+  sycamore: [["pm"], [], "Patriot muster"], fishdam: [["pm"], ["gb"], "Patriot victory"], blackstock: [["pm"], ["gb", "lo"], "Patriots hold the hill"],
+  hammond: [["us", "pm"], ["lo"], "American victory"], grindal: [["us", "pm"], [], "American camp"], cowansford: [["gb"], ["pm"], "British force the crossing"],
+  dan: [["us"], [], "American army escapes into Virginia"], hobkirk: [["gb", "lo"], ["us"], "British victory"], ninetysix: [["us"], ["lo"], "Siege fails; post later abandoned"],
+  coxes: [["us"], [], "American camp"], wilmington: [["gb"], [], "British base"], torrence: [["gb", "lo"], ["pm"], "British victory"],
+  marker: [["us", "pm"], [], "Marks the American camp"], ford: [["us", "pm"], [], "American guard post"],
+  navyyard: [["cs"], [], "Confederate naval works"], phifer: [["cs"], [], "Confederate cabinet"], bates: [["cs"], [], "Confederate government"],
+  mint: [["cs"], [], "Confederate offices and hospital"], ncmi: [["cs"], [], "Confederate drillmasters"], salisbury: [["un"], ["cs"], "Union cavalry capture the town"],
+  fortmill: [["cs"], [], "Confederate cabinet"],
+  "c-moultrie76": [["pm"], ["gb"], "American victory"], "c-breach76": [["pm"], ["gb"], "American victory"], "c-actaeon": [["gb"], [], "British frigate lost"],
+  "c-stono": [["us", "pm"], ["gb"], "British victory"], "c-hornwork": [["us", "pm"], ["gb"], "City surrenders"], "c-siegelines": [["gb"], ["us", "pm"], "British victory"],
+  "c-exchange": [["gb"], [], "British prison"], "c-monckscorner": [["gb", "lo"], ["us"], "British victory"], "c-dorchester": [["us"], ["gb"], "British pull back"],
+  "c-evacuation": [["gb", "lo"], [], "British leave; Americans march in"], "c-gadsden": [["pm"], [], "Patriot leader's wharf"],
+  "c-sumter": [["cs"], ["un"], "Confederates take the fort; Union holds it again from 1865"], "c-moultrie61": [["cs"], [], "Confederate fort"],
+  "c-ftjohnson": [["cs"], [], "Confederate battery"], "c-citadel": [["cs"], ["un"], "Supply ship turned back"], "c-secession": [["cs"], [], "Secession"],
+  "c-secessionville": [["un"], ["cs"], "Confederate victory"], "c-planter": [["un"], ["cs"], "Escape to the Union fleet"], "c-grimball": [["cs"], ["un"], "Union troops hold"],
+  "c-wagner": [["un"], ["cs"], "Assault repulsed; Union takes it by siege"], "c-gregg": [["cs"], ["un"], "Union takes it in September 1863"],
+  "c-swampangel": [["un"], [], "Union battery"], "c-battery": [["cs"], ["un"], "City evacuated; Union troops enter"], "c-castlepinckney": [["cs"], [], "Confederate fort"],
+  "c-breach64": [["cs"], [], "Confederate battery"], "c-hunley": [["cs"], ["un"], "Housatonic sunk; Hunley lost"], "c-housatonic": [["un"], ["cs"], "Sunk by the Hunley"],
+  "c-keokuk": [["un"], ["cs"], "Union attack beaten off"], "c-weehawken": [["un"], [], "Union monitor lost"], "c-patapsco": [["un"], ["cs"], "Sunk by a Confederate mine"],
+  "c-stonefleet": [["un"], [], "Union blockade"], "c-georgiana": [["cs"], ["un"], "Blockade runner wrecked"]
+};
+function sidesHTML(st) {
+  const sd = SITE_SIDES[st.id]; if (!sd) return "";
+  const grp = (arr) => arr.map(k => `<span class="row">${flagHTML(k, 27)} ${esc(SIDE_INFO[k].name)}</span>`).join("");
+  return `<div class="sides"><div class="row">${grp(sd[0])}${sd[1].length ? '<span class="vs">vs</span>' + grp(sd[1]) : ""}</div><div class="res">${esc(sd[2])}</div></div>`;
+}
+function renderFlagKey() {
+  const keys = era === "rev" ? ["us", "pm", "gb"] : ["un", "cs"];
+  const label = { us: "Continental Army (1777 flag)", pm: "Patriot militia (Moultrie flag)", gb: "British & Loyalists (Union Flag)", un: "Union (Stars and Stripes)", cs: "Confederate (Stars and Bars)" };
+  document.getElementById("flagkey").innerHTML = `<b>Flags</b>` + keys.map(k => `<span>${flagHTML(k, 24)} ${label[k]}</span>`).join("");
+}
+
 /* ======================= TIMELINES (scenarios) =======================
    Each area and war has one or more timelines. Waypoints: [iso date, lat, lon, note];
    positions between dated points are straight-line interpolations. ship: true draws a boat. */
@@ -1918,6 +1996,11 @@ function render() {
     g.dataset.id = st.id;
     if (st.id === selected) el("circle", { r: 14, class: "sel-ring" }, g);
     if (layers.moves && st.date && Math.abs(dayOf(st.date) - tDay) <= Math.max(2, DAYS / 100)) el("circle", { r: 13, class: "evt" }, g);
+    const sd = SITE_SIDES[st.id];
+    if (sd && view.s >= 2200) {
+      const fl = [sd[0][0], sd[1][0]].filter(Boolean).map(k => SIDE_INFO[k].flag).filter((f, i, a) => a.indexOf(f) === i);
+      fl.forEach((f, i) => { const sv = el("svg", { x: -32, y: -14 + i * 13, width: 18, height: 12, viewBox: "0 0 30 20", class: "flag" }, g); sv.innerHTML = FLAG_ART[f]; });
+    }
     marker(g, sty.shape, sty.c, st.type === "camp" ? 9 : 7);
     labelQueue.push({ g, x, y, st });
   }
@@ -2282,6 +2365,7 @@ function setEra(e, quiet) {
     b.closest("label").hidden = rev ? (k === "later" || (area === "charleston" && k === "camp")) : !["later", "zones", "moves"].includes(k);
   }
   document.getElementById("timebar").hidden = !layers.moves; stopPlay(); playFitted = false;
+  renderFlagKey();
   setScenario((scenarioFor(area, e) || SCENARIOS[0]).id);
   const clt = area === "charlotte";
   document.getElementById("v-campaign").hidden = !(rev && clt); document.getElementById("v-camp").hidden = !(rev && clt);
@@ -2327,8 +2411,13 @@ function drawForces(boxes, free) {
       el("text", { class: "ab", "text-anchor": "middle", y: 3 }, fg, m.f.ab);
     }
     if (selForce === m.f.id) el("circle", { r: 13, class: "sel-ring" }, fg);
-    const w = m.f.name.length * 6.1 + 4, b = { x: m.x + 11, y: m.y - 8, w, h: 15 };
-    if (free(b)) { boxes.push(b); el("text", { x: 12, y: 4, class: "force-label", style: `fill:${cssVar(m.f.c)}` }, fg, m.f.name); }
+    // the side's flag on a short pole (at the masthead for ships)
+    const fx = m.f.ship ? -1 : 6, fy = m.f.ship ? -12 : -7;
+    el("line", { x1: fx, y1: fy, x2: fx, y2: fy - 17, class: "flagpole" }, fg);
+    const fl = el("svg", { x: fx, y: fy - 17, width: 21, height: 14, viewBox: "0 0 30 20", class: "flag" }, fg);
+    fl.innerHTML = FLAG_ART[(SIDE_INFO[sideKey(m.f.side)] || SIDE_INFO.us).flag];
+    const w = m.f.name.length * 6.1 + 4, b = { x: m.x + 29, y: m.y - 8, w, h: 15 };
+    if (free(b)) { boxes.push(b); el("text", { x: 30, y: 4, class: "force-label", style: `fill:${cssVar(m.f.c)}` }, fg, m.f.name); }
   }
 }
 
@@ -2423,7 +2512,8 @@ function renderForce() {
   const f = FORCES.find(x => x.id === selForce);
   const at = forceAt(f, tDay);
   pane.innerHTML = `
-    <h2>${esc(f.name)}</h2>
+    <h2>${flagHTML(f.side, 30)} ${esc(f.name)}</h2>
+    <div class="kicker">${esc(SIDE_INFO[sideKey(f.side)].name)}${f.ship ? " · ship" : ""}</div>
     <div class="kicker">${esc(f.desc)}</div>
     <div class="callout ${at ? "ok" : "warn"}"><b>${esc(fmtDay(tDay))}:</b> ${at ? esc((at.moving ? "On the march after: " : "") + at.note) : "Not in the field on this date. Pick a date below."}</div>
     <h3>Route</h3>
@@ -2616,6 +2706,7 @@ function renderSite() {
     <h2>${esc(st.name)}</h2>
     <div class="kicker">${esc(st.kind)}</div>
     <div class="chips">${eraChip(st)}${statusChip(st)}</div>
+    ${sidesHTML(st)}
     ${st.history.map(p => `<p>${esc(p)}</p>`).join("")}
     <h3>Today</h3><p>${esc(st.today)}</p>
     <h3>Access</h3><p>${esc(st.access)}</p>
@@ -2872,7 +2963,7 @@ function portraitHTML(p, big) {
   return `<img class="${big ? "" : "avatar"}" src="${commons(p.img, big ? 260 : 96)}" alt="${big ? "Portrait of " + esc(p.n) : ""}" loading="lazy" referrerpolicy="no-referrer" onerror="${fb}">`;
 }
 function renderPeople() {
-  const sideChip = { us: '<span class="chip era-1780">Continental</span>', nc: '<span class="chip" style="color:var(--militia);border-color:var(--militia)">Patriot militia</span>', gb: '<span class="chip" style="color:var(--hi);border-color:var(--hi)">British</span>', cs: '<span class="chip" style="color:var(--later);border-color:var(--later)">Confederate</span>', un: '<span class="chip era-1780">Union</span>' };
+  const sideChip = { us: `<span class="chip era-1780">${flagHTML("us", 15)} Continental</span>`, nc: `<span class="chip" style="color:var(--militia);border-color:var(--militia)">${flagHTML("pm", 15)} Patriot militia</span>`, gb: `<span class="chip" style="color:var(--hi);border-color:var(--hi)">${flagHTML("gb", 15)} British</span>`, cs: `<span class="chip" style="color:var(--later);border-color:var(--later)">${flagHTML("cs", 15)} Confederate</span>`, un: `<span class="chip era-1780">${flagHTML("un", 15)} Union</span>` };
   const list = PEOPLE.filter(p => (p.era || "rev") === era && (p.area || "charlotte") === area);
   pane.innerHTML = `
     <h2>${area === "charleston" ? (era === "rev" ? "Revolutionary Charleston" : "Civil War Charleston") : era === "rev" ? "Important figures" : "Civil War Charlotte"}</h2>
