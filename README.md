@@ -1,18 +1,32 @@
-# Camp New Providence interactive map
+# Carolina War History Interactive Map
 
-A single-file interactive map of Camp New Providence, the Southern Continental
-Army's encampment on Six Mile Creek (Providence Road / NC 16, at the
-Mecklenburg–Union county line) from about October 20 to mid-December 1780.
+An interactive map of Revolutionary War and Civil War history in two Carolina
+areas, switched with the toggle in the header:
 
-Open `index.html` in a browser. It needs no build step and no map tiles:
-everything is drawn as SVG from data embedded in the page, and every site links
-out to Google Maps for imagery.
+- **Charlotte area**, centred on Camp New Providence, the Southern Continental
+  Army's encampment on Six Mile Creek (Providence Road / NC 16, at the
+  Mecklenburg–Union county line) from about October 20 to mid-December 1780, with
+  the 1780–81 campaign around it and Civil War Charlotte.
+- **Charleston area**: Sullivan's Island 1776, the sieges of 1779–80 and the
+  occupation; Fort Sumter, Secessionville, Fort Wagner, the Planter, the Hunley,
+  and the shipwrecks of the blockade.
+
+Serve the folder from any static web server (GitHub Pages does this) and open
+`index.html`. It needs no build step and no map tiles: everything is drawn as SVG.
+The page loads two data files next to it, so opening it straight from disk
+(`file://`) shows the map without homes or the Charleston coastline:
+
+- `homes.json`: homes near North Carolina sites, one record per line.
+- `charleston-water.json`: Charleston-area water polygons.
 
 Contents:
 
 - **Two eras**: a toggle switches the map, story, people and tour between the
   Revolutionary War (the 1780 camp and the Charlotte area) and Civil War Charlotte.
-- **Time slider** (Revolutionary War): April 20, 1780 to June 20, 1781, six months either
+- **Library** tab: original letters (Founders Online, American Revolution
+  Institute), Library of Congress maps and fort plans, articles, documentaries and
+  podcasts, filtered by area and war.
+- **Time slider** (Revolutionary War, Charlotte area), with ½×, 1× and 2× playback: April 20, 1780 to June 20, 1781, six months either
   side of the camp. Ten forces move along dated waypoints with trails; battles pulse as
   the date passes. Routes between waypoints are straight lines.
 - **Address lookup**: type any North Carolina address to drop a pin and see its distance
@@ -30,6 +44,12 @@ Contents:
   legal notes and a musket-ball calculator, a driving tour, and sources.
 
 ## Data
+
+**Charleston water**: U.S. Census Bureau TIGER areal hydrography (harbor, rivers,
+creeks, sounds and the ocean to about 3 nautical miles, public domain), with open
+ocean added beyond that line. Wreck positions are approximate.
+Charleston has detecting zones but no homes, because the state parcel service used
+for homes covers North Carolina only.
 
 Around the camp the base map is real geometry from NC OneMap
 (`services.gis.nc.gov`), fetched November 2026 and embedded in the page:
