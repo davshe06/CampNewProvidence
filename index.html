@@ -310,6 +310,7 @@ ul.tight li { margin: 3px 0; }
 .storyhead { font-family: var(--f-display); font-size: 1.15rem; margin: 22px 0 4px; }
 .era { margin-left: auto; }
 .era .btn { padding: 7px 12px; font-weight: 600; }
+.era .short { display: none; }
 .addr { display: flex; gap: 4px; width: 236px; max-width: calc(100vw - 40px); }
 .addr input { flex: 1; min-width: 0; font: inherit; font-size: .82rem; padding: 6px 8px; border: 1px solid var(--rule); border-radius: 3px; background: var(--panel); color: var(--ink); }
 #map .pin path { fill: var(--hi); stroke: var(--paper); stroke-width: 1.5; }
@@ -347,6 +348,33 @@ ul.tight li { margin: 3px 0; }
 #map .attrib { font-family: var(--f-body); font-size: 10px; fill: var(--ink-soft); stroke: var(--paper); stroke-width: 3px; paint-order: stroke; }
 #map .water { fill: color-mix(in srgb, var(--water) 34%, var(--paper)); stroke: color-mix(in srgb, var(--water) 55%, var(--paper)); stroke-width: .8; }
 #map .land { fill: var(--paper); stroke: color-mix(in srgb, var(--water) 60%, var(--paper)); stroke-width: 1; }
+/* phones */
+.panel, .mapwrap { min-width: 0; }
+@media (max-width: 900px) {
+  .main { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 600px) {
+  .tabs { flex-wrap: wrap; overflow-x: visible; gap: 0 2px; padding-top: 4px; }
+  .tab { padding: 8px 9px 8px; }
+  .brand h1 { font-size: 1.3rem; }
+  .notice { font-size: .74rem; }
+  .toprow { margin-left: 0; width: 100%; justify-content: space-between; }
+  .era .btn { padding: 6px 9px; font-size: .78rem; }
+  .timebar { padding: 6px 8px; gap: 6px; }
+  .tdate { font-size: 1rem; }
+  .tcap { white-space: nowrap; font-size: .74rem; }
+  .tlabels { display: none; }
+  .ttrack { margin-top: 0; }
+  .brand .sub { display: none; }
+  .top { padding-block: 8px; gap: 8px 12px; }
+  .notice { display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; margin: 0; }
+  .notice.open { display: block; }
+  .era .long { display: none; }
+  .era .short { display: inline; }
+  .speed .btn { padding: 2px 5px; }
+  .addr { width: 200px; }
+  .layers { max-width: 200px; }
+}
 .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--panel); padding: 7px 14px; border-radius: 3px; font-size: .82rem; z-index: 20; }
 </style>
 </head>
@@ -364,7 +392,7 @@ ul.tight li { margin: 3px 0; }
     <span id="area-l-chs" data-on="false">Charleston</span>
   </div>
   <div class="seg era" role="group" aria-label="Which war">
-    <button class="btn" id="era-rev" aria-pressed="true">Revolutionary War</button>
+    <button class="btn" id="era-rev" aria-pressed="true"><span class="long">Revolutionary War</span><span class="short">Revolution</span></button>
     <button class="btn" id="era-cw" aria-pressed="false">Civil War</button>
   </div>
   </div>
@@ -1968,6 +1996,7 @@ function setArea(a, quiet) {
   if (popAt) { popAt = null; selHome = null; pop.hidden = true; }
   setEra(era, quiet);
 }
+document.getElementById("notice").addEventListener("click", (e) => e.currentTarget.classList.toggle("open"));
 document.getElementById("areasw").addEventListener("click", () => setArea(area === "charlotte" ? "charleston" : "charlotte"));
 const ERA = {
   "chs-rev": { sub: "Charleston and the Lowcountry · Sullivan's Island 1776, the sieges of 1779–80 and the occupation to 1782",
