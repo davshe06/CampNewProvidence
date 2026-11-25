@@ -77,6 +77,11 @@ Around the camp the base map is real geometry from NC OneMap
   its site address, year built and subdivision. Owner names are deliberately
   left out. Lot lines are parcel boundaries, not building footprints.
 
+- **Charleston homes**: 1,852 residential parcels (class 1xx with a building value) near
+  14 Charleston-area sites, from Charleston County's assessor-joined parcel map
+  (`gisccapps.charlestoncounty.org`, CDC_ParcelMap). The county doesn't publish year built,
+  so those show "not recorded". Owner names are never requested.
+
 Site points (the marker, the creek crossing, the church) are placed from
 published descriptions against that base. The marker stands on NC 16 between
 Belicourt Drive and the creek. Regional rivers, the state line and the 1780

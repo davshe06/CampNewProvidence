@@ -2219,7 +2219,8 @@ const RATING_TEXT = { hi: "High · private", mid: "Moderate · private", low: "L
 for (const st of SITES) (st.dz || []).forEach((d, n) => ZONES.push({ id: `z-${st.id}-${n}`, site: st.id, lat: st.lat, lon: st.lon, r: d[0], rating: d[1], ratingText: RATING_TEXT[d[1]], name: d[2], text: d[3] }));
 const zoneInEra = (z) => { const st = siteOf(z.site); return !st || ((st.layer === "later") === (era === "cw") && (st.area || "charlotte") === area); };
 const pop = document.getElementById("homepop");
-function homeFull(hm) { return hm.addr + ", " + (hm.city || hm.county + " County") + ", NC" + (hm.zip ? " " + hm.zip : ""); }
+const homeState = (hm) => ((siteOf(hm.site) || {}).area === "charleston" ? "SC" : "NC");
+function homeFull(hm) { return hm.addr + ", " + (hm.city || hm.county + " County") + ", " + homeState(hm) + (hm.zip ? " " + hm.zip : ""); }
 function openHome(hm, fly) {
   selHome = hm; popAt = hm;
   const zn = hm.zone ? (ZONES.find(z => z.id === hm.zone) || {}).name : hm.site === "camp" ? ZONE_NAMES[""] : "Outside the rated zones";
@@ -2228,7 +2229,7 @@ function openHome(hm, fly) {
   pop.innerHTML = `
     <button class="x" aria-label="Close">×</button>
     <div class="addr">${esc(hm.addr)}</div>
-    <div class="meta">${hm.city ? esc(hm.city + ", NC" + (hm.zip ? " " + hm.zip : "")) + " · " : ""}${esc(hm.county)} County${hm.city ? "" : ", NC"}</div>
+    <div class="meta">${hm.city ? esc(hm.city + ", " + homeState(hm) + (hm.zip ? " " + hm.zip : "")) + " · " : ""}${esc(hm.county)} County${hm.city ? "" : ", " + homeState(hm)}</div>
     <dl>
       <dt>Near</dt><dd>${esc(st.name)}</dd>
       <dt>Built</dt><dd>${hm.year || "Not recorded"}</dd>
@@ -3005,12 +3006,12 @@ function renderDetectCHS(rating) {
       <li><b>Beaches:</b> rules differ by town, and dunes are protected everywhere. Check Sullivan's Island, Isle of Palms and Folly Beach ordinances before you go.</li>
       <li><b>Morris Island:</b> reachable only by boat, eroding fast, and the burial ground of soldiers killed at Fort Wagner. Leave it alone.</li>
       <li><b>Private land:</b> Stono Ferry, Biggin Bridge, Grimball's Landing and the James Island approaches are mostly private. Use the Charleston County parcel viewer to find owners and get written permission.</li>
-      <li><b>Homes:</b> street-address lots are mapped only for North Carolina, where the state publishes parcel data.</li>
+      <li><b>Homes:</b> ${HOMES.filter(h => (siteOf(h.site) || {}).area === "charleston").length} homes near the Charleston sites come from Charleston County's parcel map. Tap one for its address. Sites on Berkeley and Dorchester county land (Monck's Corner, Colonial Dorchester) have no homes mapped.</li>
     </ul>
     <h3>Zones by site</h3>
     ${sids.map(sid => { const st = siteOf(sid), zs = ZONES.filter(z => z.site === sid);
       return `<details class="zonecard" style="border-left:4px solid ${rating[zs.some(z => z.rating === "hi") ? "hi" : zs.some(z => z.rating === "mid") ? "mid" : zs[0].rating]}">
-        <summary class="zh"><span class="zn">${esc(st.name)}</span><span class="zr">${zs.map(z => esc(RATING_SHORT[z.rating])).join(" · ")}</span></summary>
+        <summary class="zh"><span class="zn">${esc(st.name)}</span><span class="zr">${zs.map(z => esc(RATING_SHORT[z.rating])).join(" · ")}${(n => n ? ` · ${n} homes` : "")(HOMES.filter(h => h.site === sid).length)}</span></summary>
         ${zs.map(z => `<p><b style="color:${rating[z.rating]}">${esc(z.name)}:</b> ${esc(z.text)}</p>`).join("")}
         <button class="btn" data-zone="${zs[zs.length - 1].id}">Show on map</button></details>`; }).join("")}`;
   wireRows();
@@ -3032,7 +3033,7 @@ function renderDetect() {
       </div>`).join("")}
 
     <h3>Around the other sites</h3>
-    <p class="note">Every site on the map has zones rated by who owns the land: national and state parks, cemeteries, church grounds and built-over downtowns are off-limits, and private land around battlefields, crossings and camps needs the owner's permission. These are generated from ownership and the site's history, not from survey. Homes are shown for North Carolina sites only, where the state publishes parcel data; Guilford and Orange counties' state records lack street names, so Guilford Courthouse and Hillsborough have zones but no homes.</p>
+    <p class="note">Every site on the map has zones rated by who owns the land: national and state parks, cemeteries, church grounds and built-over downtowns are off-limits, and private land around battlefields, crossings and camps needs the owner's permission. These are generated from ownership and the site's history, not from survey. Homes come from North Carolina's statewide parcel map and Charleston County's parcels. Guilford and Orange counties' state records lack street names, so Guilford Courthouse and Hillsborough have zones but no homes, and sites in other South Carolina counties, Tennessee and Virginia have none.</p>
     ${[...new Set(ZONES.filter(z => z.site !== "camp" && z.id !== "z-church" && zoneInEra(z)).map(z => z.site))].map(sid => {
       const st = siteOf(sid), zs = ZONES.filter(z => z.site === sid), n = HOMES.filter(h => h.site === sid).length;
       return `<details class="zonecard" style="border-left:4px solid ${rating[zs.some(z => z.rating === "hi") ? "hi" : zs.some(z => z.rating === "mid") ? "mid" : zs[0].rating]}">
