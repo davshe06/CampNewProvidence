@@ -18,6 +18,8 @@ The page loads two data files next to it, so opening it straight from disk
 
 - `homes.json`: homes near North Carolina sites, one record per line.
 - `charleston-water.json`: Charleston-area water polygons.
+- `basemap.json`: the regional base map (interstates, US highways, towns, major
+  rivers, large lakes and sounds, state lines).
 
 Contents:
 
@@ -44,6 +46,11 @@ Contents:
   legal notes and a musket-ball calculator, a driving tour, and sources.
 
 ## Data
+
+**Regional base map**: U.S. Census Bureau TIGERweb (public domain): interstates and
+US highways, incorporated places of 2,500+ people and census-designated places of
+15,000+ with 2020 populations (towns appear by size as you zoom), 33 named major
+rivers, lakes and sounds over 25 km², and state boundaries.
 
 **Charleston water**: U.S. Census Bureau TIGER areal hydrography (harbor, rivers,
 creeks, sounds and the ocean to about 3 nautical miles, public domain), with open
