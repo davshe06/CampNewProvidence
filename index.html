@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Camp New Providence</title>
+<title>Carolina War History Interactive Map</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -328,6 +328,25 @@ ul.tight li { margin: 3px 0; }
 @media (max-width: 420px) { .portrait { grid-template-columns: 1fr; } }
 .tlabels { position: relative; height: 1.3em; display: block; }
 .tlabels span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.areasw { display: inline-flex; align-items: center; gap: 8px; font-size: .82rem; font-weight: 600; }
+.areasw button { position: relative; width: 46px; height: 24px; border-radius: 12px; border: 1px solid var(--rule); background: var(--chip); cursor: pointer; padding: 0; }
+.areasw button::after { content: ""; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: var(--continental); transition: transform .2s; }
+.areasw button[aria-checked="true"]::after { transform: translateX(22px); }
+@media (prefers-reduced-motion: reduce) { .areasw button::after { transition: none; } }
+.areasw span[data-on="true"] { color: var(--continental); }
+.toprow { display: flex; gap: 10px 16px; align-items: center; flex-wrap: wrap; margin-left: auto; }
+.speed { display: inline-flex; margin-left: 6px; }
+.speed .btn { padding: 2px 7px; font-size: .72rem; }
+.lib-filters { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
+.lib-filters .btn[aria-pressed="true"] { background: var(--continental); color: var(--panel); border-color: var(--continental); }
+.libitem { border-top: 1px solid var(--rule); padding: 10px 0; display: grid; gap: 3px; }
+.libitem:last-child { border-bottom: 1px solid var(--rule); }
+.libitem .lt { font-weight: 600; }
+.libitem .lm { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
+.libitem p { margin: 0; font-size: .86rem; }
+#map .attrib { font-family: var(--f-body); font-size: 10px; fill: var(--ink-soft); stroke: var(--paper); stroke-width: 3px; paint-order: stroke; }
+#map .water { fill: color-mix(in srgb, var(--water) 16%, var(--paper)); }
+#map .land { fill: var(--paper); stroke: color-mix(in srgb, var(--water) 60%, var(--paper)); stroke-width: 1; }
 .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--panel); padding: 7px 14px; border-radius: 3px; font-size: .82rem; z-index: 20; }
 </style>
 </head>
@@ -335,12 +354,19 @@ ul.tight li { margin: 3px 0; }
 
 <header class="top">
   <div class="brand">
-    <h1>Camp New Providence</h1>
+    <h1>Carolina War History Interactive Map</h1>
     <span class="sub" id="subtitle">Southern Continental Army encampment · Six Mile Creek, Mecklenburg–Union line · Oct–Dec 1780</span>
+  </div>
+  <div class="toprow">
+  <div class="areasw">
+    <span id="area-l-clt" data-on="true">Charlotte</span>
+    <button id="areasw" role="switch" aria-checked="false" aria-label="Switch between the Charlotte and Charleston areas"></button>
+    <span id="area-l-chs" data-on="false">Charleston</span>
   </div>
   <div class="seg era" role="group" aria-label="Which war">
     <button class="btn" id="era-rev" aria-pressed="true">Revolutionary War</button>
     <button class="btn" id="era-cw" aria-pressed="false">Civil War</button>
+  </div>
   </div>
   <p class="notice" id="notice"><b>A Revolutionary War camp, not a Civil War one.</b> The state marker and NC Archives date it to the fall of 1780; some online listings label it Civil War in error. Charlotte's Civil War sites are on the map as a separate layer.</p>
 </header>
@@ -354,6 +380,8 @@ ul.tight li { margin: 3px 0; }
         <button class="btn" id="v-camp" aria-pressed="true">Camp</button>
         <button class="btn" id="v-charlotte" aria-pressed="false">Charlotte area</button>
         <button class="btn" id="v-campaign" aria-pressed="false">Campaign</button>
+        <button class="btn" id="v-harbor" aria-pressed="false" hidden>Harbor</button>
+        <button class="btn" id="v-lowcountry" aria-pressed="false" hidden>Lowcountry</button>
       </div>
       <form class="addr" id="addrform" role="search">
         <input id="addr-q" placeholder="Find a modern address" aria-label="Find a modern address" autocomplete="street-address">
@@ -381,7 +409,14 @@ ul.tight li { margin: 3px 0; }
     </div>
     <div class="homepop" id="homepop" hidden role="dialog" aria-label="Home details"></div>
     <div class="timebar" id="timebar">
-      <button class="btn sq" id="tplay" aria-label="Play the campaign">▶</button>
+      <div>
+        <button class="btn sq" id="tplay" aria-label="Play the campaign">▶</button>
+        <div class="speed" role="group" aria-label="Playback speed">
+          <button class="btn" data-speed="0.5" aria-pressed="false">½×</button>
+          <button class="btn" data-speed="1" aria-pressed="true">1×</button>
+          <button class="btn" data-speed="2" aria-pressed="false">2×</button>
+        </div>
+      </div>
       <div>
         <div class="trow"><span class="tdate" id="tdate">—</span><span class="tphase" id="tphase"></span></div>
         <div class="ttrack" id="ttrack">
@@ -407,6 +442,7 @@ ul.tight li { margin: 3px 0; }
       <button class="tab" role="tab" data-tab="people" aria-selected="false">People</button>
       <button class="tab" role="tab" data-tab="detect" aria-selected="false">Detecting</button>
       <button class="tab" role="tab" data-tab="visit" aria-selected="false">Visit today</button>
+      <button class="tab" role="tab" data-tab="library" aria-selected="false">Library</button>
       <button class="tab" role="tab" data-tab="sources" aria-selected="false">Sources</button>
     </div>
     <div class="pane" id="pane" role="tabpanel"></div>
@@ -724,6 +760,188 @@ const SITES = [
     name: "Andrew Jackson State Park", kind: "Waxhaws · Jackson's boyhood", status: "public", statusText: "State park",
     history: ["The future president grew up in the Waxhaws. At thirteen he rode with Davie's men, was captured in 1781, and was slashed by a British officer when he refused to clean his boots. His mother and both brothers died during the war."],
     today: "Lancaster County, SC. Location approximate.", access: "State park.", detect: "No." },
+
+  // ======================= CHARLESTON AREA =======================
+  // Revolutionary War
+  { id: "c-moultrie76", area: "charleston", date: "1776-06-28", layer: "sites", era: "1776", type: "battle", lat: 32.7597, lon: -79.8574, zl: 9000,
+    name: "Fort Sullivan (Fort Moultrie)", kind: "Battle of Sullivan's Island · June 28, 1776", status: "public", statusText: "National park",
+    history: ["Col. William Moultrie's unfinished fort of palmetto logs and sand faced Sir Peter Parker's fleet for more than nine hours. The spongy palmetto soaked up British shot, and the fleet withdrew badly damaged. It was the first decisive American victory of the war and kept the British out of the South for three years.",
+      "When the fort's flag was shot down, Sgt. William Jasper climbed out under fire to raise it again. The palmetto on South Carolina's flag comes from this fight."],
+    today: "Fort Moultrie, part of Fort Sumter and Fort Moultrie National Historical Park, Sullivan's Island. The present fort dates from 1809.", access: "Open to visitors.", detect: "Illegal. Federal land.",
+    dz: [[700, "off", "Fort Moultrie NHP", "Federal land. Detecting and digging are illegal under the Archaeological Resources Protection Act."]] },
+  { id: "c-breach76", area: "charleston", date: "1776-06-28", layer: "sites", era: "1776", type: "battle", lat: 32.7775, lon: -79.8106, zl: 9000,
+    name: "Breach Inlet, 1776", kind: "Clinton's crossing blocked · June 28, 1776", status: "public", statusText: "Inlet and beaches",
+    history: ["While the fleet attacked the fort, about 2,000 British troops under Sir Henry Clinton waited on Long Island (today's Isle of Palms) to cross Breach Inlet. The water was deeper than expected, and Col. William Thomson's riflemen and artillery behind sand works stopped every attempt."],
+    today: "The inlet between Sullivan's Island and Isle of Palms, crossed by the SC 703 bridge. The current is dangerous; swimming is banned.", access: "Public beaches on both sides.", detect: "Beach detecting rules differ by town; check before you go.",
+    dz: [[600, "mid", "Beaches either side of the inlet", "Both towns regulate digging on their beaches and dunes, and dunes are protected. Check the Sullivan's Island and Isle of Palms ordinances before detecting. Anything below the low-tide line is state bottomland."]] },
+  { id: "c-actaeon", area: "charleston", date: "1776-06-29", layer: "sites", era: "1776", type: "wreck", lat: 32.7560, lon: -79.8780, zl: 9000,
+    name: "HMS Actaeon wreck", kind: "British frigate · burned June 29, 1776", status: "public", statusText: "Underwater, protected",
+    history: ["The 28-gun frigate ran aground on the Middle Ground shoal during the attack on the fort. Her crew set her on fire the next morning, and Americans briefly boarded her before she blew up. Location approximate; Fort Sumter was later built on the same shoal."],
+    today: "Underwater in Charleston Harbor near Fort Sumter.", access: "No public access.", detect: "No. Protected underwater site.",
+    dz: [[400, "off", "Wreck area", "Underwater archaeological site, protected by the South Carolina Underwater Antiquities Act. Diving on or removing anything needs a state license."]] },
+  { id: "c-stono", area: "charleston", date: "1779-06-20", layer: "sites", era: "1779", type: "battle", lat: 32.7520, lon: -80.1460, zl: 3000,
+    name: "Stono Ferry", kind: "Battle · June 20, 1779", status: "private", statusText: "Marker",
+    history: ["After a British raid reached the gates of Charleston in May 1779, Gen. Benjamin Lincoln attacked the British rearguard dug in at the Stono River ferry. The assault failed with heavy American losses. A young William R. Davie was badly wounded here. Location approximate."],
+    today: "Near Hollywood and Rantowles, Charleston County. Marked by a roadside marker.", access: "Marker only.", detect: "Only with landowner permission.",
+    dz: [[700, "hi", "Stono Ferry battlefield", "Little-developed land around the old ferry. Find the owner on the Charleston County parcel viewer and get written permission."]] },
+  { id: "c-hornwork", area: "charleston", date: "1780-04-01", layer: "sites", era: "1780", type: "house", lat: 32.7865, lon: -79.9340, zl: 9000,
+    name: "The Hornwork (Marion Square)", kind: "Siege of Charleston · 1780", status: "public", statusText: "City park",
+    history: ["The centerpiece of the American lines across Charleston Neck, a tabby fortification facing the British siege works. A fragment survives in Marion Square."],
+    today: "Marion Square, King and Calhoun streets.", access: "Public park.", detect: "No. City park.",
+    dz: [[250, "off", "Marion Square", "City park with a protected fortification remnant."]] },
+  { id: "c-siegelines", area: "charleston", date: "1780-04-01", layer: "sites", era: "1780", type: "battle", lat: 32.8000, lon: -79.9440, zl: 6000,
+    name: "British siege lines", kind: "Siege of Charleston · April 1 – May 12, 1780", status: "public", statusText: "Built over",
+    history: ["Clinton's engineers dug three parallels down Charleston Neck, each closer to the American lines, while the Royal Navy ran past Fort Moultrie into the harbor on April 8. Gen. Benjamin Lincoln surrendered the city and about 5,000 men on May 12. Location approximate."],
+    today: "Under today's upper peninsula neighborhoods.", access: "Public streets.", detect: "Private yards only, with permission.",
+    dz: [[700, "low", "Charleston Neck", "Heavily built over, but siege-era lead and buttons do surface in older yards. Private land; get permission."]] },
+  { id: "c-exchange", area: "charleston", date: "1780-05-12", layer: "sites", era: "1780", type: "house", lat: 32.7769, lon: -79.9271, zl: 9000,
+    name: "Old Exchange & Provost Dungeon", kind: "British prison · 1780–1782", status: "public", statusText: "Museum",
+    history: ["Built in 1771 as the customs house. During the British occupation its cellar held Patriot prisoners. Col. Isaac Hayne was held in the city before he was hanged in August 1781, which outraged Americans and many British officers."],
+    today: "122 East Bay Street.", access: "Museum, open daily.", detect: "No.",
+    dz: [[150, "off", "Old Exchange", "Museum property in the historic district."]] },
+  { id: "c-stmichaels", area: "charleston", layer: "sites", era: "1780", type: "church", lat: 32.7765, lon: -79.9302, zl: 12000,
+    name: "St. Michael's Church", kind: "Church · 1761", status: "limited", statusText: "Active church",
+    history: ["Its white steeple was a landmark for ships and a lookout for both sides. The British took its bells to England in 1782; they were bought back and returned."],
+    today: "71 Broad Street, at the Four Corners of Law.", access: "Active church.", detect: "Never. Churchyard.",
+    dz: [[100, "off", "Churchyard", "Burial ground."]] },
+  { id: "c-gadsden", area: "charleston", layer: "sites", era: "1780", type: "house", lat: 32.7915, lon: -79.9255, zl: 9000,
+    name: "Gadsden's Wharf", kind: "Wharf · 1767 onward", status: "public", statusText: "Museum",
+    history: ["Built by Christopher Gadsden, a leading Patriot who was sent to prison in St. Augustine after the city fell in 1780. After the war tens of thousands of enslaved Africans were landed here, which is why the International African American Museum now stands on the site."],
+    today: "International African American Museum, 14 Wharfside Street.", access: "Museum.", detect: "No.",
+    dz: [[200, "off", "Museum grounds", "Museum and memorial grounds."]] },
+  { id: "c-monckscorner", area: "charleston", date: "1780-04-14", layer: "sites", era: "1780", type: "battle", lat: 33.1950, lon: -80.0130, zl: 3000,
+    name: "Monck's Corner (Biggin Bridge)", kind: "Surprise · April 14, 1780", status: "private", statusText: "Rural land",
+    history: ["Tarleton's Legion surprised Gen. Isaac Huger's cavalry at night, closing the last road out of besieged Charleston. Location approximate."],
+    today: "Near Moncks Corner, Berkeley County.", access: "Private.", detect: "Only with landowner permission.",
+    dz: [[700, "hi", "Biggin Bridge camp", "Private land around the old bridge and church ruins. Get written permission."]] },
+  { id: "c-dorchester", area: "charleston", layer: "sites", era: "1781", type: "house", lat: 32.9450, lon: -80.1720, zl: 3000,
+    name: "Colonial Dorchester", kind: "Tabby fort · garrisoned 1775–1782", status: "public", statusText: "State historic site",
+    history: ["A colonial town on the Ashley River with a tabby fort used by both sides. Its garrison was driven off by Greene's cavalry in December 1781 as the British pulled back to Charleston."],
+    today: "Colonial Dorchester State Historic Site, Summerville.", access: "State park.", detect: "No. State property.",
+    dz: [[500, "off", "State historic site", "State-owned. Detecting needs a state permit."]] },
+  { id: "c-drayton", area: "charleston", layer: "sites", era: "1780", type: "house", lat: 32.8697, lon: -80.0747, zl: 3000,
+    name: "Drayton Hall", kind: "Plantation house · c. 1750", status: "public", statusText: "Historic site",
+    history: ["Used by British and American troops during the Revolution, and the only Ashley River plantation house to survive the war of 1865. The site is also a place of memory for the enslaved people whose labor built it."],
+    today: "3380 Ashley River Road.", access: "Open to visitors.", detect: "No.",
+    dz: [[500, "off", "Drayton Hall grounds", "Museum property, including an African American cemetery."]] },
+  { id: "c-middleton", area: "charleston", layer: "sites", era: "1780", type: "house", lat: 32.9006, lon: -80.1378, zl: 3000,
+    name: "Middleton Place", kind: "Plantation · Arthur Middleton's home", status: "public", statusText: "Historic site",
+    history: ["Home of Arthur Middleton, a signer of the Declaration of Independence who was captured when Charleston fell in 1780. Union troops burned the main house in February 1865."],
+    today: "4300 Ashley River Road.", access: "Open to visitors.", detect: "No.",
+    dz: [[600, "off", "Middleton Place grounds", "Museum property."]] },
+  { id: "c-evacuation", area: "charleston", date: "1782-12-14", layer: "sites", era: "1782", type: "town", lat: 32.7790, lon: -79.9240, zl: 6000,
+    name: "British evacuation", kind: "December 14, 1782", status: "public", statusText: "Waterfront",
+    history: ["After two and a half years of occupation the British sailed away, taking Loyalists and thousands of enslaved people with them. American troops under Gen. Anthony Wayne marched in behind them."],
+    today: "The Cooper River waterfront.", access: "Public waterfront.", detect: "No.", dz: [] },
+
+  // Civil War
+  { id: "c-sumter", area: "charleston", date: "1861-04-12", layer: "later", era: "later", type: "battle", lat: 32.7523, lon: -79.8747, zl: 6000,
+    name: "Fort Sumter", kind: "First shots of the Civil War · April 12–13, 1861", status: "public", statusText: "National park",
+    history: ["Maj. Robert Anderson's small Union garrison surrendered after 34 hours of bombardment, without a combat death. Union guns reduced the fort to rubble in 1863–64, but its Confederate garrison held on until Charleston was evacuated in February 1865. Anderson raised the same flag over the fort again on April 14, 1865."],
+    today: "Fort Sumter, reached by tour boat from Liberty Square or Patriots Point.", access: "Open by ferry.", detect: "Illegal. Federal land.",
+    dz: [[450, "off", "Fort Sumter NHP", "Federal land and surrounding protected waters."]] },
+  { id: "c-moultrie61", area: "charleston", date: "1861-04-12", layer: "later", era: "later", type: "battle", lat: 32.7597, lon: -79.8574, zl: 9000,
+    name: "Fort Moultrie, 1861–65", kind: "Confederate fort", status: "public", statusText: "National park",
+    history: ["Anderson abandoned Fort Moultrie for Fort Sumter on December 26, 1860. Confederate guns here then fired on Sumter, and the fort guarded the harbor mouth until 1865."],
+    today: "Fort Moultrie, Sullivan's Island.", access: "Open to visitors.", detect: "Illegal. Federal land.",
+    dz: [[700, "off", "Fort Moultrie NHP", "Federal land."]] },
+  { id: "c-ftjohnson", area: "charleston", date: "1861-04-12", layer: "later", era: "later", type: "battle", lat: 32.7517, lon: -79.8985, zl: 9000,
+    name: "Fort Johnson", kind: "Signal shot · 4:30 a.m., April 12, 1861", status: "public", statusText: "State property",
+    history: ["A mortar here fired the signal shell that opened the bombardment of Fort Sumter."],
+    today: "SC Department of Natural Resources marine center, James Island.", access: "Grounds partly open.", detect: "No. State property.",
+    dz: [[350, "off", "Fort Johnson", "State property."]] },
+  { id: "c-citadel", area: "charleston", date: "1861-01-09", layer: "later", era: "later", type: "later", lat: 32.7872, lon: -79.9336, zl: 9000,
+    name: "Old Citadel and Star of the West", kind: "January 9, 1861", status: "public", statusText: "Marion Square",
+    history: ["Citadel cadets manning a battery on Morris Island fired on the supply ship Star of the West as it tried to reach Fort Sumter, turning it back. Some count these as the war's first shots. The original Citadel building still faces Marion Square."],
+    today: "Marion Square; the old Citadel building is now a hotel.", access: "Public square.", detect: "No.",
+    dz: [[200, "off", "Marion Square", "City park."]] },
+  { id: "c-secession", area: "charleston", date: "1860-12-20", layer: "later", era: "later", type: "later", lat: 32.7795, lon: -79.9310, zl: 12000,
+    name: "Institute Hall (site)", kind: "Ordinance of Secession · December 20, 1860", status: "public", statusText: "Site only",
+    history: ["South Carolina's convention signed the ordinance of secession here, the first state to leave the Union. The hall burned in the great fire of 1861."],
+    today: "Meeting Street, near Circular Congregational Church. Location approximate.", access: "Public street.", detect: "No.", dz: [] },
+  { id: "c-secessionville", area: "charleston", date: "1862-06-16", layer: "later", era: "later", type: "battle", lat: 32.7090, lon: -79.9390, zl: 6000,
+    name: "Secessionville (Fort Lamar)", kind: "Battle · June 16, 1862", status: "public", statusText: "Heritage preserve",
+    history: ["Union troops attacked an earthwork on James Island and were thrown back with about 700 casualties, ending the first Union attempt to take Charleston by land."],
+    today: "Fort Lamar Heritage Preserve, James Island.", access: "Open daylight hours.", detect: "No. State heritage preserve.",
+    dz: [[400, "off", "Fort Lamar Heritage Preserve", "State-owned heritage preserve."], [1000, "mid", "Approaches across the marsh and fields", "Much of the attack ground is now neighborhoods and private land. Get permission."]] },
+  { id: "c-planter", area: "charleston", date: "1862-05-13", layer: "later", era: "later", type: "later", lat: 32.7745, lon: -79.9245, zl: 9000,
+    name: "Robert Smalls and the Planter", kind: "Escape to freedom · May 13, 1862", status: "public", statusText: "Waterfront",
+    history: ["Before dawn, enslaved pilot Robert Smalls took the Confederate steamer Planter from her wharf, picked up his family and others, gave the right signals passing the harbor forts, and handed the ship to the Union fleet. Sixteen people reached freedom. Smalls later served five terms in Congress. Wharf location approximate."],
+    today: "The Cooper River waterfront near Southern Wharf.", access: "Public waterfront.", detect: "No.", dz: [] },
+  { id: "c-grimball", area: "charleston", date: "1863-07-16", layer: "later", era: "later", type: "battle", lat: 32.7280, lon: -79.9650, zl: 6000,
+    name: "Grimball's Landing", kind: "Battle · July 16, 1863", status: "private", statusText: "Private land",
+    history: ["A Confederate attack on James Island was held off in part by the 54th Massachusetts in its first fight, two days before Fort Wagner. Location approximate."],
+    today: "James Island, along the Stono River.", access: "Private.", detect: "Only with landowner permission.",
+    dz: [[800, "mid", "Grimball's Landing", "Mostly private land along the Stono. Get permission."]] },
+  { id: "c-wagner", area: "charleston", date: "1863-07-18", layer: "later", era: "later", type: "battle", lat: 32.7080, lon: -79.8840, zl: 6000,
+    name: "Battery (Fort) Wagner", kind: "Assault · July 18, 1863", status: "public", statusText: "Eroded into the sea",
+    history: ["The 54th Massachusetts, one of the first Black regiments raised in the North, led a night assault across the open beach. Col. Robert Gould Shaw was killed on the parapet, and Sgt. William Carney carried the flag back while wounded, earning the Medal of Honor. The Confederates held until September 7. Erosion has since carried the site offshore. Location approximate."],
+    today: "Offshore of Morris Island; reachable only by boat.", access: "No access to the site.", detect: "No. Underwater and protected; also a burial site.",
+    dz: [[800, "off", "Fort Wagner and Morris Island", "Underwater and beach sites protected by state law, and a burial site for the soldiers killed here."]] },
+  { id: "c-gregg", area: "charleston", layer: "later", era: "later", type: "later", lat: 32.7275, lon: -79.8820, zl: 9000,
+    name: "Battery Gregg (Cummings Point)", kind: "Morris Island · 1861–1863", status: "public", statusText: "Eroded",
+    history: ["Northern tip of Morris Island, near where cadets fired on the Star of the West and where guns later bombarded Fort Sumter. Location approximate."],
+    today: "Morris Island, by boat only.", access: "No facilities.", detect: "No.", dz: [[500, "off", "Morris Island shore", "Protected state shoreline and bottomland."]] },
+  { id: "c-swampangel", area: "charleston", date: "1863-08-22", layer: "later", era: "later", type: "later", lat: 32.7200, lon: -79.9050, zl: 9000,
+    name: "Swamp Angel battery", kind: "Shelling of Charleston · August 22, 1863", status: "public", statusText: "Marsh",
+    history: ["Union engineers built a platform in the marsh for an 8-inch Parrott rifle that could reach the city nearly five miles away. It fired incendiary shells into Charleston and burst on its 36th round. Location approximate."],
+    today: "Marsh between Morris and James islands. The gun survives in Trenton, NJ.", access: "No access.", detect: "No.", dz: [] },
+  { id: "c-battery", area: "charleston", date: "1865-02-18", layer: "later", era: "later", type: "town", lat: 32.7700, lon: -79.9305, zl: 9000,
+    name: "The Battery and White Point Garden", kind: "Siege and evacuation · 1863–1865", status: "public", statusText: "City park",
+    history: ["Charlestonians watched the bombardment of Fort Sumter from here. During the Union siege of 1863–65 the lower city was shelled for over 500 days. Confederate forces evacuated on February 18, 1865, and the 55th Massachusetts, a Black regiment, marched in soon after."],
+    today: "White Point Garden, end of the peninsula.", access: "Public park.", detect: "No. City park.",
+    dz: [[300, "off", "White Point Garden", "City park."]] },
+  { id: "c-castlepinckney", area: "charleston", layer: "later", era: "later", type: "later", lat: 32.7731, lon: -79.9110, zl: 9000,
+    name: "Castle Pinckney", kind: "Harbor fort · Union prisoners 1861", status: "public", statusText: "Island, no access",
+    history: ["A small masonry fort on Shutes Folly island. It held Union prisoners taken at First Manassas in 1861."],
+    today: "Shutes Folly, Charleston Harbor.", access: "No public access.", detect: "No.", dz: [[250, "off", "Shutes Folly", "Protected; no landing."]] },
+  { id: "c-breach64", area: "charleston", date: "1864-02-17", layer: "later", era: "later", type: "later", lat: 32.7775, lon: -79.8115, zl: 9000,
+    name: "Breach Inlet and Battery Marshall", kind: "The Hunley's departure · February 17, 1864", status: "public", statusText: "Inlet",
+    history: ["The submarine H. L. Hunley set out from Battery Marshall at the Sullivan's Island end of the inlet on her last mission. A marker stands at the inlet."],
+    today: "SC 703 bridge between Sullivan's Island and Isle of Palms.", access: "Public.", detect: "Check town rules.", dz: [] },
+  { id: "c-hunley", area: "charleston", date: "1864-02-17", layer: "later", era: "later", type: "wreck", lat: 32.7210, lon: -79.7740, zl: 6000,
+    name: "H. L. Hunley wreck site", kind: "First submarine to sink a warship · February 17, 1864", status: "public", statusText: "Recovered 2000",
+    history: ["The hand-cranked submarine rammed a spar torpedo into USS Housatonic, which sank in minutes. The Hunley and her crew of eight under Lt. George Dixon never returned. Found in 1995 about four miles off Sullivan's Island, she was raised on August 8, 2000. Location approximate."],
+    today: "Open ocean. The submarine is in conservation at the Warren Lasch Conservation Center, North Charleston.", access: "No access.", detect: "No. Protected wreck site.",
+    dz: [[600, "off", "Wreck site", "Protected by state and federal law, including the Sunken Military Craft Act."]] },
+  { id: "c-housatonic", area: "charleston", date: "1864-02-17", layer: "later", era: "later", type: "wreck", lat: 32.7250, lon: -79.7700, zl: 6000,
+    name: "USS Housatonic wreck", kind: "Union sloop-of-war · sunk February 17, 1864", status: "public", statusText: "Underwater, protected",
+    history: ["A blockading sloop sunk by the Hunley's torpedo. Five of her crew died; the rest climbed the rigging and were rescued. Location approximate."],
+    today: "Underwater off Sullivan's Island.", access: "No access.", detect: "No. U.S. Navy property.",
+    dz: [[500, "off", "Wreck site", "Sunken U.S. Navy vessels remain Navy property under the Sunken Military Craft Act."]] },
+  { id: "c-keokuk", area: "charleston", date: "1863-04-08", layer: "later", era: "later", type: "wreck", lat: 32.6930, lon: -79.8720, zl: 6000,
+    name: "USS Keokuk wreck", kind: "Ironclad · sank April 8, 1863", status: "public", statusText: "Underwater, protected",
+    history: ["Hit about 90 times in Admiral Du Pont's failed ironclad attack on Fort Sumter on April 7, the Keokuk sank off Morris Island the next morning. Confederates later salvaged her two big guns from under the noses of the Union fleet. Location approximate."],
+    today: "Underwater off Morris Island.", access: "No access.", detect: "No. U.S. Navy property.",
+    dz: [[500, "off", "Wreck site", "U.S. Navy property under the Sunken Military Craft Act."]] },
+  { id: "c-weehawken", area: "charleston", date: "1863-12-06", layer: "later", era: "later", type: "wreck", lat: 32.7140, lon: -79.8680, zl: 6000,
+    name: "USS Weehawken wreck", kind: "Monitor · sank December 6, 1863", status: "public", statusText: "Underwater, protected",
+    history: ["The monitor flooded through an open hatch while at anchor off Morris Island and sank in minutes, taking about 30 men with her. Location approximate."],
+    today: "Underwater off Morris Island.", access: "No access.", detect: "No. U.S. Navy property; war grave.",
+    dz: [[500, "off", "Wreck site", "War grave and U.S. Navy property."]] },
+  { id: "c-patapsco", area: "charleston", date: "1865-01-15", layer: "later", era: "later", type: "wreck", lat: 32.7480, lon: -79.8650, zl: 6000,
+    name: "USS Patapsco wreck", kind: "Monitor · sunk January 15, 1865", status: "public", statusText: "Underwater, protected",
+    history: ["While clearing obstructions near Fort Sumter, the monitor struck a Confederate torpedo (mine) and sank in seconds; more than 60 men died. Location approximate."],
+    today: "Underwater in the harbor entrance.", access: "No access.", detect: "No. War grave.",
+    dz: [[500, "off", "Wreck site", "War grave and U.S. Navy property."]] },
+  { id: "c-stonefleet", area: "charleston", date: "1861-12-20", layer: "later", era: "later", type: "wreck", lat: 32.7000, lon: -79.8400, zl: 6000,
+    name: "The Stone Fleet", kind: "Sunk December 20, 1861", status: "public", statusText: "Underwater",
+    history: ["The Union bought old New England whaling ships, filled them with granite and sank them in the main ship channel to block blockade runners. The tides soon scoured new channels around them. Location approximate."],
+    today: "Buried in the sands of the old main ship channel.", access: "No access.", detect: "No.",
+    dz: [[900, "off", "Old main ship channel", "Underwater; protected wreck material."]] },
+  { id: "c-georgiana", area: "charleston", date: "1863-03-19", layer: "later", era: "later", type: "wreck", lat: 32.7600, lon: -79.7400, zl: 6000,
+    name: "Blockade runner Georgiana", kind: "Wrecked March 19, 1863", status: "public", statusText: "Underwater, protected",
+    history: ["A new British-built cruiser-blockade runner, run aground and burned off Long Island (Isle of Palms) on her first trip. Dozens of blockade runners were wrecked along these beaches. Location approximate."],
+    today: "Underwater off Isle of Palms.", access: "No access.", detect: "No. Protected under state law.",
+    dz: [[500, "off", "Wreck site", "Protected by the South Carolina Underwater Antiquities Act."]] },
+  { id: "c-lasch", area: "charleston", layer: "later", era: "later", type: "house", lat: 32.8640, lon: -79.9650, zl: 6000,
+    name: "Warren Lasch Conservation Center", kind: "The H. L. Hunley today", status: "public", statusText: "Museum (weekends)",
+    history: ["Clemson University's lab where the Hunley is being conserved. Tours on weekends let you see the submarine in her tank."],
+    today: "1250 Supply Street, North Charleston (former Navy base).", access: "Open for tours, usually weekends.", detect: "No.", dz: [] },
+  { id: "c-magnolia", area: "charleston", layer: "later", era: "later", type: "church", lat: 32.8160, lon: -79.9490, zl: 6000,
+    name: "Magnolia Cemetery", kind: "Hunley crews' graves", status: "public", statusText: "Cemetery",
+    history: ["All three Hunley crews lie here, including the last crew, buried in 2004 after their remains were recovered from the submarine. Location approximate."],
+    today: "70 Cunnington Avenue.", access: "Open daytime.", detect: "Never. Cemetery.", dz: [[300, "off", "Magnolia Cemetery", "Burial ground."]] },
 
   // ---------- Civil War and later ----------
   { id: "navyyard", date: "1864-01-07", layer: "later", era: "later", type: "later", lat: 35.2292, lon: -80.8382, zl: 25000,
@@ -1187,6 +1405,40 @@ const PEOPLE = [
   { n: "The rank and file", r: "Continentals and militia", side: "nc", site: "camp", nolike: true,
     b: "Most men at the camp left no letters, but many applied for federal pensions decades later and described their service under oath. Searching the transcribed Southern Campaign pension statements for 'New Providence' turns up first-hand memories of camp duty, foraging and guard posts here." }
 ,
+  // ---------- Charleston: Revolution ----------
+  { n: "William Moultrie", r: "Colonel, later General · defender of Fort Sullivan", side: "nc", site: "c-moultrie76", area: "charleston", img: "William_Moultrie_portrait.jpg", credit: "Charles Willson Peale, 1782",
+    b: "Commanded the palmetto-log fort that beat the Royal Navy on June 28, 1776; the fort was renamed for him. Captured when Charleston fell in 1780, he was later exchanged and served two terms as South Carolina's governor." },
+  { n: "William Jasper", r: "Sergeant · 2nd South Carolina", side: "nc", site: "c-moultrie76", area: "charleston", nolike: true,
+    b: "Climbed onto the fort's wall under fire to raise the shot-down flag in 1776. He was killed in the attack on Savannah in 1779." },
+  { n: "Benjamin Lincoln", r: "Major General · Southern Department", side: "us", site: "c-hornwork", area: "charleston",
+    b: "Defended Charleston in 1780 and surrendered the city and its army on May 12, the largest American surrender of the war. A year later at Yorktown he accepted the British surrender." },
+  { n: "Sir Henry Clinton", r: "British commander-in-chief", side: "gb", site: "c-siegelines", area: "charleston",
+    b: "Failed to cross Breach Inlet in 1776, then returned in 1780 to besiege and take Charleston before leaving Cornwallis in command in the South." },
+  { n: "Sir Peter Parker", r: "Commodore, Royal Navy", side: "gb", site: "c-actaeon", area: "charleston",
+    b: "Led the fleet that attacked Fort Sullivan in 1776 and lost the frigate Actaeon. He was wounded in the battle." },
+  { n: "Christopher Gadsden", r: "Patriot leader · lieutenant governor", side: "nc", site: "c-gadsden", area: "charleston",
+    b: "Charleston merchant and early radical, remembered for the 'Don't Tread on Me' flag. After the city fell he spent ten months in a St. Augustine dungeon." },
+  { n: "Isaac Hayne", r: "Colonel · SC militia", side: "nc", site: "c-exchange", area: "charleston", nolike: true,
+    b: "Took British protection after Charleston fell, then rejoined the fight. Captured again, he was hanged in Charleston in August 1781 without a proper trial." },
+  // ---------- Charleston: Civil War ----------
+  { n: "Robert Smalls", r: "Pilot of the Planter; later Congressman", side: "un", site: "c-planter", area: "charleston", era: "cw", img: "Robert_Smalls_-_Brady-Handy.jpg", credit: "Brady-Handy, Library of Congress",
+    b: "Enslaved harbor pilot who sailed the Confederate steamer Planter out of Charleston to the Union fleet on May 13, 1862, freeing his family and others. He served as a pilot for the Union navy, later bought his former owner's house in Beaufort, and served five terms in Congress." },
+  { n: "Robert Anderson", r: "Major · Union garrison of Fort Sumter", side: "un", site: "c-sumter", area: "charleston", era: "cw",
+    b: "Moved his small garrison to Fort Sumter in December 1860 and surrendered it in April 1861 after 34 hours of bombardment. He raised the same flag over the fort on April 14, 1865." },
+  { n: "P. G. T. Beauregard", r: "Confederate general", side: "cs", site: "c-sumter", area: "charleston", era: "cw",
+    b: "Opened fire on Fort Sumter in 1861; his old West Point instructor was Anderson. He returned in 1862–64 to defend Charleston against the Union siege." },
+  { n: "Robert Gould Shaw", r: "Colonel · 54th Massachusetts", side: "un", site: "c-wagner", area: "charleston", era: "cw",
+    b: "Commanded one of the first Black regiments raised in the North. He was killed on the parapet of Fort Wagner on July 18, 1863 and buried with his men." },
+  { n: "William H. Carney", r: "Sergeant · 54th Massachusetts", side: "un", site: "c-wagner", area: "charleston", era: "cw", img: "William_Harvey_Carney_with_flag.jpg", credit: "public domain",
+    b: "Wounded several times at Fort Wagner, he kept the regiment's flag from falling and carried it back, saying 'the old flag never touched the ground.' His Medal of Honor was among the first earned by a Black soldier." },
+  { n: "Horace L. Hunley", r: "Submarine financier and designer", side: "cs", site: "c-magnolia", area: "charleston", era: "cw", img: "Horace_L_Hunley.jpg", credit: "public domain",
+    b: "New Orleans lawyer who funded the submarine. He died with his crew when it sank in a training dive in October 1863, months before its successful attack." },
+  { n: "George E. Dixon", r: "Lieutenant · commander of the Hunley", side: "cs", site: "c-hunley", area: "charleston", era: "cw", nolike: true,
+    b: "Commanded the Hunley on her last mission. A gold coin that had stopped a bullet at Shiloh was found with his remains in the submarine." },
+  { n: "Quincy A. Gillmore", r: "Union general · siege of Charleston", side: "un", site: "c-swampangel", area: "charleston", era: "cw",
+    b: "Engineer who ran the siege of Morris Island, the reduction of Fort Sumter and the Swamp Angel battery that shelled the city." },
+  { n: "Samuel F. Du Pont", r: "Rear Admiral, U.S. Navy", side: "un", site: "c-keokuk", area: "charleston", era: "cw",
+    b: "Led the ironclad attack on Fort Sumter on April 7, 1863. Its failure cost him his command." },
   // ---------- Revolutionary Charlotte ----------
   { n: "Thomas Polk", r: "Colonel · Mecklenburg militia and commissary", side: "nc", site: "settlers",
     b: "Leading Charlotte merchant and surveyor whose house at Trade and Tryon became Cornwallis's headquarters in September 1780. As commissary he struggled to feed the army at New Providence and resigned in December, when Greene turned to Davie. He is buried in Settlers' Cemetery." },
@@ -1261,7 +1513,8 @@ function buildHomes(raw) { HOMES = raw.map((r, i) => {
   return { i, wx, wy, addr: r[2], city: r[3], zip: r[4], year: r[5], sub: r[6], county: r[7], zone: r[8], lot, site: r[10] || "camp" };
 }); }
 let selHome = null, popAt = null, pin = null;
-let era = "rev";
+let era = "rev", area = "charlotte";
+try { if (localStorage.getItem("cnp-area") === "charleston") area = "charleston"; } catch { /* storage unavailable */ }
 try { if (localStorage.getItem("cnp-era") === "cw") era = "cw"; } catch { /* storage unavailable */ }
 function el(tag, attrs, parent, text) {
   const e = document.createElementNS(NS, tag);
@@ -1276,7 +1529,9 @@ const PRESETS = {
   camp: [35.022, -80.795, 35.048, -80.757],
   charlotte: [35.03, -80.98, 35.53, -80.60],
   cw: [34.98, -80.99, 35.70, -80.44],
-  campaign: [32.7, -82.6, 37.3, -77.3]
+  campaign: [32.7, -82.6, 37.3, -77.3],
+  harbor: [32.69, -79.98, 32.80, -79.74],
+  lowcountry: [32.60, -80.30, 33.25, -79.60]
 };
 function fit(b, animate) {
   const [la1, lo1, la2, lo2] = b;
@@ -1348,7 +1603,7 @@ function graticule(g) {
 
 const TYPE_STYLE = {
   camp: { c: "continental", shape: "star" }, marker: { c: "buff", shape: "square" }, ford: { c: "water", shape: "diamond" },
-  church: { c: "ink", shape: "cross" }, house: { c: "continental", shape: "square" }, town: { c: "ink", shape: "circle" }, park: { c: "low", shape: "circle" },
+  church: { c: "ink", shape: "cross" }, house: { c: "continental", shape: "square" }, wreck: { c: "water", shape: "diamond" }, town: { c: "ink", shape: "circle" }, park: { c: "low", shape: "circle" },
   battle: { c: "militia", shape: "swords" }, enemy: { c: "militia", shape: "square" }, later: { c: "later", shape: "diamond" }
 };
 function marker(g, kind, col, r) {
@@ -1389,6 +1644,8 @@ function render() {
   svg.textContent = "";
   const s = view.s;
 
+  coastShown = false;
+  drawCoast();
   if (layers.grid) graticule(el("g", { class: "grat" }, svg));
 
   // zones (under everything else)
@@ -1465,7 +1722,7 @@ function render() {
   // sites
   const gs = el("g", {}, svg);
   const labelQueue = [];
-  const drawSites = SITES.filter(st => (st.layer === "sites" && layers.sites) || (st.layer === "later" && layers.later) || (st.id === selected));
+  const drawSites = SITES.filter(st => ((st.area || "charlotte") === area && ((st.layer === "sites" && layers.sites) || (st.layer === "later" && layers.later))) || (st.id === selected));
   // draw selected last
   drawSites.sort((a, b) => (a.id === selected) - (b.id === selected));
   for (const st of drawSites) {
@@ -1501,6 +1758,7 @@ function render() {
 
   if (layers.moves) drawForces(boxes, free);
   drawPin();
+  drawAttribution();
 
   // scale bar
   const target = 90 / (s / M_PER_DEG); // metres in 90px
@@ -1515,6 +1773,23 @@ function render() {
 
 function sx_(wx) { return (wx - view.cx) * view.s + W / 2; }
 function sy_(wy) { return (wy - view.cy) * view.s + H / 2; }
+/* Charleston coastline (OpenStreetMap land polygons, ODbL), loaded from charleston-land.json. */
+let LAND = null;
+const COAST_BOX = [32.45, -80.45, 33.05, -79.55];
+function drawCoast() {
+  if (!LAND) return;
+  const [a1, o1, a2, o2] = COAST_BOX, [x1, y1] = toScreen(a2, o1), [x2, y2] = toScreen(a1, o2);
+  if (x2 < 0 || x1 > W || y2 < 0 || y1 > H) return;
+  const g = el("g", {}, svg);
+  el("rect", { x: x1, y: y1, width: x2 - x1, height: y2 - y1, class: "water" }, g);
+  el("path", { d: LAND.map(pathD).map(d => d + "Z").join(""), class: "land", "fill-rule": "evenodd" }, g);
+  coastShown = true;
+}
+let coastShown = false;
+function drawAttribution() {
+  if (!coastShown) return;
+  el("text", { x: W - 10, y: H - (document.getElementById("timebar").hidden ? 10 : 112), "text-anchor": "end", class: "attrib" }, svg, "Coastline © OpenStreetMap contributors (ODbL)");
+}
 function drawHomes() {
   const s = view.s, mpx = s / M_PER_DEG;          // pixels per metre
   const g = el("g", {}, svg);
@@ -1559,7 +1834,9 @@ function pickHome(px, py) {
 }
 const ZONE_NAMES = { "": "Inside the conjectural camp layout" };
 const siteOf = (id) => SITES.find(x => x.id === id);
-const zoneInEra = (z) => { const st = siteOf(z.site); return !st || (st.layer === "later") === (era === "cw"); };
+const RATING_TEXT = { hi: "High · private", mid: "Moderate · private", low: "Low · built over", off: "Off-limits" };
+for (const st of SITES) (st.dz || []).forEach((d, n) => ZONES.push({ id: `z-${st.id}-${n}`, site: st.id, lat: st.lat, lon: st.lon, r: d[0], rating: d[1], ratingText: RATING_TEXT[d[1]], name: d[2], text: d[3] }));
+const zoneInEra = (z) => { const st = siteOf(z.site); return !st || ((st.layer === "later") === (era === "cw") && (st.area || "charlotte") === area); };
 const pop = document.getElementById("homepop");
 function homeFull(hm) { return hm.addr + ", " + (hm.city || hm.county + " County") + ", NC" + (hm.zip ? " " + hm.zip : ""); }
 function openHome(hm, fly) {
@@ -1671,7 +1948,21 @@ function drawPin() {
 }
 
 /* ---------- era toggle ---------- */
+function setArea(a, quiet) {
+  area = a;
+  const chs = a === "charleston";
+  document.getElementById("areasw").setAttribute("aria-checked", chs);
+  document.getElementById("area-l-clt").dataset.on = !chs; document.getElementById("area-l-chs").dataset.on = chs;
+  try { localStorage.setItem("cnp-area", a); } catch { /* storage unavailable */ }
+  if (popAt) { popAt = null; selHome = null; pop.hidden = true; }
+  setEra(era, quiet);
+}
+document.getElementById("areasw").addEventListener("click", () => setArea(area === "charlotte" ? "charleston" : "charlotte"));
 const ERA = {
+  "chs-rev": { sub: "Charleston and the Lowcountry · Sullivan's Island 1776, the sieges of 1779–80 and the occupation to 1782",
+               note: "<b>Revolutionary Charleston.</b> Forts, siege lines, plantations and the wreck of HMS Actaeon. Switch to Civil War for Fort Sumter, Fort Wagner and the Hunley." },
+  "chs-cw":  { sub: "Charleston Harbor · Fort Sumter, Fort Wagner, the Hunley and the wrecks of the blockade, 1860–1865",
+               note: "<b>Civil War Charleston.</b> Battles ashore and afloat, plus shipwrecks. Wreck positions are approximate; every wreck is protected." },
   rev: { sub: "Southern Continental Army encampment · Six Mile Creek, Mecklenburg–Union line · Oct–Dec 1780",
          note: "<b>A Revolutionary War camp, not a Civil War one.</b> The state marker and NC Archives date it to the fall of 1780; some online listings label it Civil War in error. Switch to Civil War for Charlotte's 1861–65 history." },
   cw:  { sub: "Civil War Charlotte · navy yard, mint, hospitals and the Confederacy's last days · 1861–1865",
@@ -1682,20 +1973,24 @@ function setEra(e, quiet) {
   const rev = e === "rev";
   document.getElementById("era-rev").setAttribute("aria-pressed", rev);
   document.getElementById("era-cw").setAttribute("aria-pressed", !rev);
-  document.getElementById("subtitle").textContent = ERA[e].sub;
-  document.getElementById("notice").innerHTML = ERA[e].note;
-  Object.assign(layers, rev ? { sites: true, later: false, camp: true, moves: true } : { sites: false, later: true, camp: false, moves: false });
+  const key = area === "charleston" ? "chs-" + e : e;
+  document.getElementById("subtitle").textContent = ERA[key].sub;
+  document.getElementById("notice").innerHTML = ERA[key].note;
+  Object.assign(layers, rev ? { sites: true, later: false, camp: area === "charlotte", moves: area === "charlotte" } : { sites: false, later: true, camp: false, moves: false });
   for (const k of ["sites", "later", "camp", "moves", "zones"]) {
     if (k === "zones") { document.getElementById("L-zones").checked = layers.zones; document.getElementById("L-zones").closest("label").hidden = false; continue; }
     const b = document.getElementById("L-" + k); b.checked = layers[k];
-    b.closest("label").hidden = rev ? k === "later" : !["later", "zones"].includes(k);
+    b.closest("label").hidden = rev ? (k === "later" || (area === "charleston" && (k === "camp" || k === "moves"))) : !["later", "zones"].includes(k);
   }
   document.getElementById("timebar").hidden = !layers.moves; stopPlay();
-  document.getElementById("v-campaign").hidden = !rev; document.getElementById("v-camp").hidden = !rev;
-  selForce = null; selected = rev ? "camp" : "bates";
+  const clt = area === "charlotte";
+  document.getElementById("v-campaign").hidden = !(rev && clt); document.getElementById("v-camp").hidden = !(rev && clt);
+  document.getElementById("v-charlotte").hidden = !clt;
+  document.getElementById("v-harbor").hidden = clt; document.getElementById("v-lowcountry").hidden = clt;
+  selForce = null; selected = clt ? (rev ? "camp" : "bates") : (rev ? "c-moultrie76" : "c-sumter");
   if (popAt) { popAt = null; selHome = null; pop.hidden = true; }
   try { localStorage.setItem("cnp-era", e); } catch { /* storage unavailable */ }
-  if (!quiet) { if (rev) setPreset("camp"); else fit(PRESETS.cw, true); showTab(currentTab === "detect" && !rev ? "site" : currentTab); }
+  if (!quiet) { if (!clt) setPreset(rev ? "lowcountry" : "harbor"); else if (rev) setPreset("camp"); else fit(PRESETS.cw, true); showTab(currentTab); }
 }
 document.getElementById("era-rev").addEventListener("click", () => era !== "rev" && setEra("rev"));
 document.getElementById("era-cw").addEventListener("click", () => era !== "cw" && setEra("cw"));
@@ -1759,7 +2054,12 @@ function setDay(d, quiet) {
   if (selForce && currentTab === "site") renderForce();
 }
 tslider.addEventListener("input", () => { stopPlay(); setDay(+tslider.value); });
-let playT = 0;
+let playT = 0, playSpeed = 1;
+document.querySelectorAll(".speed .btn").forEach(b => b.addEventListener("click", () => {
+  playSpeed = +b.dataset.speed;
+  document.querySelectorAll(".speed .btn").forEach(x => x.setAttribute("aria-pressed", x === b));
+  if (playT) { stopPlay(); playBtn.click(); }
+}));
 const playBtn = document.getElementById("tplay");
 function stopPlay() { if (playT) { clearInterval(playT); playT = 0; playBtn.textContent = "▶"; playBtn.setAttribute("aria-label", "Play the campaign"); } }
 playBtn.addEventListener("click", () => {
@@ -1768,7 +2068,7 @@ playBtn.addEventListener("click", () => {
   if (!layers.moves) { layers.moves = true; document.getElementById("L-moves").checked = true; }
   if (view.s > 3000) setPreset("campaign");
   playBtn.textContent = "❚❚"; playBtn.setAttribute("aria-label", "Pause");
-  playT = setInterval(() => { if (tDay >= DAYS) return stopPlay(); setDay(tDay + 1); }, reduceMotion ? 160 : 70);
+  playT = setInterval(() => { if (tDay >= DAYS) return stopPlay(); setDay(tDay + 1); }, (reduceMotion ? 160 : 70) / playSpeed);
 });
 function goToDay(iso, siteId) {
   stopPlay();
@@ -1907,10 +2207,10 @@ document.getElementById("zin").onclick = () => zoomAt(1.6);
 document.getElementById("zout").onclick = () => zoomAt(1 / 1.6);
 
 function setPreset(name) {
-  for (const n of ["camp", "charlotte", "campaign"]) document.getElementById("v-" + n).setAttribute("aria-pressed", n === name);
+  for (const n of ["camp", "charlotte", "campaign", "harbor", "lowcountry"]) document.getElementById("v-" + n).setAttribute("aria-pressed", n === name);
   fit(PRESETS[name], true);
 }
-for (const n of ["camp", "charlotte", "campaign"]) document.getElementById("v-" + n).onclick = () => setPreset(n);
+for (const n of ["camp", "charlotte", "campaign", "harbor", "lowcountry"]) document.getElementById("v-" + n).onclick = () => setPreset(n);
 for (const k in layers) {
   const box = document.getElementById("L-" + k);
   box.checked = layers[k];
@@ -1926,12 +2226,12 @@ let currentTab = "site";
 const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const gmaps = (la, lo) => `https://www.google.com/maps/search/?api=1&query=${la.toFixed(5)},${lo.toFixed(5)}`;
 const statusChip = (st) => `<span class="chip st-${st.status}">${esc(st.statusText)}</span>`;
-const eraChip = (st) => st.era === "later" ? `<span class="chip era-later">Civil War &amp; later</span>` : `<span class="chip era-1780">${st.era === "1781" ? "1781" : "1780"}</span>`;
+const eraChip = (st) => st.era === "later" ? `<span class="chip era-later">Civil War &amp; later</span>` : `<span class="chip era-1780">${esc(st.era)}</span>`;
 
 function showTab(name) {
   currentTab = name;
   document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.tab === name));
-  ({ site: renderSite, story: renderStory, people: renderPeople, detect: renderDetect, visit: renderVisit, sources: renderSources })[name]();
+  ({ site: renderSite, story: renderStory, people: renderPeople, detect: renderDetect, visit: renderVisit, library: renderLibrary, sources: renderSources })[name]();
   pane.scrollTop = 0;
 }
 document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => showTab(t.dataset.tab)));
@@ -1940,6 +2240,7 @@ function selectSite(id, fromMap) {
   const st = SITES.find(s => s.id === id);
   if (!st) return;
   selected = id; selForce = null;
+  if ((st.area || "charlotte") !== area) { area = st.area || "charlotte"; era = st.layer === "later" ? "cw" : "rev"; setArea(area, true); }
   if ((st.layer === "later") !== (era === "cw")) setEra(st.layer === "later" ? "cw" : "rev", true);
   if (!fromMap) flyToSite(st);
   else render();
@@ -1999,6 +2300,41 @@ function anniversary() {
   return "";
 }
 
+const CHS_REV_TIMELINE = [
+  { d: "June 28, 1776", md: "06-28", t: "Battle of Sullivan's Island", s: "Moultrie's palmetto fort beats Parker's fleet; Clinton's troops can't cross Breach Inlet.", site: "c-moultrie76" },
+  { d: "June 29, 1776", md: "06-29", t: "Actaeon burned", s: "The grounded frigate is set on fire by her crew.", site: "c-actaeon" },
+  { d: "May 1779", t: "Prevost's raid", s: "A British force marches up from Savannah to the edge of Charleston, then falls back.", site: "c-siegelines" },
+  { d: "June 20, 1779", md: "06-20", t: "Stono Ferry", s: "Lincoln's attack on the British rearguard fails.", site: "c-stono" },
+  { d: "Feb 11, 1780", t: "Clinton lands", s: "About 8,500 British troops land south of the city.", site: "c-siegelines" },
+  { d: "Apr 1, 1780", md: "04-01", t: "Siege lines opened", s: "British engineers begin their first parallel across Charleston Neck.", site: "c-siegelines" },
+  { d: "Apr 8, 1780", md: "04-08", t: "Fleet passes Fort Moultrie", s: "The Royal Navy runs into the harbor; the city is cut off by sea.", site: "c-moultrie76" },
+  { d: "Apr 14, 1780", md: "04-14", t: "Monck's Corner", s: "Tarleton closes the last road out.", site: "c-monckscorner" },
+  { d: "May 12, 1780", md: "05-12", t: "Charleston surrenders", s: "Lincoln gives up about 5,000 men, the worst American defeat of the war.", site: "c-hornwork" },
+  { d: "Aug 1780", t: "Patriot leaders exiled", s: "Christopher Gadsden and others are shipped to prison at St. Augustine.", site: "c-gadsden" },
+  { d: "Aug 4, 1781", md: "08-04", t: "Isaac Hayne hanged", s: "His execution becomes a rallying cry.", site: "c-exchange" },
+  { d: "Dec 1781", t: "Dorchester abandoned", s: "Greene's cavalry pushes the British back toward the city.", site: "c-dorchester" },
+  { d: "Dec 14, 1782", md: "12-14", t: "The British leave", s: "Occupation ends after two and a half years.", site: "c-evacuation" }
+];
+const CHS_CW_TIMELINE = [
+  { d: "Dec 20, 1860", md: "12-20", t: "Secession", s: "South Carolina leaves the Union at Institute Hall.", site: "c-secession" },
+  { d: "Jan 9, 1861", md: "01-09", t: "Star of the West", s: "Citadel cadets fire on a Union supply ship.", site: "c-citadel" },
+  { d: "Apr 12–13, 1861", md: "04-12", t: "Fort Sumter", s: "The bombardment that starts the war.", site: "c-sumter" },
+  { d: "Dec 20, 1861", t: "The Stone Fleet", s: "Old whalers are sunk to block the main channel.", site: "c-stonefleet" },
+  { d: "May 13, 1862", md: "05-13", t: "Robert Smalls takes the Planter", s: "Sixteen people sail to freedom.", site: "c-planter" },
+  { d: "June 16, 1862", md: "06-16", t: "Secessionville", s: "Union assault on James Island fails.", site: "c-secessionville" },
+  { d: "Mar 19, 1863", t: "Georgiana wrecked", s: "A new blockade runner is lost off Isle of Palms.", site: "c-georgiana" },
+  { d: "Apr 7–8, 1863", md: "04-07", t: "Ironclad attack", s: "Du Pont's monitors are beaten off; the Keokuk sinks.", site: "c-keokuk" },
+  { d: "July 16, 1863", md: "07-16", t: "Grimball's Landing", s: "The 54th Massachusetts in its first fight.", site: "c-grimball" },
+  { d: "July 18, 1863", md: "07-18", t: "Fort Wagner", s: "The 54th's assault; Shaw killed, Carney's Medal of Honor.", site: "c-wagner" },
+  { d: "Aug 22, 1863", md: "08-22", t: "The Swamp Angel", s: "Union shells reach the city.", site: "c-swampangel" },
+  { d: "Sept 7, 1863", t: "Wagner abandoned", s: "Confederates evacuate Morris Island.", site: "c-wagner" },
+  { d: "Dec 6, 1863", t: "Weehawken sinks", s: "A monitor founders at anchor.", site: "c-weehawken" },
+  { d: "Feb 17, 1864", md: "02-17", t: "Hunley sinks Housatonic", s: "The first submarine to sink a warship, and lost with all hands.", site: "c-hunley" },
+  { d: "Jan 15, 1865", t: "Patapsco sunk", s: "A monitor strikes a torpedo near Fort Sumter.", site: "c-patapsco" },
+  { d: "Feb 18, 1865", md: "02-18", t: "Charleston evacuated", s: "Confederate troops leave; Union regiments, including Black regiments, march in.", site: "c-battery" },
+  { d: "Apr 14, 1865", t: "The flag returns", s: "Anderson raises the Sumter flag again, the day Lincoln is shot.", site: "c-sumter" },
+  { d: "1995 / 2000 / 2004", t: "Hunley found, raised, crew buried", s: "Found 1995, raised August 8, 2000; the crew buried at Magnolia in 2004.", site: "c-lasch" }
+];
 const CW_TIMELINE = [
   { d: "1837", t: "Charlotte Mint opens", s: "A U.S. branch mint for the gold from the Carolina gold rush.", site: "mint" },
   { d: "1852", t: "The railroad arrives", s: "The Charlotte & South Carolina Railroad reaches town. By 1861 Charlotte is a rail junction, which is why the Confederacy later puts industry here.", site: null },
@@ -2028,7 +2364,96 @@ function renderStoryCW() {
         <span class="when">${esc(t.d)}</span><span class="what">${esc(t.t)}</span><span class="why">${esc(t.s)}</span></button></li>`).join("")}</ul>`;
   wireRows();
 }
+/* Library: documents, maps and plans, video and audio. All links checked to exist. */
+const LIBRARY = [
+  // Charlotte · Revolution
+  { a: "charlotte", e: "rev", k: "doc", t: "Greene to Thomas Jefferson, Charlotte, 6 December 1780", src: "Founders Online (National Archives)", u: "https://founders.archives.gov/documents/Jefferson/01-04-02-0222", d: "Greene, three days in command, describes the army he found at Charlotte and asks Virginia for help." },
+  { a: "charlotte", e: "rev", k: "doc", t: "Greene to Thomas Jefferson, Camp Charlotte, 14 December 1780", src: "Founders Online", u: "https://founders.archives.gov/documents/Jefferson/01-04-02-0254", d: "Written while the army was still at Charlotte and New Providence." },
+  { a: "charlotte", e: "rev", k: "doc", t: "Greene to Washington, Camp at the Cheraws, 28 December 1780", src: "Founders Online", u: "https://founders.archives.gov/documents/Washington/03-29-02-0431", d: "Explains why he left the Charlotte area, which he found too stripped to feed the army, and sent Kosciuszko to scout the Pee Dee." },
+  { a: "charlotte", e: "rev", k: "doc", t: "Washington to Greene, 18 October 1780", src: "Founders Online", u: "https://founders.archives.gov/documents/Washington/03-28-02-0323", d: "Washington's letter as Greene took up the Southern command." },
+  { a: "charlotte", e: "rev", k: "doc", t: "Greene to Washington, 31 October 1780", src: "Founders Online", u: "https://founders.archives.gov/documents/Washington/03-29-02-0023", d: "Greene on his way south to take command." },
+  { a: "charlotte", e: "rev", k: "doc", t: "William R. Davie to Gen. Smallwood, 11 November 1780", src: "American Revolution Institute", u: "https://collections.americanrevolutioninstitute.org/record/725", d: "Supplies and militia problems at the forward camp." },
+  { a: "charlotte", e: "rev", k: "doc", t: "William R. Davie to Gen. Smallwood, 15 November 1780", src: "American Revolution Institute", u: "https://collections.americanrevolutioninstitute.org/record/729", d: "A second letter from the New Providence period." },
+  { a: "charlotte", e: "rev", k: "doc", t: "Southern Campaign pension statements", src: "revwarapps.org", u: "https://revwarapps.org/", d: "Thousands of veterans' sworn accounts, transcribed. Search for 'New Providence', 'Six Mile Creek' or 'Charlotte'." },
+  { a: "charlotte", e: "rev", k: "doc", t: "Account of the Mecklenburg Declaration", src: "NC Museum of History", u: "https://www.ncmuseumofhistory.org/exhibits/witnesses-revolution/transcripts/mecklenburg-declaration-account", d: "Transcript of an account of the disputed 1775 declaration." },
+  { a: "charlotte", e: "rev", k: "doc", t: "North Carolina primary resources: the American Revolution", src: "America 250 NC", u: "https://www.america250.nc.gov/revolution-north-carolina-primary-resources", d: "Curated letters, records and images from North Carolina archives." },
+  { a: "charlotte", e: "rev", k: "doc", t: "Revolutionary War and North Carolina collection (PDF finding aid)", src: "Charlotte Mecklenburg Library", u: "https://www.cmstory.org/sites/default/files/special_collections/Revolutionary%20War%20and%20North%20Carolina%20Collection.pdf", d: "What the Carolina Room holds." },
+  { a: "charlotte", e: "rev", k: "read", t: "Camp New Providence (L-110)", src: "NC Dept. of Natural & Cultural Resources", u: "https://www.dncr.nc.gov/blog/2024/01/16/camp-new-providence-l-110", d: "The state marker's essay and sources." },
+  { a: "charlotte", e: "rev", k: "read", t: "Battle of Charlotte", src: "NCpedia", u: "https://www.ncpedia.org/charlotte-battle", d: "The courthouse fight of September 26, 1780." },
+  { a: "charlotte", e: "rev", k: "video", t: "Southern Campaign animated map", src: "American Battlefield Trust & Cowpens NB", u: "https://www.battlefields.org/news/american-battlefield-trust-cowpens-national-battlefield-launch-animated-map-tracing-dynamic", d: "A 15-minute animated map of the whole Southern Campaign." },
+  { a: "charlotte", e: "rev", k: "video", t: "Animated battle maps collection", src: "American Battlefield Trust", u: "https://www.battlefields.org/learn/maps/animated-battle-maps", d: "Includes Cowpens, Kings Mountain and Guilford Courthouse." },
+  { a: "charlotte", e: "rev", k: "video", t: "Daniel Morgan in 4 minutes", src: "American Battlefield Trust", u: "https://www.battlefields.org/learn/videos/daniel-morgan", d: "The commander of the light corps at New Providence." },
+  { a: "charlotte", e: "rev", k: "video", t: "The Battle of Cowpens", src: "PBS", u: "https://www.pbs.org/video/the-battle-of-cowpens-ogudft/", d: "From PBS's The American Revolution." },
+  { a: "charlotte", e: "rev", k: "video", t: "Cowpens and Camden 360° virtual tours", src: "American Battlefield Trust", u: "https://www.battlefields.org/visit/virtual-tours/cowpens-virtual-tour", d: "Walk the fields; a Camden tour is on the same site." },
+  { a: "charlotte", e: "rev", k: "audio", t: "Southern War podcast", src: "National Park Service", u: "https://www.nps.gov/podcasts/southern-war.htm", d: "Episodes on Kings Mountain, Cowpens, Guilford Courthouse, Ninety Six and more." },
+  { a: "charlotte", e: "rev", k: "audio", t: "King's Mountain & Cowpens", src: "Key Battles of the Revolutionary War", u: "https://www.godtube.com/podcasts/key-battles-of-the-revolutionary-war/kings-mountain-cowpens-the-revolutionary-wars-largest-all-american-fight", d: "27-minute episode covering both battles." },
+  { a: "charlotte", e: "rev", k: "audio", t: "Nathanael Greene's Southern Campaign", src: "Story of Rhode Island podcast", u: "https://storyofrhodeislandpodcast.transistor.fm/episodes/bonus-nathanael-greenes-southern-campaign", d: "Greene's strategy after taking command at Charlotte." },
+  // Charlotte · Civil War
+  { a: "charlotte", e: "cw", k: "read", t: "Confederate Cabinet (marker L-3)", src: "NC DNCR", u: "https://www.dncr.nc.gov/blog/2024/01/11/confederate-cabinet-l-3", d: "The April 1865 cabinet meetings in Charlotte." },
+  { a: "charlotte", e: "cw", k: "read", t: "Jefferson Davis (marker L-4)", src: "NC DNCR", u: "https://www.dncr.nc.gov/blog/2024/01/11/jefferson-davis-l-4", d: "Davis in Charlotte and the news of Lincoln's death." },
+  { a: "charlotte", e: "cw", k: "doc", t: "U.S. Civil War exhibit", src: "Charlotte Mecklenburg Story", u: "https://www.cmstory.org/exhibits/us-civil-war-1861-1865?page=2", d: "Images, documents and timeline from the library's collections." },
+  // Charleston · Revolution
+  { a: "charleston", e: "rev", k: "map", t: "A plan of the attack of Fort Sulivan, 28 June 1776 (manuscript)", src: "Library of Congress", u: "https://www.loc.gov/item/gm71000631", d: "Hand-drawn plan with an inset of the fort's gun platform." },
+  { a: "charleston", e: "rev", k: "map", t: "A plan of the attack of Fort Sulivan (Faden, 1776)", src: "Library of Congress", u: "https://www.loc.gov/item/gm71000629/", d: "The engraved version, annotated by a Royal Artillery officer." },
+  { a: "charleston", e: "rev", k: "map", t: "Plan of the attack of Fort Sulivan, 'by an officer on the spot'", src: "Library of Congress", u: "https://www.loc.gov/item/gm71002458/", d: "London, 1776, showing Parker's squadron." },
+  { a: "charleston", e: "rev", k: "map", t: "The attack on the fort on Sulivan's Island, painted by Henry Gray", src: "Library of Congress", u: "https://www.loc.gov/item/2004670007", d: "Watercolor of the 1776 battle." },
+  { a: "charleston", e: "rev", k: "map", t: "Plan of the siege of Charles Town, 1780 (Fennigan)", src: "Library of Congress", u: "https://www.loc.gov/item/gm71000887/", d: "Manuscript siege plan showing both sides' lines of fire." },
+  { a: "charleston", e: "rev", k: "map", t: "Plan de la ville de Charlestown ... siège 1780", src: "Library of Congress", u: "https://www.loc.gov/item/gm71002163", d: "French manuscript plan of the town, its works and the siege." },
+  { a: "charleston", e: "rev", k: "map", t: "A sketch of the operations before Charlestown (Des Barres, 1780)", src: "Library of Congress", u: "https://www.loc.gov/item/gm71000644/", d: "Printed map with an inset of the harbor." },
+  { a: "charleston", e: "rev", k: "map", t: "The investiture of Charleston by the English army, 1780", src: "Library of Congress", u: "https://www.loc.gov/item/gm71000638/", d: "Positions of each British corps." },
+  { a: "charleston", e: "rev", k: "map", t: "Fort Moultrie, Historic American Buildings Survey", src: "Library of Congress", u: "https://www.loc.gov/item/sc0365", d: "Measured drawings and photographs of the fort." },
+  { a: "charleston", e: "rev", k: "video", t: "Charleston virtual field trip", src: "American Battlefield Trust", u: "https://battlefields.org/learn/charleston-virtual-field-trip", d: "Revolutionary and Civil War Charleston in 360°." },
+  // Charleston · Civil War
+  { a: "charleston", e: "cw", k: "map", t: "Plan of the attack on Ft. Sumter, April 1863 (Sneden)", src: "Library of Congress", u: "https://www.loc.gov/resource/gvhs01.vhs00131/", d: "The Union ironclad attack of April 7, 1863." },
+  { a: "charleston", e: "cw", k: "map", t: "Fort Wagner, Morris Island", src: "Library of Congress", u: "https://www.loc.gov/item/gvhs01.vhs00230/", d: "Plan of the fort the 54th Massachusetts assaulted." },
+  { a: "charleston", e: "cw", k: "map", t: "Plan of the assault on Ft. Wagner, July 11th 1863", src: "Library of Congress", u: "https://www.loc.gov/item/gvhs01.vhs00151/", d: "The first, daylight assault, a week before the 54th's." },
+  { a: "charleston", e: "cw", k: "map", t: "Gillmore's line of earthworks in front of Fort Wagner, July 1863", src: "Library of Congress", u: "https://www.loc.gov/resource/gvhs01.vhs00152/", d: "The Union siege approaches." },
+  { a: "charleston", e: "cw", k: "map", t: "Civil War maps of Charleston Harbor", src: "Library of Congress", u: "https://www.loc.gov/collections/civil-war-maps?fa=location%3Acharleston+harbor", d: "The full digitized set, including battery positions and Coast Survey charts." },
+  { a: "charleston", e: "cw", k: "doc", t: "The Planter: a strike for freedom", src: "National Park Service", u: "https://www.nps.gov/reer/learn/historyculture/the-planter-a-strike-for-freedom.htm", d: "Robert Smalls's escape, from Reconstruction Era NHP." },
+  { a: "charleston", e: "cw", k: "read", t: "Robert Smalls", src: "National Park Service", u: "https://www.nps.gov/people/robert-smalls.htm", d: "Biography." },
+  { a: "charleston", e: "cw", k: "read", t: "The Underground Railroad and Fort Sumter", src: "National Park Service", u: "https://www.nps.gov/articles/000/the-underground-railroad-and-fort-sumter.htm", d: "Freedom-seekers in Charleston Harbor." },
+  { a: "charleston", e: "cw", k: "read", t: "Battle of Secessionville", src: "National Park Service", u: "https://www.nps.gov/articles/000/battle-of-secessionville.htm", d: "" },
+  { a: "charleston", e: "cw", k: "read", t: "Fort Wagner: battle facts and summary", src: "American Battlefield Trust", u: "https://www.battlefields.org/learn/civil-war/battles/fort-wagner", d: "" },
+  { a: "charleston", e: "cw", k: "read", t: "Charleston during the Civil War", src: "American Battlefield Trust", u: "https://www.battlefields.org/learn/articles/charleston-during-civil-war", d: "" },
+  { a: "charleston", e: "cw", k: "read", t: "Robert Smalls and the Planter", src: "American Battlefield Trust", u: "https://www.battlefields.org/learn/articles/robert-smalls-and-planter", d: "" },
+  { a: "charleston", e: "cw", k: "read", t: "H. L. Hunley overview", src: "Friends of the Hunley", u: "https://hunley.org/overview/", d: "The submarine's story, recovery and conservation." },
+  { a: "charleston", e: "cw", k: "read", t: "Is it the H. L. Hunley or the CSS Hunley?", src: "Friends of the Hunley", u: "https://www.hunley.org/whats-in-a-name-is-it-the-h-l-hunley-or-the-css-hunley/", d: "Why the submarine was never commissioned 'CSS'." },
+  { a: "charleston", e: "cw", k: "read", t: "H. L. Hunley", src: "South Carolina Encyclopedia", u: "https://scencyclopedia.org/sce/?p=3208", d: "" },
+  { a: "charleston", e: "cw", k: "video", t: "Robert Smalls: a daring escape", src: "PBS, Many Rivers to Cross", u: "https://www.pbs.org/wnet/african-americans-many-rivers-to-cross/?p=545", d: "" },
+  { a: "charleston", e: "cw", k: "video", t: "Charleston virtual field trip", src: "American Battlefield Trust", u: "https://battlefields.org/learn/charleston-virtual-field-trip", d: "Fort Sumter, Morris Island and the 54th Massachusetts in 360°." }
+];
+const LIB_KINDS = { all: "All", doc: "Letters & documents", map: "Maps, plans & schematics", read: "Articles", video: "Video", audio: "Audio" };
+let libKind = "all";
+function renderLibrary() {
+  const items = LIBRARY.filter(x => x.a === area && x.e === era && (libKind === "all" || x.k === libKind));
+  const counts = Object.fromEntries(Object.keys(LIB_KINDS).map(k => [k, LIBRARY.filter(x => x.a === area && x.e === era && (k === "all" || x.k === k)).length]));
+  pane.innerHTML = `
+    <h2>Library</h2>
+    <div class="kicker">Original letters, maps and fort plans, articles, documentaries and podcasts for ${area === "charleston" ? "Charleston" : "the Charlotte area"} in the ${era === "rev" ? "Revolutionary War" : "Civil War"}. Switch the area or war at the top to see more. Links open the source's own site.</div>
+    <div class="lib-filters">${Object.entries(LIB_KINDS).filter(([k]) => counts[k]).map(([k, l]) => `<button class="btn" data-kind="${k}" aria-pressed="${k === libKind}">${l} (${counts[k]})</button>`).join("")}</div>
+    ${items.length ? items.map(x => `
+      <div class="libitem"><span class="lm">${esc(LIB_KINDS[x.k])} · ${esc(x.src)}</span>
+        <a class="lt" href="${x.u}" target="_blank" rel="noopener">${esc(x.t)} ↗</a>${x.d ? `<p>${esc(x.d)}</p>` : ""}</div>`).join("") : `<p class="note">Nothing in this category yet.</p>`}`;
+  pane.querySelectorAll("[data-kind]").forEach(b => b.addEventListener("click", () => { libKind = b.dataset.kind; renderLibrary(); }));
+}
+function renderStoryCHS() {
+  const tl = era === "rev" ? CHS_REV_TIMELINE : CHS_CW_TIMELINE;
+  const now = new Date(), md = String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
+  pane.innerHTML = era === "rev" ? `
+    <h2>Revolutionary Charleston</h2>
+    <div class="kicker">Select an entry to fly to its place on the map.</div>
+    <p>Charleston was the richest city in the American South and the prize of two British campaigns. In 1776 a half-built palmetto fort turned back the Royal Navy. In 1780 the British returned with an army, besieged the city for six weeks and captured its entire garrison, the worst American defeat of the war. They held Charleston until December 1782.</p>
+    <div class="callout warn">Charleston's 1780 surrender is why the Southern Army had to be rebuilt, and why it ended up camped at New Providence near Charlotte that fall.</div>` : `
+    <h2>Civil War Charleston</h2>
+    <div class="kicker">Select an entry to fly to its place on the map.</div>
+    <p>The war began in Charleston Harbor, and for four years the harbor was the scene of some of its most inventive fighting: ironclads and monitors, the first submarine to sink a warship, a granite-filled blockade fleet, mines, and a 587-day siege. It was also where Robert Smalls sailed sixteen people to freedom and where the 54th Massachusetts made its assault on Fort Wagner.</p>`;
+  pane.innerHTML += `<ul class="list">${tl.map(t => `
+      <li><button class="rowbtn${t.md === md ? " today" : ""}" ${t.site ? `data-site="${t.site}"` : "disabled"}>
+        <span class="when">${esc(t.d)}</span><span class="what">${esc(t.t)}</span><span class="why">${esc(t.s)}</span></button></li>`).join("")}</ul>`;
+  wireRows();
+}
 function renderStory() {
+  if (area === "charleston") return renderStoryCHS();
   if (era === "cw") return renderStoryCW();
   const now = new Date();
   const md = String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
@@ -2094,10 +2519,10 @@ function portraitHTML(p, big) {
 }
 function renderPeople() {
   const sideChip = { us: '<span class="chip era-1780">Continental</span>', nc: '<span class="chip" style="color:var(--militia);border-color:var(--militia)">Patriot militia</span>', gb: '<span class="chip" style="color:var(--hi);border-color:var(--hi)">British</span>', cs: '<span class="chip" style="color:var(--later);border-color:var(--later)">Confederate</span>', un: '<span class="chip era-1780">Union</span>' };
-  const list = PEOPLE.filter(p => (p.era || "rev") === era);
+  const list = PEOPLE.filter(p => (p.era || "rev") === era && (p.area || "charlotte") === area);
   pane.innerHTML = `
-    <h2>${era === "rev" ? "Important figures" : "Civil War Charlotte"}</h2>
-    <div class="kicker">${era === "rev" ? "Officers named on the state marker, the local commanders, Charlotte's Revolutionary leaders, and the men across the line." : "The people behind Charlotte's wartime industries and the Confederacy's last days."} Portraits load from Wikimedia Commons.</div>
+    <h2>${area === "charleston" ? (era === "rev" ? "Revolutionary Charleston" : "Civil War Charleston") : era === "rev" ? "Important figures" : "Civil War Charlotte"}</h2>
+    <div class="kicker">${area === "charleston" ? (era === "rev" ? "The defenders of 1776 and 1780, the British commanders, and the city's Patriot leaders." : "Commanders on both sides, the men of the 54th Massachusetts, Robert Smalls, and the Hunley's builders and crew.") : era === "rev" ? "Officers named on the state marker, the local commanders, Charlotte's Revolutionary leaders, and the men across the line." : "The people behind Charlotte's wartime industries and the Confederacy's last days."} Portraits load from Wikimedia Commons.</div>
     ${list.map(p => `
       <details class="person">
         <summary>${portraitHTML(p, false)}<span class="nm">${esc(p.n)}</span><span class="side">${sideChip[p.side]}</span><span class="rk">${esc(p.r)}</span></summary>
@@ -2124,9 +2549,31 @@ function attribution(d) {
   return "Larger than standard musket balls: wall gun, blunderbuss, or a ball deformed by impact. Measure across the roundest axis.";
 }
 
+function renderDetectCHS(rating) {
+  const sids = [...new Set(ZONES.filter(z => zoneInEra(z) && (siteOf(z.site) || {}).area === "charleston").map(z => z.site))];
+  pane.innerHTML = `
+    <h2>Metal detecting</h2>
+    <div class="kicker">Charleston's best-known sites are protected. Here is what is open, what isn't, and why.</div>
+    <div class="callout"><b>Shipwrecks are off-limits.</b> Every wreck on this map is protected. The South Carolina Underwater Antiquities Act requires a state license to dive on or recover anything from historic wrecks and state bottomland. Sunken U.S. Navy vessels like the Housatonic, Keokuk, Weehawken and Patapsco remain Navy property under the federal Sunken Military Craft Act, and several are war graves.</div>
+    <ul class="tight">
+      <li><b>Forts:</b> Fort Sumter and Fort Moultrie are national park land; Fort Lamar, Colonial Dorchester and Fort Johnson are state property. No detecting.</li>
+      <li><b>Beaches:</b> rules differ by town, and dunes are protected everywhere. Check Sullivan's Island, Isle of Palms and Folly Beach ordinances before you go.</li>
+      <li><b>Morris Island:</b> reachable only by boat, eroding fast, and the burial ground of soldiers killed at Fort Wagner. Leave it alone.</li>
+      <li><b>Private land:</b> Stono Ferry, Biggin Bridge, Grimball's Landing and the James Island approaches are mostly private. Use the Charleston County parcel viewer to find owners and get written permission.</li>
+      <li><b>Homes:</b> street-address lots are mapped only for North Carolina, where the state publishes parcel data.</li>
+    </ul>
+    <h3>Zones by site</h3>
+    ${sids.map(sid => { const st = siteOf(sid), zs = ZONES.filter(z => z.site === sid);
+      return `<details class="zonecard" style="border-left:4px solid ${rating[zs.some(z => z.rating === "hi") ? "hi" : zs.some(z => z.rating === "mid") ? "mid" : zs[0].rating]}">
+        <summary class="zh"><span class="zn">${esc(st.name)}</span><span class="zr">${zs.map(z => esc(RATING_SHORT[z.rating])).join(" · ")}</span></summary>
+        ${zs.map(z => `<p><b style="color:${rating[z.rating]}">${esc(z.name)}:</b> ${esc(z.text)}</p>`).join("")}
+        <button class="btn" data-zone="${zs[zs.length - 1].id}">Show on map</button></details>`; }).join("")}`;
+  wireRows();
+}
 const RATING_SHORT = { hi: "High", mid: "Moderate", low: "Low", off: "Off-limits" };
 function renderDetect() {
   const rating = { hi: "var(--hi)", mid: "var(--mid)", low: "var(--low)", off: "var(--off)" };
+  if (area === "charleston") return renderDetectCHS(rating);
   pane.innerHTML = `
     <h2>Metal detecting</h2>
     <div class="kicker">Where 1780 material is likely to be, and the rules that decide whether you can look.</div>
@@ -2207,6 +2654,16 @@ function renderDetect() {
 }
 
 function renderVisit() {
+  if (area === "charleston") {
+    const ids = era === "rev" ? ["c-moultrie76", "c-breach76", "c-exchange", "c-stmichaels", "c-hornwork", "c-gadsden", "c-drayton", "c-middleton", "c-dorchester"]
+                              : ["c-sumter", "c-moultrie61", "c-breach64", "c-battery", "c-citadel", "c-secessionville", "c-lasch", "c-magnolia"];
+    pane.innerHTML = `
+      <h2>Visit today</h2>
+      <div class="kicker">${era === "rev" ? "A day on the peninsula and Sullivan's Island, plus the Ashley River plantations." : "Fort Sumter by boat, Sullivan's Island, the Battery and the Hunley in North Charleston (weekend tours)."}</div>
+      <ul class="list">${ids.map((id, i) => { const s = SITES.find(x => x.id === id);
+        return `<li><button class="rowbtn" data-site="${s.id}"><span class="when">Stop ${i + 1}</span><span class="what">${esc(s.name)}</span><span class="why">${esc(s.today)}</span></button></li>`; }).join("")}</ul>`;
+    return wireRows();
+  }
   if (era === "cw") {
     pane.innerHTML = `
       <h2>Visit today</h2>
@@ -2268,7 +2725,8 @@ function toast(msg) {
 /* ---------- boot ---------- */
 if (innerWidth < 900) document.getElementById("layers").open = false;
 setDay(tDay, true);
-setEra(era, true);
+setArea(area, true);
+fetch("charleston-land.json").then(r => r.ok ? r.json() : null).then(j => { if (j) { LAND = j; render(); } }).catch(() => {});
 fetch("homes.json").then(r => r.ok ? r.json() : Promise.reject(r.status)).then(raw => {
   buildHomes(raw); render();
   if (currentTab === "detect") renderDetect();
@@ -2280,6 +2738,8 @@ if (SITES.some(s => s.id === startId)) {
   const st = SITES.find(s => s.id === startId);
   if (st.layer === "later") { layers.later = true; document.getElementById("L-later").checked = true; }
   const [x, y] = world(st.lat, st.lon); flyTo(x, y, targetScale(st), false);
+} else if (area === "charleston") {
+  fit(PRESETS[era === "rev" ? "lowcountry" : "harbor"], false);
 } else if (era === "cw") {
   fit(PRESETS.cw, false);
 } else {
