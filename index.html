@@ -398,6 +398,8 @@ ul.tight li { margin: 3px 0; }
 .flagkey b { font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
 .flagkey span { display: flex; align-items: center; gap: 6px; }
 #map .flagpole { stroke: var(--ink); stroke-width: 1.2; }
+.areaseg .btn { padding: 7px 11px; font-weight: 600; }
+@media (max-width: 600px) { .areaseg .btn { padding: 6px 8px; font-size: .78rem; } }
 .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--panel); padding: 7px 14px; border-radius: 3px; font-size: .82rem; z-index: 20; }
 </style>
 </head>
@@ -409,10 +411,10 @@ ul.tight li { margin: 3px 0; }
     <span class="sub" id="subtitle">Southern Continental Army encampment · Six Mile Creek, Mecklenburg–Union line · Oct–Dec 1780</span>
   </div>
   <div class="toprow">
-  <div class="areasw">
-    <span id="area-l-clt" data-on="true">Charlotte</span>
-    <button id="areasw" role="switch" aria-checked="false" aria-label="Switch between the Charlotte and Charleston areas"></button>
-    <span id="area-l-chs" data-on="false">Charleston</span>
+  <div class="seg areaseg" role="group" aria-label="Which area">
+    <button class="btn" id="area-charlotte" aria-pressed="true">Charlotte</button>
+    <button class="btn" id="area-charleston" aria-pressed="false">Charleston</button>
+    <button class="btn" id="area-carolinas" aria-pressed="false">Carolinas</button>
   </div>
   <div class="seg era" role="group" aria-label="Which war">
     <button class="btn" id="era-rev" aria-pressed="true"><span class="long">Revolutionary War</span><span class="short">Revolution</span></button>
@@ -433,6 +435,7 @@ ul.tight li { margin: 3px 0; }
         <button class="btn" id="v-campaign" aria-pressed="false">Campaign</button>
         <button class="btn" id="v-harbor" aria-pressed="false" hidden>Harbor</button>
         <button class="btn" id="v-lowcountry" aria-pressed="false" hidden>Lowcountry</button>
+        <button class="btn" id="v-carolinas" aria-pressed="false" hidden>Carolinas</button>
       </div>
       <form class="addr" id="addrform" role="search">
         <input id="addr-q" placeholder="Find a modern address" aria-label="Find a modern address" autocomplete="street-address">
@@ -995,6 +998,54 @@ const SITES = [
     history: ["All three Hunley crews lie here, including the last crew, buried in 2004 after their remains were recovered from the submarine. Location approximate."],
     today: "70 Cunnington Avenue.", access: "Open daytime.", detect: "Never. Cemetery.", dz: [[300, "off", "Magnolia Cemetery", "Burial ground."]] },
 
+  // ======================= THE CAROLINAS (statewide) =======================
+  {"id": "alamance", "area": "carolinas", "date": "1771-05-16", "layer": "sites", "era": "1771", "type": "battle", "lat": 36.0093, "lon": -79.5199, "zl": 1500, "name": "Alamance Battleground", "kind": "Regulator War · May 16, 1771", "status": "public", "statusText": "State historic site", "history": ["Royal Governor William Tryon's militia crushed the Regulators, backcountry farmers protesting corrupt officials and fees. Six were later hanged. Many backcountry men remembered Alamance when they chose sides a few years later."], "today": "Alamance Battleground State Historic Site, near Burlington.", "access": "Open to visitors.", "detect": "No. State property.", "dz": [[500, "off", "State historic site", "State-owned historic site. Detecting needs a state permit."], [1100, "mid", "Farmland around the battlefield", "Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "edenton", "area": "carolinas", "date": "1774-10-25", "layer": "sites", "era": "1774", "type": "town", "lat": 36.0618, "lon": -76.6077, "zl": 1500, "name": "Edenton Tea Party", "kind": "Women's political protest · October 25, 1774", "status": "public", "statusText": "Historic town", "history": ["Fifty-one women led by Penelope Barker signed a pledge to boycott British tea and cloth, one of the earliest organized political actions by American women. London newspapers mocked them in a famous cartoon."], "today": "Historic Edenton, on Albemarle Sound.", "access": "Public streets and state historic site.", "detect": "No.", "dz": [[400, "off", "Historic district", "Built over and publicly owned."]]},
+  {"id": "tryon", "area": "carolinas", "date": "1775-05-31", "layer": "sites", "era": "1775", "type": "house", "lat": 35.1047, "lon": -77.043, "zl": 1500, "name": "Tryon Palace", "kind": "Royal governor's palace, New Bern", "status": "public", "statusText": "State historic site", "history": ["Built for Gov. William Tryon in 1770. Gov. Josiah Martin fled it on May 31, 1775 as the colony turned against royal rule. It then served as North Carolina's first state capitol. Today's palace is a reconstruction on the original foundations."], "today": "529 S. Front Street, New Bern.", "access": "Open to visitors.", "detect": "No. State property.", "dz": [[300, "off", "Palace grounds", "State-owned historic site. Detecting needs a state permit."]]},
+  {"id": "fortjohnston", "area": "carolinas", "date": "1775-07-18", "layer": "sites", "era": "1775", "type": "house", "lat": 33.9171, "lon": -78.019, "zl": 1500, "name": "Fort Johnston", "kind": "Burned by Patriot militia · July 18, 1775", "status": "public", "statusText": "Historic site", "history": ["Gov. Martin took refuge in this royal fort at the mouth of the Cape Fear, then escaped to HMS Cruizer as militia burned it. A later fort on the site served in the Civil War."], "today": "Southport waterfront.", "access": "Public waterfront and museum.", "detect": "No.", "dz": [[250, "off", "Fort site", "Publicly owned historic site."]]},
+  {"id": "brunswick", "area": "carolinas", "date": "1766-02-21", "layer": "sites", "era": "1766", "type": "house", "lat": 34.0398, "lon": -77.9462, "zl": 1500, "name": "Brunswick Town", "kind": "Stamp Act resistance · 1766", "status": "public", "statusText": "State historic site", "history": ["Armed colonists here forced royal officials to stop enforcing the Stamp Act in 1766, years before Lexington. The British burned the town in 1776; its ruins and St. Philip's Church remain."], "today": "Brunswick Town/Fort Anderson State Historic Site, Winnabow.", "access": "Open to visitors.", "detect": "No. State property.", "dz": [[500, "off", "State historic site", "State-owned historic site. Detecting needs a state permit."]]},
+  {"id": "halifax", "area": "carolinas", "date": "1776-04-12", "layer": "sites", "era": "1776", "type": "town", "lat": 36.33, "lon": -77.5894, "zl": 1500, "name": "Halifax Resolves", "kind": "First call for independence · April 12, 1776", "status": "public", "statusText": "State historic site", "history": ["North Carolina's Provincial Congress told its delegates to vote for independence, the first colony to do so. The date is on the state flag."], "today": "Historic Halifax State Historic Site.", "access": "Open to visitors.", "detect": "No. State property.", "dz": [[400, "off", "Historic Halifax", "State-owned historic site. Detecting needs a state permit."]]},
+  {"id": "moorescreek", "area": "carolinas", "date": "1776-02-27", "layer": "sites", "era": "1776", "type": "battle", "lat": 34.4588, "lon": -78.108, "zl": 1500, "name": "Moores Creek Bridge", "kind": "Battle · February 27, 1776", "status": "public", "statusText": "National battlefield", "history": ["About 1,600 Loyalist Highlanders marching to meet a British fleet charged across a bridge whose planks Patriot militia had pulled up and greased. Patriot muskets and two small cannon broke them in minutes. It ended Loyalist power in North Carolina for years."], "today": "Moores Creek National Battlefield, near Currie.", "access": "Open daily.", "detect": "Illegal. Federal land.", "dz": [[700, "off", "Moores Creek National Battlefield", "Federal land. Detecting and digging are illegal under the Archaeological Resources Protection Act."], [1400, "mid", "Approaches beyond the park", "The Loyalist march and flight crossed private land. Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "shallowford", "area": "carolinas", "date": "1780-10-14", "layer": "sites", "era": "1780", "type": "battle", "lat": 36.12, "lon": -80.49, "zl": 1500, "name": "Shallow Ford", "kind": "Skirmish · October 14, 1780", "status": "private", "statusText": "Rural land", "history": ["Patriot militia ambushed Loyalists crossing the Yadkin a week after Kings Mountain. Location approximate."], "today": "Yadkin River, Forsyth and Yadkin counties.", "access": "Private.", "detect": "Only with landowner permission.", "dz": [[700, "hi", "Shallow Ford crossing", "Little-studied ford fight. Location approximate. Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "pyles", "area": "carolinas", "date": "1781-02-25", "layer": "sites", "era": "1781", "type": "battle", "lat": 36.0245, "lon": -79.4295, "zl": 1500, "name": "Pyle's Defeat", "kind": "Massacre · February 25, 1781", "status": "private", "statusText": "Historic marker", "history": ["Henry Lee's Legion, wearing green coats like Tarleton's, rode into about 400 Loyalist militia under Dr. John Pyle, who mistook them for friends. Over 90 Loyalists were killed and no Americans. Location approximate."], "today": "Near Burlington, Alamance County.", "access": "Small memorial park and markers.", "detect": "No at the memorial; private land around it.", "dz": [[300, "off", "Memorial site", "Burial ground."], [900, "hi", "Surrounding farmland", "Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "lindley", "area": "carolinas", "date": "1781-09-13", "layer": "sites", "era": "1781", "type": "battle", "lat": 35.9264, "lon": -79.3247, "zl": 1500, "name": "Lindley's Mill", "kind": "Battle · September 13, 1781", "status": "private", "statusText": "Rural land", "history": ["Loyalist partisan David Fanning, carrying the captured Governor Thomas Burke from Hillsborough, fought through a Patriot ambush at Cane Creek. Fanning was wounded but Burke reached the British at Wilmington. Location approximate."], "today": "Cane Creek, southern Alamance County.", "access": "Private.", "detect": "Only with landowner permission.", "dz": [[800, "hi", "Lindley's Mill", "One of the larger battles in the state; little detected. Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "elizabethtown", "area": "carolinas", "date": "1781-08-27", "layer": "sites", "era": "1781", "type": "battle", "lat": 34.6293, "lon": -78.6053, "zl": 1500, "name": "Elizabethtown", "kind": "Skirmish · late August 1781", "status": "public", "statusText": "Town", "history": ["A small Patriot force crossed the Cape Fear at night and routed a larger Loyalist garrison, weakening the British hold on the lower Cape Fear. Location approximate."], "today": "Elizabethtown, Bladen County.", "access": "Public town.", "detect": "Private yards only, with permission.", "dz": [[600, "mid", "Riverside town", "Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "portroyal79", "area": "carolinas", "date": "1779-02-03", "layer": "sites", "era": "1779", "type": "battle", "lat": 32.43, "lon": -80.7, "zl": 1500, "name": "Port Royal Island", "kind": "Battle of Beaufort · February 3, 1779", "status": "private", "statusText": "Marker", "history": ["Gen. William Moultrie's militia drove off a British landing party, one of few Patriot successes in the South in 1779. Location approximate."], "today": "Port Royal Island near Beaufort.", "access": "Marker.", "detect": "Private yards only, with permission.", "dz": [[700, "mid", "Battle ground", "Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "snowsisland", "area": "carolinas", "date": "1781-03-28", "layer": "sites", "era": "1781", "type": "camp", "lat": 33.84, "lon": -79.38, "zl": 1500, "name": "Snow's Island", "kind": "Francis Marion's base · 1780–81", "status": "private", "statusText": "River swamp", "history": ["Marion's hideout at the junction of Lynches River and the Pee Dee, where his men rested between raids. The British destroyed it in March 1781. Location approximate."], "today": "Pee Dee River swamps, Florence County.", "access": "Mostly private; reachable by boat.", "detect": "Only with landowner permission.", "dz": [[800, "hi", "Snow's Island camp", "Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "fortwatson", "area": "carolinas", "date": "1781-04-23", "layer": "sites", "era": "1781", "type": "battle", "lat": 33.5335, "lon": -80.431, "zl": 1500, "name": "Fort Watson", "kind": "Siege · April 15–23, 1781", "status": "public", "statusText": "National wildlife refuge", "history": ["A British post on top of an ancient Santee Indian mound. Marion and Lee had no cannon, so Col. Hezekiah Maham built a log tower overlooking the walls, and riflemen on top forced a surrender."], "today": "Santee National Wildlife Refuge, Clarendon County.", "access": "Open to visitors.", "detect": "Illegal. Federal land.", "dz": [[500, "off", "Santee NWR and mound", "Federal land. Detecting and digging are illegal under the Archaeological Resources Protection Act."]]},
+  {"id": "fortmotte", "area": "carolinas", "date": "1781-05-12", "layer": "sites", "era": "1781", "type": "battle", "lat": 33.69, "lon": -80.68, "zl": 1500, "name": "Fort Motte", "kind": "Siege · May 12, 1781", "status": "private", "statusText": "Marker", "history": ["The British had fortified Rebecca Motte's mansion. She gave Marion and Lee the arrows used to set her own roof on fire, and the garrison surrendered. Location approximate."], "today": "Calhoun County.", "access": "Marker.", "detect": "Only with landowner permission.", "dz": [[600, "hi", "Fort Motte site", "Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "fortgranby", "area": "carolinas", "date": "1781-05-15", "layer": "sites", "era": "1781", "type": "battle", "lat": 33.9649, "lon": -81.06, "zl": 1500, "name": "Fort Granby", "kind": "Surrender · May 15, 1781", "status": "public", "statusText": "Built over", "history": ["A fortified trading post on the Congaree, surrendered to Lee's Legion. Location approximate."], "today": "Cayce, near Columbia.", "access": "Built over.", "detect": "No.", "dz": [[300, "low", "Fort Granby", "Built over; private yards with permission."]]},
+  {"id": "quinby", "area": "carolinas", "date": "1781-07-17", "layer": "sites", "era": "1781", "type": "battle", "lat": 33.07, "lon": -79.77, "zl": 1500, "name": "Quinby Bridge", "kind": "Battle · July 17, 1781", "status": "private", "statusText": "Rural land", "history": ["Sumter, Marion and Lee chased a British force toward Charleston and attacked it at Shubrick's plantation. Location approximate."], "today": "Berkeley County.", "access": "Private.", "detect": "Only with landowner permission.", "dz": [[700, "hi", "Quinby Bridge", "Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "parkersferry", "area": "carolinas", "date": "1781-08-30", "layer": "sites", "era": "1781", "type": "battle", "lat": 32.86, "lon": -80.42, "zl": 1500, "name": "Parker's Ferry", "kind": "Ambush · August 30, 1781", "status": "private", "statusText": "Rural land", "history": ["Marion ambushed British dragoons on a causeway over the Edisto. Location approximate."], "today": "Edisto River, Colleton County.", "access": "Private.", "detect": "Only with landowner permission.", "dz": [[700, "hi", "Causeway ambush", "Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "eutaw", "area": "carolinas", "date": "1781-09-08", "layer": "sites", "era": "1781", "type": "battle", "lat": 33.4108, "lon": -80.3307, "zl": 1500, "name": "Eutaw Springs", "kind": "Battle · September 8, 1781", "status": "public", "statusText": "Battlefield park", "history": ["Greene's last major battle. His army nearly broke the British under Lt. Col. Alexander Stewart, then lost order plundering the British camp. The British held the field but retreated to Charleston days later. It was the last major battle in the Carolinas."], "today": "Eutawville, Orangeburg County, on Lake Marion.", "access": "Small park; part of the field is under the lake.", "detect": "No at the park; private land around it.", "dz": [[300, "off", "Battlefield park", "Protected battlefield land."], [1200, "mid", "Battlefield beyond the park", "Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "georgetown", "area": "carolinas", "date": "1781-06-06", "layer": "sites", "era": "1781", "type": "town", "lat": 33.3768, "lon": -79.2945, "zl": 1500, "name": "Georgetown", "kind": "British post · 1780–81", "status": "public", "statusText": "Historic town", "history": ["A British base raided repeatedly by Marion, who took it in June 1781. In the Civil War, Union ships blockaded Winyah Bay outside."], "today": "Historic Georgetown.", "access": "Public.", "detect": "No.", "dz": [[600, "off", "Historic district", "Built over and publicly owned."]]},
+  {"id": "combahee82", "area": "carolinas", "date": "1782-08-27", "layer": "sites", "era": "1782", "type": "battle", "lat": 32.65, "lon": -80.56, "zl": 1500, "name": "Combahee Ferry, 1782", "kind": "Skirmish · August 27, 1782", "status": "private", "statusText": "Rural land", "history": ["One of the last fights of the war. Lt. Col. John Laurens, Washington's former aide and an advocate of freeing enslaved men who served, was killed here. Location approximate."], "today": "Combahee River, Beaufort and Colleton counties.", "access": "Private.", "detect": "Only with landowner permission.", "dz": [[700, "hi", "Combahee Ferry", "Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "hatteras", "area": "carolinas", "date": "1861-08-29", "layer": "later", "era": "later", "type": "battle", "lat": 35.2, "lon": -75.73, "zl": 1500, "name": "Hatteras Inlet forts", "kind": "Union attack · August 28–29, 1861", "status": "public", "statusText": "Eroded", "history": ["The first Union amphibious victory of the war. Ships shelled Forts Clark and Hatteras until they surrendered, closing the inlet to Confederate raiders. Location approximate; the forts have eroded away."], "today": "Hatteras Inlet, Outer Banks.", "access": "Beach.", "detect": "No. Cape Hatteras National Seashore.", "dz": [[800, "off", "Cape Hatteras National Seashore", "Federal land. Detecting and digging are illegal under the Archaeological Resources Protection Act."]]},
+  {"id": "roanoke", "area": "carolinas", "date": "1862-02-08", "layer": "later", "era": "later", "type": "battle", "lat": 35.89, "lon": -75.67, "zl": 1500, "name": "Roanoke Island", "kind": "Battle · February 7–8, 1862", "status": "public", "statusText": "Island", "history": ["Burnside's expedition landed about 10,000 men and captured the island's 2,500 defenders, opening the North Carolina sounds. A freedmen's colony grew here afterward. Location approximate."], "today": "Roanoke Island, Dare County.", "access": "Public roads.", "detect": "Private yards only, with permission.", "dz": [[900, "mid", "Battle ground", "Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "newbern", "area": "carolinas", "date": "1862-03-14", "layer": "later", "era": "later", "type": "battle", "lat": 35.07, "lon": -77.03, "zl": 1500, "name": "New Bern", "kind": "Battle · March 14, 1862", "status": "public", "statusText": "Battlefield park", "history": ["Burnside's troops broke Gen. Lawrence Branch's line south of town. New Bern stayed in Union hands for the rest of the war and drew thousands of freedom-seekers. Location approximate."], "today": "New Bern Battlefield Park and surroundings.", "access": "Park open daylight hours.", "detect": "No at the park; private land around it.", "dz": [[400, "off", "Battlefield park", "Protected land."], [1200, "mid", "Battle lines beyond the park", "Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "fortmacon", "area": "carolinas", "date": "1862-04-26", "layer": "later", "era": "later", "type": "battle", "lat": 34.6956, "lon": -76.6793, "zl": 1500, "name": "Fort Macon", "kind": "Siege · March 23 – April 26, 1862", "status": "public", "statusText": "State park", "history": ["Union rifled guns breached the masonry fort from across Bogue Banks, and its garrison surrendered, opening Beaufort harbor."], "today": "Fort Macon State Park, Atlantic Beach.", "access": "Open daily.", "detect": "No. State park.", "dz": [[800, "off", "Fort Macon State Park", "State-owned historic site. Detecting needs a state permit."]]},
+  {"id": "plymouth", "area": "carolinas", "date": "1864-04-20", "layer": "later", "era": "later", "type": "battle", "lat": 35.8686, "lon": -76.748, "zl": 1500, "name": "Plymouth and the CSS Albemarle", "kind": "Battle · April 17–20, 1864; Albemarle sunk October 27, 1864", "status": "public", "statusText": "Historic town", "history": ["The Confederate ironclad Albemarle, built in a cornfield up the Roanoke River, sank a Union gunboat and helped Gen. Robert Hoke retake Plymouth. Lt. William Cushing sank her at her wharf with a spar torpedo that October, and Union troops retook the town."], "today": "Port o' Plymouth Museum, 302 E. Water Street.", "access": "Museum.", "detect": "No at the waterfront; river is protected.", "dz": [[500, "off", "Waterfront and river", "Underwater site, protected by state law (and, for U.S. Navy wrecks, the federal Sunken Military Craft Act)."], [1100, "mid", "Battle lines around town", "Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "neuse", "area": "carolinas", "date": "1865-03-12", "layer": "later", "era": "later", "type": "wreck", "lat": 35.2604, "lon": -77.5814, "zl": 1500, "name": "CSS Neuse", "kind": "Ironclad · scuttled March 12, 1865", "status": "public", "statusText": "Museum", "history": ["A Confederate ironclad built at Kinston. Her crew burned and sank her as Union troops approached in March 1865. Her raised hull is on display."], "today": "CSS Neuse Civil War Interpretive Center, Kinston.", "access": "Museum.", "detect": "No.", "dz": [[300, "off", "Museum", "Museum property."]]},
+  {"id": "fortfisher", "area": "carolinas", "date": "1865-01-15", "layer": "later", "era": "later", "type": "battle", "lat": 33.9717, "lon": -77.9176, "zl": 1500, "name": "Fort Fisher", "kind": "Battles · December 24–25, 1864 and January 13–15, 1865", "status": "public", "statusText": "State historic site", "history": ["The largest earthwork fort in the Confederacy kept Wilmington open to blockade runners. The first Union attack failed; the second, after the heaviest naval bombardment of the war, overran it. Its fall cut the Confederacy's last major supply line."], "today": "Fort Fisher State Historic Site, Kure Beach.", "access": "Open to visitors.", "detect": "No. State property; offshore wrecks protected.", "dz": [[700, "off", "Fort Fisher State Historic Site", "State-owned historic site. Detecting needs a state permit."], [1500, "off", "Beach and surf", "State-recreation and underwater site; wrecks offshore are protected."]]},
+  {"id": "fortanderson", "area": "carolinas", "date": "1865-02-19", "layer": "later", "era": "later", "type": "battle", "lat": 34.0398, "lon": -77.9462, "zl": 1500, "name": "Fort Anderson", "kind": "Battle · February 17–19, 1865", "status": "public", "statusText": "State historic site", "history": ["Earthworks built through the ruins of colonial Brunswick Town. Evacuated after Union troops flanked it, opening the river to Wilmington."], "today": "Brunswick Town/Fort Anderson State Historic Site.", "access": "Open to visitors.", "detect": "No. State property.", "dz": [[500, "off", "State historic site", "State-owned historic site. Detecting needs a state permit."]]},
+  {"id": "wilmington65", "area": "carolinas", "date": "1865-02-22", "layer": "later", "era": "later", "type": "town", "lat": 34.236, "lon": -77.946, "zl": 1500, "name": "Wilmington", "kind": "Blockade-running port · fell February 22, 1865", "status": "public", "statusText": "City", "history": ["The Confederacy's busiest blockade-running port, its lifeline to Europe. It fell five weeks after Fort Fisher."], "today": "Downtown Wilmington.", "access": "Public city.", "detect": "No.", "dz": [[700, "off", "Downtown", "Built over and publicly owned."]]},
+  {"id": "wysefork", "area": "carolinas", "date": "1865-03-10", "layer": "later", "era": "later", "type": "battle", "lat": 35.23, "lon": -77.5, "zl": 1500, "name": "Wyse Fork", "kind": "Battle · March 7–10, 1865", "status": "private", "statusText": "Rural land", "history": ["Gen. Braxton Bragg tried to stop Gen. John Schofield's march from the coast to join Sherman. Location approximate."], "today": "Near Kinston, Lenoir County.", "access": "Private.", "detect": "Only with landowner permission.", "dz": [[900, "hi", "Battlefield", "Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "monroes", "area": "carolinas", "date": "1865-03-10", "layer": "later", "era": "later", "type": "battle", "lat": 35.12, "lon": -79.13, "zl": 1500, "name": "Monroe's Crossroads", "kind": "Battle · March 10, 1865", "status": "public", "statusText": "Military base", "history": ["Wade Hampton's cavalry surprised Gen. Judson Kilpatrick's camp at dawn; Kilpatrick escaped in his nightclothes. Location approximate."], "today": "On Fort Bragg (Fort Liberty) training land.", "access": "Restricted military land.", "detect": "No. Federal military land.", "dz": [[800, "off", "Military reservation", "Federal military land. Detecting and digging are illegal under the Archaeological Resources Protection Act."]]},
+  {"id": "arsenal", "area": "carolinas", "date": "1865-03-14", "layer": "later", "era": "later", "type": "house", "lat": 35.0545, "lon": -78.8927, "zl": 1500, "name": "Fayetteville Arsenal", "kind": "Destroyed March 1865", "status": "public", "statusText": "Museum and park", "history": ["A U.S. arsenal seized in 1861 and turned into a major Confederate weapons works. Sherman's engineers knocked it down in March 1865."], "today": "Museum of the Cape Fear Historical Complex, Fayetteville.", "access": "Open to visitors.", "detect": "No.", "dz": [[300, "off", "Arsenal park", "State property."]]},
+  {"id": "averasboro", "area": "carolinas", "date": "1865-03-16", "layer": "later", "era": "later", "type": "battle", "lat": 35.266, "lon": -78.672, "zl": 1500, "name": "Averasboro", "kind": "Battle · March 16, 1865", "status": "public", "statusText": "Battlefield museum", "history": ["Gen. William Hardee delayed one wing of Sherman's army, buying Johnston time to gather at Bentonville."], "today": "Averasboro Battlefield and Museum, near Dunn.", "access": "Museum and markers.", "detect": "No at the museum; private land around it.", "dz": [[400, "off", "Museum grounds", "Protected land."], [1300, "mid", "Battle lines on private land", "Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "bentonville", "area": "carolinas", "date": "1865-03-21", "layer": "later", "era": "later", "type": "battle", "lat": 35.3022, "lon": -78.3224, "zl": 1500, "name": "Bentonville", "kind": "Battle · March 19–21, 1865", "status": "public", "statusText": "State historic site", "history": ["The largest battle fought in North Carolina and the Confederacy's last major attack. Johnston struck one wing of Sherman's army and was driven off."], "today": "Bentonville Battlefield State Historic Site, near Four Oaks.", "access": "Open to visitors.", "detect": "No. State and preservation land.", "dz": [[1200, "off", "State historic site and preserved land", "State-owned historic site. Detecting needs a state permit."], [2200, "mid", "Wider battlefield on farms", "Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "bennett", "area": "carolinas", "date": "1865-04-26", "layer": "later", "era": "later", "type": "house", "lat": 36.0295, "lon": -78.9737, "zl": 1500, "name": "Bennett Place", "kind": "Largest surrender of the war · April 26, 1865", "status": "public", "statusText": "State historic site", "history": ["Johnston and Sherman met at James Bennett's farmhouse and agreed the surrender of about 90,000 Confederate soldiers in the Carolinas, Georgia and Florida."], "today": "Bennett Place State Historic Site, Durham.", "access": "Open to visitors.", "detect": "No. State property.", "dz": [[300, "off", "State historic site", "State-owned historic site. Detecting needs a state permit."]]},
+  {"id": "portroyal61", "area": "carolinas", "date": "1861-11-07", "layer": "later", "era": "later", "type": "battle", "lat": 32.215, "lon": -80.68, "zl": 1500, "name": "Port Royal Sound", "kind": "Battle · November 7, 1861", "status": "public", "statusText": "Island", "history": ["Flag Officer Samuel Du Pont's fleet steamed in a great oval past Forts Walker and Beauregard and drove out their garrisons. The Sea Islands became the Union's base for the southern blockade. Location approximate."], "today": "Hilton Head Island and St. Helena Sound.", "access": "Public roads; fort site in a gated community.", "detect": "No.", "dz": [[700, "off", "Fort Walker site", "Protected historic site."]]},
+  {"id": "penn", "area": "carolinas", "date": "1862-04-15", "layer": "later", "era": "later", "type": "house", "lat": 32.3889, "lon": -80.5664, "zl": 1500, "name": "Penn Center", "kind": "Penn School · founded 1862", "status": "public", "statusText": "National Historical Park", "history": ["One of the first schools for formerly enslaved people, founded during the Port Royal Experiment after the Union took the Sea Islands. It is part of Reconstruction Era National Historical Park."], "today": "St. Helena Island.", "access": "Open to visitors.", "detect": "No. Protected campus.", "dz": [[400, "off", "Penn Center campus", "National Historic Landmark district."]]},
+  {"id": "combahee63", "area": "carolinas", "date": "1863-06-02", "layer": "later", "era": "later", "type": "battle", "lat": 32.64, "lon": -80.55, "zl": 1500, "name": "Combahee River Raid", "kind": "June 2, 1863", "status": "public", "statusText": "Bridge and marker", "history": ["Harriet Tubman guided Union gunboats and the 2nd South Carolina Volunteers, a Black regiment, up the Combahee River. More than 700 enslaved people were freed in a single night. Location approximate."], "today": "Harriet Tubman Bridge on US 17 over the Combahee.", "access": "Public marker.", "detect": "No. River and marsh are protected.", "dz": [[700, "off", "River and marsh", "Underwater site, protected by state law (and, for U.S. Navy wrecks, the federal Sunken Military Craft Act)."]]},
+  {"id": "honeyhill", "area": "carolinas", "date": "1864-11-30", "layer": "later", "era": "later", "type": "battle", "lat": 32.63, "lon": -80.98, "zl": 1500, "name": "Honey Hill", "kind": "Battle · November 30, 1864", "status": "private", "statusText": "Rural land", "history": ["Union troops, including the 54th and 55th Massachusetts, failed to cut the Charleston and Savannah Railroad. Location approximate."], "today": "Jasper County.", "access": "Private.", "detect": "Only with landowner permission.", "dz": [[900, "hi", "Battlefield", "Private land. Find the owner through the county parcel viewer and get written permission first."]]},
+  {"id": "riversbridge", "area": "carolinas", "date": "1865-02-03", "layer": "later", "era": "later", "type": "battle", "lat": 33.04, "lon": -81.1, "zl": 1500, "name": "Rivers' Bridge", "kind": "Battle · February 2–3, 1865", "status": "public", "statusText": "State historic site", "history": ["One of the few stands against Sherman's march in South Carolina. Confederates held the Salkehatchie crossing for two days before being flanked."], "today": "Rivers Bridge State Historic Site, near Ehrhardt.", "access": "Open to visitors.", "detect": "No. State property.", "dz": [[700, "off", "State historic site", "State-owned historic site. Detecting needs a state permit."]]},
+  {"id": "aiken", "area": "carolinas", "date": "1865-02-11", "layer": "later", "era": "later", "type": "battle", "lat": 33.5604, "lon": -81.7196, "zl": 1500, "name": "Aiken", "kind": "Battle · February 11, 1865", "status": "public", "statusText": "Town", "history": ["Wheeler's Confederate cavalry stopped Kilpatrick's raid on the Graniteville mills in the streets of Aiken."], "today": "Downtown Aiken.", "access": "Public.", "detect": "No.", "dz": [[600, "low", "Town streets", "Built over; private yards with permission."]]},
+  {"id": "columbia65", "area": "carolinas", "date": "1865-02-17", "layer": "later", "era": "later", "type": "town", "lat": 34.0007, "lon": -81.0348, "zl": 1500, "name": "Columbia", "kind": "Burned February 17, 1865", "status": "public", "statusText": "City", "history": ["Sherman's armies occupied South Carolina's capital, and much of it burned that night. Who set the fires is still argued."], "today": "Downtown Columbia; the State House still shows marks of Union shells.", "access": "Public.", "detect": "No.", "dz": [[1000, "off", "Downtown", "Built over and publicly owned."]]},
+  {"id": "cheraw65", "area": "carolinas", "date": "1865-03-03", "layer": "later", "era": "later", "type": "town", "lat": 34.6976, "lon": -79.8834, "zl": 1500, "name": "Cheraw, 1865", "kind": "Sherman crosses the Pee Dee · March 3, 1865", "status": "public", "statusText": "Historic town", "history": ["Sherman's army captured stores and artillery sent from Charleston and crossed into North Carolina."], "today": "Historic Cheraw.", "access": "Public.", "detect": "No.", "dz": [[600, "off", "Historic district", "Built over and publicly owned."]]},
+  {"id": "harvestmoon", "area": "carolinas", "date": "1865-03-01", "layer": "later", "era": "later", "type": "wreck", "lat": 33.28, "lon": -79.2, "zl": 1500, "name": "USS Harvest Moon wreck", "kind": "Sunk March 1, 1865", "status": "public", "statusText": "Underwater, protected", "history": ["Rear Admiral John Dahlgren's flagship struck a Confederate torpedo in Winyah Bay and sank in minutes. Her wreck still lies in the bay. Location approximate."], "today": "Winyah Bay, Georgetown County.", "access": "No access.", "detect": "No. U.S. Navy property.", "dz": [[500, "off", "Wreck site", "Underwater site, protected by state law (and, for U.S. Navy wrecks, the federal Sunken Military Craft Act)."]]},
+  {"id": "batterywhite", "area": "carolinas", "date": "1865-02-25", "layer": "later", "era": "later", "type": "house", "lat": 33.31, "lon": -79.23, "zl": 1500, "name": "Battery White", "kind": "Confederate earthwork, Winyah Bay", "status": "private", "statusText": "Preserved earthwork", "history": ["Earthworks guarding Georgetown's harbor, abandoned in February 1865. Location approximate."], "today": "Belle Isle, Georgetown County.", "access": "On private resort land.", "detect": "No.", "dz": [[400, "off", "Earthwork", "Preserved historic earthwork on private land."]]},
+
   // ---------- Civil War and later ----------
   { id: "navyyard", date: "1864-01-07", layer: "later", era: "later", type: "later", lat: 35.2292, lon: -80.8382, zl: 25000,
     name: "Confederate Navy Yard", kind: "Civil War · 1862–1865",
@@ -1436,7 +1487,24 @@ const SITE_SIDES = {
   "c-swampangel": [["un"], [], "Union battery"], "c-battery": [["cs"], ["un"], "City evacuated; Union troops enter"], "c-castlepinckney": [["cs"], [], "Confederate fort"],
   "c-breach64": [["cs"], [], "Confederate battery"], "c-hunley": [["cs"], ["un"], "Housatonic sunk; Hunley lost"], "c-housatonic": [["un"], ["cs"], "Sunk by the Hunley"],
   "c-keokuk": [["un"], ["cs"], "Union attack beaten off"], "c-weehawken": [["un"], [], "Union monitor lost"], "c-patapsco": [["un"], ["cs"], "Sunk by a Confederate mine"],
-  "c-stonefleet": [["un"], [], "Union blockade"], "c-georgiana": [["cs"], ["un"], "Blockade runner wrecked"]
+  "c-stonefleet": [["un"], [], "Union blockade"],
+  alamance: [["gb"], ["pm"], "Royal militia crush the Regulators"], edenton: [["pm"], [], "Patriot protest"], tryon: [["gb"], [], "Royal governor flees"],
+  fortjohnston: [["pm"], ["gb"], "Patriots burn the royal fort"], brunswick: [["pm"], ["gb"], "Stamp Act defied"], halifax: [["pm"], [], "Call for independence"],
+  moorescreek: [["pm"], ["lo"], "Patriot victory"], shallowford: [["pm"], ["lo"], "Patriot victory"], pyles: [["us"], ["lo"], "Loyalists cut down"],
+  lindley: [["lo"], ["pm"], "Loyalists fight through with the governor"], elizabethtown: [["pm"], ["lo"], "Patriot victory"],
+  portroyal79: [["pm"], ["gb"], "Patriot victory"], snowsisland: [["pm"], [], "Marion's base"], fortwatson: [["us", "pm"], ["gb", "lo"], "American victory"],
+  fortmotte: [["us", "pm"], ["gb"], "American victory"], fortgranby: [["us"], ["lo"], "American victory"], quinby: [["pm", "us"], ["gb"], "British hold"],
+  parkersferry: [["pm"], ["gb", "lo"], "Patriot ambush succeeds"], eutaw: [["us", "pm"], ["gb"], "British hold the field, then retreat"],
+  georgetown: [["gb"], ["pm"], "Taken by Marion, 1781"], combahee82: [["us"], ["gb"], "British victory; Laurens killed"],
+  hatteras: [["un"], ["cs"], "Union victory"], roanoke: [["un"], ["cs"], "Union victory"], newbern: [["un"], ["cs"], "Union victory"],
+  fortmacon: [["un"], ["cs"], "Union victory"], plymouth: [["cs"], ["un"], "Confederates retake the town; Union returns in October"],
+  neuse: [["cs"], [], "Ironclad scuttled"], fortfisher: [["un"], ["cs"], "Union victory, second attack"], fortanderson: [["un"], ["cs"], "Union victory"],
+  wilmington65: [["un"], ["cs"], "City falls"], wysefork: [["un"], ["cs"], "Union victory"], monroes: [["cs"], ["un"], "Union holds after a surprise"],
+  arsenal: [["cs"], ["un"], "Destroyed by Sherman"], averasboro: [["un"], ["cs"], "Union advance delayed"], bentonville: [["un"], ["cs"], "Union victory"],
+  bennett: [["cs"], ["un"], "Surrender"], portroyal61: [["un"], ["cs"], "Union victory"], penn: [["un"], [], "School for the freed"],
+  combahee63: [["un"], ["cs"], "Over 700 people freed"], honeyhill: [["cs"], ["un"], "Confederate victory"], riversbridge: [["un"], ["cs"], "Union victory"],
+  aiken: [["cs"], ["un"], "Confederate victory"], columbia65: [["un"], ["cs"], "City occupied and burned"], cheraw65: [["un"], ["cs"], "Union occupation"],
+  harvestmoon: [["un"], ["cs"], "Sunk by a Confederate torpedo"], batterywhite: [["cs"], [], "Confederate earthwork"], "c-georgiana": [["cs"], ["un"], "Blockade runner wrecked"]
 };
 function sidesHTML(st) {
   const sd = SITE_SIDES[st.id]; if (!sd) return "";
@@ -1455,9 +1523,9 @@ function renderFlagKey() {
 const W_ = (iso, la, lo, n) => [iso, la, lo, n];
 const SCENARIOS = [
   { id: "clt-rev", area: "charlotte", era: "rev", name: "Southern Campaign 1780–81", start: "1780-04-20", end: "1781-06-20", at: "1780-11-25",
-    band: ["1780-10-20", "1780-12-20", "Camp New Providence occupied"], fit: "campaign", forces: null /* CLT_REV_FORCES */, events: null /* TIMELINE */ },
+    band: ["1780-10-20", "1780-12-20", "Camp New Providence occupied"], fit: "campaign", bbox: [32.6, -83.4, 37.6, -77.0], forces: null /* CLT_REV_FORCES */, events: null /* TIMELINE */ },
   { id: "chs-1776", area: "charleston", era: "rev", name: "Sullivan's Island, 1776", start: "1776-05-31", end: "1776-07-25", at: "1776-06-28",
-    band: ["1776-06-28", "1776-06-29", "Battle of Sullivan's Island"], fit: "harbor",
+    band: ["1776-06-28", "1776-06-29", "Battle of Sullivan's Island"], fit: "harbor", bbox: [32.45, -80.45, 33.4, -79.55],
     events: [
       { iso: "1776-06-01", d: "June 1, 1776", t: "British fleet arrives", s: "Sir Peter Parker's squadron and Clinton's transports appear off the Charleston bar." },
       { iso: "1776-06-08", d: "June 8–9", t: "Clinton lands on Long Island", s: "About 2,000 troops land on today's Isle of Palms to cross Breach Inlet." },
@@ -1480,7 +1548,7 @@ const SCENARIOS = [
       { id: "thomson", name: "Thomson's riflemen", ab: "TR", c: "militia", side: "nc", desc: "Col. William Thomson's South Carolina rangers and riflemen.",
         wp: [W_("1776-06-12", 32.7788, -79.8130, "Dig in at Breach Inlet"), W_("1776-07-15", 32.7788, -79.8130, "Hold the inlet")] }] },
   { id: "chs-1780", area: "charleston", era: "rev", name: "Siege of Charleston, 1780", start: "1780-02-01", end: "1780-05-20", at: "1780-04-08",
-    band: ["1780-04-01", "1780-05-12", "Under siege"], fit: "lowcountry",
+    band: ["1780-04-01", "1780-05-12", "Under siege"], fit: "lowcountry", bbox: [32.45, -80.45, 33.4, -79.55], primary: true,
     events: [
       { iso: "1780-02-11", d: "Feb 11, 1780", t: "Clinton lands", s: "About 8,500 British troops land on Simmons (Seabrook) Island." },
       { iso: "1780-03-29", d: "Mar 29", t: "The Ashley crossed", s: "The British cross above the city and close in on Charleston Neck." },
@@ -1508,7 +1576,7 @@ const SCENARIOS = [
       { id: "huger", name: "Huger's cavalry", ab: "IH", c: "fx-drag", side: "us", desc: "Gen. Isaac Huger's horsemen, keeping the road north open.",
         wp: [W_("1780-04-01", 33.190, -80.010, "Holding Monck's Corner"), W_("1780-04-14", 33.195, -80.013, "Routed by Tarleton")] }] },
   { id: "chs-1861", area: "charleston", era: "cw", name: "Fort Sumter, 1860–61", start: "1860-12-20", end: "1861-04-16", at: "1861-04-12",
-    band: ["1861-04-12", "1861-04-13", "Bombardment"], fit: "harbor",
+    band: ["1861-04-12", "1861-04-13", "Bombardment"], fit: "harbor", bbox: [32.45, -80.45, 33.4, -79.55],
     events: [
       { iso: "1860-12-20", d: "Dec 20, 1860", t: "Secession", s: "South Carolina leaves the Union.", site: "c-secession" },
       { iso: "1860-12-26", d: "Dec 26", t: "Anderson moves to Sumter", s: "The Union garrison slips across from Fort Moultrie at night.", site: "c-sumter" },
@@ -1530,7 +1598,7 @@ const SCENARIOS = [
       { id: "beauregard", name: "Beauregard's batteries", ab: "CS", c: "fx-cs", side: "cs", desc: "Confederate guns on James, Morris and Sullivan's islands under Gen. P. G. T. Beauregard.",
         wp: [W_("1861-03-03", 32.7517, -79.8985, "Beauregard takes command"), W_("1861-04-16", 32.7517, -79.8985, "Fort Johnson and the ring of batteries")] }] },
   { id: "chs-cw", area: "charleston", era: "cw", name: "The harbor war, 1862–65", start: "1862-05-01", end: "1865-02-28", at: "1864-02-17",
-    fit: "harbor",
+    fit: "harbor", bbox: [32.45, -80.45, 33.4, -79.55], primary: true,
     events: [
       { iso: "1862-05-13", d: "May 13, 1862", t: "The Planter", s: "Robert Smalls sails sixteen people to freedom.", site: "c-planter" },
       { iso: "1862-06-16", d: "June 16, 1862", t: "Secessionville", s: "The Union attack on James Island fails.", site: "c-secessionville" },
@@ -1568,13 +1636,193 @@ const SCENARIOS = [
       { id: "csgarrison", name: "Confederate garrison", ab: "CS", c: "fx-cs", side: "cs", desc: "The city's defenders under Beauregard and later Hardee.",
         wp: [W_("1862-05-01", 32.7700, -79.9305, "Holding the city and harbor forts"), W_("1865-02-17", 32.7700, -79.9305, "Holding the city"),
              W_("1865-02-18", 32.900, -79.990, "Evacuate Charleston")] }] },
-  { id: "clt-cw", area: "charlotte", era: "cw", name: "1865: the end in the Carolinas", start: "1865-02-01", end: "1865-05-12", at: "1865-04-19",
-    band: ["1865-04-18", "1865-04-26", "Davis in Charlotte"], fit: "campaign",
+  { id: "nc-1776", area: "carolinas", era: "rev", name: "North Carolina rises, 1775–76", start: "1775-05-01", end: "1776-05-15", at: "1776-02-27",
+    bbox: [33.8, -79.6, 36.6, -75.4], fit: [33.7, -79.3, 36.5, -76.0], band: ["1776-02-27", "1776-02-28", "Moores Creek"],
     events: [
-      { iso: "1865-02-17", d: "Feb 17, 1865", t: "Columbia burns", s: "Sherman's armies take South Carolina's capital." },
-      { iso: "1865-03-03", d: "Mar 3", t: "Cheraw", s: "Sherman crosses into the Pee Dee country." },
-      { iso: "1865-03-11", d: "Mar 11", t: "Fayetteville", s: "The arsenal is destroyed." },
-      { iso: "1865-03-19", d: "Mar 19–21", t: "Bentonville", s: "Johnston's last attack fails." },
+      { iso: "1775-05-31", d: "May 31, 1775", t: "Governor Martin flees", s: "The royal governor leaves Tryon Palace for Fort Johnston.", site: "tryon" },
+      { iso: "1775-07-18", d: "July 18, 1775", t: "Fort Johnston burned", s: "Militia burn the royal fort; Martin flees to a British warship.", site: "fortjohnston" },
+      { iso: "1776-02-15", d: "Feb 15, 1776", t: "Highlanders march", s: "Loyalists gather at Cross Creek to meet a British fleet." },
+      { iso: "1776-02-27", d: "Feb 27, 1776", t: "Moores Creek Bridge", s: "Patriot militia break the Loyalist charge.", site: "moorescreek" },
+      { iso: "1776-04-12", d: "Apr 12, 1776", t: "Halifax Resolves", s: "North Carolina is the first colony to call for independence.", site: "halifax" }],
+    forces: [
+      { id: "martin", name: "Gov. Josiah Martin", ab: "JM", c: "fx-gb", side: "gb", ship: true, desc: "The last royal governor, who ruled from aboard British warships.",
+        wp: [W_("1775-05-31", 35.1047, -77.0430, "Flees Tryon Palace"), W_("1775-06-02", 33.9171, -78.0190, "Takes refuge at Fort Johnston"),
+             W_("1775-07-18", 33.9000, -78.0000, "Escapes to HMS Cruizer as the fort burns"), W_("1776-05-15", 33.8800, -77.9800, "Still aboard ship in the Cape Fear")] },
+      { id: "highlanders", name: "Highland Loyalists", ab: "HL", c: "fx-loyal", side: "gb", desc: "About 1,600 Scottish Highlanders and Regulators under Gen. Donald MacDonald.",
+        wp: [W_("1776-02-15", 35.0527, -78.8784, "Gather at Cross Creek"), W_("1776-02-20", 34.8000, -78.6000, "March toward Wilmington"),
+             W_("1776-02-27", 34.4588, -78.1080, "Charge at Moores Creek Bridge; routed"), W_("1776-03-03", 34.7000, -78.6000, "Scattered; hundreds captured")] },
+      { id: "caswell", name: "Caswell and Lillington", ab: "RC", c: "militia", side: "nc", desc: "Patriot militia under Col. Richard Caswell and Col. Alexander Lillington.",
+        wp: [W_("1776-02-12", 35.1047, -77.0430, "Caswell's minutemen leave New Bern"), W_("1776-02-25", 34.4588, -78.1080, "Dig in at Moores Creek Bridge"),
+             W_("1776-03-10", 34.4588, -78.1080, "Hold the bridge")] },
+      { id: "moore", name: "Moore's Continentals", ab: "1NC", c: "continental", side: "us", desc: "The 1st North Carolina Continentals under Col. James Moore.",
+        wp: [W_("1776-02-10", 34.2360, -77.9460, "At Wilmington"), W_("1776-02-15", 35.0000, -78.9200, "Block the Loyalists at Rockfish Creek"),
+             W_("1776-02-28", 34.4588, -78.1080, "Reach Moores Creek after the battle"), W_("1776-03-20", 34.2360, -77.9460, "Back to Wilmington")] },
+      { id: "clinton76nc", name: "Clinton's expedition", ab: "HC", c: "fx-gb", side: "gb", ship: true, desc: "The British force sent to join the Loyalists, arriving too late.",
+        wp: [W_("1776-03-12", 33.8800, -77.9800, "Clinton reaches the Cape Fear, too late"), W_("1776-05-15", 33.8800, -77.9800, "Waits for Parker's fleet, then sails for Charleston")] }] },
+  { id: "nc-1781", area: "carolinas", era: "rev", name: "North Carolina, 1781: Guilford and the Tory war", start: "1781-01-15", end: "1781-11-20", at: "1781-03-15",
+    bbox: [34.0, -80.3, 36.8, -77.0], fit: [33.9, -80.3, 36.8, -77.3], band: ["1781-03-15", "1781-03-16", "Guilford Courthouse"],
+    events: [
+      { iso: "1781-02-14", d: "Feb 14", t: "Race to the Dan", s: "Greene escapes into Virginia.", site: "dan" },
+      { iso: "1781-02-25", d: "Feb 25", t: "Pyle's Defeat", s: "Lee's Legion cuts down Loyalist militia.", site: "pyles" },
+      { iso: "1781-03-15", d: "Mar 15", t: "Guilford Courthouse", s: "Cornwallis holds the field at heavy cost.", site: "guilford" },
+      { iso: "1781-04-07", d: "Apr 7", t: "Cornwallis at Wilmington", s: "His battered army rests, then marches for Virginia.", site: "wilmington" },
+      { iso: "1781-08-27", d: "Late Aug", t: "Elizabethtown", s: "Patriots rout the Loyalist garrison.", site: "elizabethtown" },
+      { iso: "1781-09-12", d: "Sept 12", t: "Hillsborough raid", s: "David Fanning captures Governor Thomas Burke.", site: "hillsborough" },
+      { iso: "1781-09-13", d: "Sept 13", t: "Lindley's Mill", s: "Fanning fights through a Patriot ambush.", site: "lindley" },
+      { iso: "1781-11-18", d: "Nov 18", t: "Wilmington evacuated", s: "News of Yorktown ends the British hold on North Carolina.", site: "wilmington" }],
+    forces: [
+      { id: "greene81", name: "Greene's army", ab: "NG", c: "continental", side: "us", desc: "The Southern Army under Nathanael Greene.",
+        wp: [W_("1781-01-28", 34.668, -79.889, "Leaves Cheraw"), W_("1781-02-07", 36.131, -79.843, "Reunites at Guilford Courthouse"),
+             W_("1781-02-14", 36.70, -78.90, "Crosses the Dan"), W_("1781-02-22", 36.70, -78.90, "Recrosses into North Carolina"),
+             W_("1781-03-15", 36.131, -79.843, "Guilford Courthouse"), W_("1781-03-28", 35.56, -79.30, "Ramsey's Mill"), W_("1781-04-06", 35.56, -79.30, "Turns south")] },
+      { id: "corn81", name: "Cornwallis's army", ab: "CW", c: "fx-gb", side: "gb", desc: "The British field army.",
+        wp: [W_("1781-01-25", 35.4745, -81.27, "Ramsour's Mill"), W_("1781-02-14", 36.66, -79.00, "Reaches the Dan too late"),
+             W_("1781-02-20", 36.075, -79.10, "Hillsborough"), W_("1781-03-15", 36.131, -79.843, "Guilford Courthouse"),
+             W_("1781-04-01", 35.05, -78.88, "Cross Creek"), W_("1781-04-07", 34.236, -77.946, "Wilmington"), W_("1781-04-25", 34.236, -77.946, "Marches for Virginia"),
+             W_("1781-05-12", 36.30, -77.59, "Leaves North Carolina near Halifax")] },
+      { id: "lee81", name: "Lee's Legion", ab: "HL", c: "fx-drag", side: "us", desc: "Lt. Col. Henry Lee's cavalry and light infantry.",
+        wp: [W_("1781-02-20", 36.05, -79.35, "Recross into North Carolina"), W_("1781-02-25", 36.0245, -79.4295, "Pyle's Defeat"),
+             W_("1781-03-15", 36.131, -79.843, "Guilford Courthouse"), W_("1781-04-06", 35.56, -79.30, "Ride south ahead of Greene")] },
+      { id: "pyle", name: "Pyle's Loyalists", ab: "JP", c: "fx-loyal", side: "gb", desc: "About 400 Loyalist militia under Dr. John Pyle.",
+        wp: [W_("1781-02-22", 35.85, -79.35, "Gather to join Cornwallis"), W_("1781-02-25", 36.0245, -79.4295, "Cut down by Lee's Legion")] },
+      { id: "craig", name: "Craig's garrison", ab: "JC", c: "fx-gb", side: "gb", desc: "Maj. James Craig's British garrison at Wilmington.",
+        wp: [W_("1781-01-29", 34.236, -77.946, "Occupy Wilmington"), W_("1781-08-20", 35.1047, -77.043, "Raid New Bern"),
+             W_("1781-09-05", 34.236, -77.946, "Back at Wilmington"), W_("1781-11-18", 34.236, -77.946, "Evacuate Wilmington")] },
+      { id: "fanning", name: "Fanning's Loyalists", ab: "DF", c: "fx-loyal", side: "gb", desc: "Loyalist partisans under David Fanning.",
+        wp: [W_("1781-07-15", 35.70, -79.55, "Raid Patriot militia along the Deep River"), W_("1781-09-12", 36.075, -79.10, "Raid Hillsborough; capture Governor Burke"),
+             W_("1781-09-13", 35.9264, -79.3247, "Lindley's Mill"), W_("1781-09-24", 34.236, -77.946, "Deliver Burke to Wilmington")] },
+      { id: "butler", name: "Butler's militia", ab: "JB", c: "militia", side: "nc", desc: "Patriot militia under Gen. John Butler.",
+        wp: [W_("1781-09-12", 35.97, -79.25, "Gather after the raid"), W_("1781-09-13", 35.9264, -79.3247, "Ambush at Lindley's Mill")] }] },
+  { id: "sc-1781", area: "carolinas", era: "rev", name: "South Carolina, 1781: Greene and the partisans", start: "1781-04-01", end: "1781-12-31", at: "1781-09-08",
+    bbox: [32.3, -82.6, 34.6, -78.9], fit: [32.3, -82.6, 34.8, -78.8], band: ["1781-09-08", "1781-09-09", "Eutaw Springs"],
+    events: [
+      { iso: "1781-04-23", d: "Apr 23", t: "Fort Watson", s: "The Maham tower forces a surrender.", site: "fortwatson" },
+      { iso: "1781-04-25", d: "Apr 25", t: "Hobkirk's Hill", s: "Rawdon attacks Greene outside Camden.", site: "hobkirk" },
+      { iso: "1781-05-12", d: "May 12", t: "Fort Motte", s: "Fire arrows end the siege.", site: "fortmotte" },
+      { iso: "1781-05-15", d: "May 15", t: "Fort Granby", s: "The Congaree post surrenders to Lee.", site: "fortgranby" },
+      { iso: "1781-05-22", d: "May 22", t: "Siege of Ninety Six", s: "Greene and Kosciuszko dig in.", site: "ninetysix" },
+      { iso: "1781-06-19", d: "June 19", t: "Siege lifted", s: "Rawdon's relief column approaches.", site: "ninetysix" },
+      { iso: "1781-07-17", d: "July 17", t: "Quinby Bridge", s: "Sumter, Marion and Lee strike near Charleston.", site: "quinby" },
+      { iso: "1781-08-04", d: "Aug 4", t: "Isaac Hayne hanged", s: "His execution in Charleston outrages both sides.", site: "c-exchange" },
+      { iso: "1781-08-30", d: "Aug 30", t: "Parker's Ferry", s: "Marion's causeway ambush.", site: "parkersferry" },
+      { iso: "1781-09-08", d: "Sept 8", t: "Eutaw Springs", s: "The last major battle in the Carolinas.", site: "eutaw" },
+      { iso: "1781-12-01", d: "Dec 1", t: "Dorchester", s: "Greene presses the British back to Charleston.", site: "c-dorchester" }],
+    forces: [
+      { id: "greene-sc", name: "Greene's army", ab: "NG", c: "continental", side: "us", desc: "The Southern Army under Nathanael Greene.",
+        wp: [W_("1781-04-06", 35.56, -79.30, "Leaves North Carolina"), W_("1781-04-19", 34.30, -80.62, "Before Camden"), W_("1781-04-25", 34.265, -80.605, "Hobkirk's Hill"),
+             W_("1781-05-22", 34.146, -82.024, "Siege of Ninety Six"), W_("1781-06-19", 34.146, -82.024, "Lifts the siege"), W_("1781-07-15", 33.95, -80.55, "Camp in the High Hills of Santee"),
+             W_("1781-08-22", 33.95, -80.55, "Leaves the High Hills"), W_("1781-09-08", 33.4108, -80.3307, "Eutaw Springs"), W_("1781-12-01", 33.00, -80.20, "Closes in on Charleston")] },
+      { id: "marion", name: "Marion's brigade", ab: "FM", c: "militia", side: "nc", desc: "Gen. Francis Marion's partisans, the 'Swamp Fox'.",
+        wp: [W_("1781-04-01", 33.84, -79.38, "Snow's Island"), W_("1781-04-15", 33.5335, -80.431, "Besiege Fort Watson with Lee"), W_("1781-04-23", 33.5335, -80.431, "Fort Watson surrenders"),
+             W_("1781-05-12", 33.69, -80.68, "Fort Motte"), W_("1781-06-06", 33.3768, -79.2945, "Retake Georgetown"), W_("1781-07-17", 33.07, -79.77, "Quinby Bridge"),
+             W_("1781-08-30", 32.86, -80.42, "Parker's Ferry"), W_("1781-09-08", 33.4108, -80.3307, "Eutaw Springs")] },
+      { id: "lee-sc", name: "Lee's Legion", ab: "HL", c: "fx-drag", side: "us", desc: "Lt. Col. Henry Lee's cavalry and light infantry.",
+        wp: [W_("1781-04-14", 33.5335, -80.431, "Join Marion at Fort Watson"), W_("1781-05-12", 33.69, -80.68, "Fort Motte"), W_("1781-05-15", 33.9649, -81.06, "Fort Granby"),
+             W_("1781-06-05", 33.47, -81.97, "Siege of Augusta"), W_("1781-06-10", 34.146, -82.024, "Ninety Six"), W_("1781-07-17", 33.07, -79.77, "Quinby Bridge"),
+             W_("1781-09-08", 33.4108, -80.3307, "Eutaw Springs")] },
+      { id: "sumter81", name: "Sumter's brigade", ab: "TS", c: "fx-sc", side: "nc", desc: "Gen. Thomas Sumter's South Carolina militia.",
+        wp: [W_("1781-05-11", 33.4918, -80.8556, "Take Orangeburg"), W_("1781-07-17", 33.07, -79.77, "Quinby Bridge"), W_("1781-08-15", 33.95, -80.55, "Rejoin Greene's camp")] },
+      { id: "rawdon", name: "British field army", ab: "RA", c: "fx-gb", side: "gb", desc: "Lord Rawdon's, then Lt. Col. Alexander Stewart's, troops.",
+        wp: [W_("1781-04-01", 34.247, -80.607, "Rawdon holds Camden"), W_("1781-04-25", 34.265, -80.605, "Hobkirk's Hill"), W_("1781-05-10", 34.247, -80.607, "Abandon Camden"),
+             W_("1781-06-21", 34.146, -82.024, "Relieve Ninety Six"), W_("1781-07-15", 33.4918, -80.8556, "Orangeburg"), W_("1781-09-08", 33.4108, -80.3307, "Eutaw Springs (Stewart)"),
+             W_("1781-12-01", 32.95, -80.03, "Fall back to Charleston Neck")] }] },
+  { id: "nc-coast-1862", area: "carolinas", era: "cw", name: "The North Carolina coast, 1861–62", start: "1861-08-20", end: "1862-05-01", at: "1862-02-08",
+    bbox: [34.5, -77.5, 36.6, -75.3], fit: [34.4, -77.4, 36.5, -75.4], band: ["1862-02-07", "1862-03-14", "Burnside's expedition"],
+    events: [
+      { iso: "1861-08-29", d: "Aug 29, 1861", t: "Hatteras Inlet", s: "The first Union amphibious victory.", site: "hatteras" },
+      { iso: "1862-01-13", d: "Jan 1862", t: "Burnside's fleet arrives", s: "Dozens of ships struggle over the bar at Hatteras Inlet." },
+      { iso: "1862-02-08", d: "Feb 8, 1862", t: "Roanoke Island", s: "2,500 Confederates surrender.", site: "roanoke" },
+      { iso: "1862-02-10", d: "Feb 10", t: "Elizabeth City", s: "Union gunboats destroy the Confederate 'mosquito fleet'." },
+      { iso: "1862-03-14", d: "Mar 14", t: "New Bern", s: "The town falls and stays Union for the rest of the war.", site: "newbern" },
+      { iso: "1862-04-26", d: "Apr 26", t: "Fort Macon", s: "Rifled guns breach the masonry fort.", site: "fortmacon" }],
+    forces: [
+      { id: "stringham", name: "Stringham and Butler", ab: "US", c: "fx-navy", side: "un", ship: true, desc: "Union squadron and troops sent against Hatteras Inlet.",
+        wp: [W_("1861-08-27", 35.10, -75.60, "Arrive off Hatteras"), W_("1861-08-29", 35.20, -75.73, "Forts Hatteras and Clark surrender"), W_("1861-09-15", 35.20, -75.73, "Hold the inlet")] },
+      { id: "burnsidefleet", name: "Burnside's fleet", ab: "AB", c: "fx-navy", side: "un", ship: true, desc: "Gunboats and transports of the Burnside expedition.",
+        wp: [W_("1862-01-13", 35.20, -75.73, "Cross the bar at Hatteras Inlet"), W_("1862-02-07", 35.85, -75.70, "Shell Roanoke Island; land troops"),
+             W_("1862-02-10", 36.30, -76.22, "Destroy the 'mosquito fleet' at Elizabeth City"), W_("1862-03-13", 35.05, -76.95, "Land troops below New Bern"),
+             W_("1862-03-14", 35.105, -77.040, "New Bern falls"), W_("1862-04-25", 34.70, -76.70, "Support the siege of Fort Macon")] },
+      { id: "burnsidetroops", name: "Burnside's troops", ab: "AB", c: "fx-un", side: "un", desc: "About 13,000 Union soldiers under Gen. Ambrose Burnside.",
+        wp: [W_("1862-02-07", 35.86, -75.69, "Land at Ashby's Harbor"), W_("1862-02-08", 35.89, -75.67, "Take Roanoke Island"),
+             W_("1862-03-14", 35.07, -77.03, "Break the line at New Bern"), W_("1862-04-26", 34.6956, -76.6793, "Parke takes Fort Macon")] },
+      { id: "ncdefenders", name: "Confederate defenders", ab: "CS", c: "fx-cs", side: "cs", desc: "North Carolina coastal garrisons.",
+        wp: [W_("1861-08-28", 35.20, -75.73, "Forts at Hatteras Inlet"), W_("1862-02-08", 35.89, -75.67, "Roanoke Island garrison surrenders"),
+             W_("1862-03-14", 35.07, -77.03, "Branch's line at New Bern breaks"), W_("1862-04-26", 34.6956, -76.6793, "Fort Macon surrenders")] }] },
+  { id: "nc-1864", area: "carolinas", era: "cw", name: "Plymouth and the Albemarle, 1864", start: "1864-04-01", end: "1864-11-05", at: "1864-04-19",
+    bbox: [35.6, -77.3, 36.3, -76.0], fit: [35.6, -77.3, 36.2, -76.2], band: ["1864-04-17", "1864-04-20", "Battle of Plymouth"],
+    events: [
+      { iso: "1864-04-19", d: "Apr 19, 1864", t: "Albemarle strikes", s: "The ironclad sinks USS Southfield off Plymouth.", site: "plymouth" },
+      { iso: "1864-04-20", d: "Apr 20", t: "Plymouth falls", s: "Hoke's Confederates take the town and its garrison.", site: "plymouth" },
+      { iso: "1864-05-05", d: "May 5", t: "Battle of Albemarle Sound", s: "Union gunboats fight the ironclad to a draw." },
+      { iso: "1864-10-27", d: "Oct 27", t: "Albemarle sunk", s: "Lt. William Cushing's torpedo launch sinks her at the wharf.", site: "plymouth" },
+      { iso: "1864-10-31", d: "Oct 31", t: "Plymouth retaken", s: "Union troops return." }],
+    forces: [
+      { id: "albemarle", name: "CSS Albemarle", ab: "AL", c: "fx-cs", side: "cs", ship: true, desc: "Confederate ironclad built in a cornfield up the Roanoke River.",
+        wp: [W_("1864-04-17", 35.95, -77.10, "Steam down the Roanoke"), W_("1864-04-19", 35.875, -76.745, "Sink USS Southfield off Plymouth"),
+             W_("1864-05-05", 35.95, -76.55, "Battle in Albemarle Sound"), W_("1864-05-06", 35.8686, -76.748, "Back to Plymouth for repairs"),
+             W_("1864-10-27", 35.8686, -76.748, "Sunk at her wharf by Cushing's torpedo")] },
+      { id: "hoke", name: "Hoke's division", ab: "RH", c: "fx-cs", side: "cs", desc: "Gen. Robert F. Hoke's Confederate troops.",
+        wp: [W_("1864-04-17", 35.84, -76.80, "Attack Plymouth"), W_("1864-04-20", 35.8686, -76.748, "Plymouth surrenders"),
+             W_("1864-05-04", 35.55, -77.06, "Washington, NC"), W_("1864-05-08", 35.30, -77.20, "Recalled to Virginia")] },
+      { id: "unionsound", name: "Union gunboats", ab: "US", c: "fx-navy", side: "un", ship: true, desc: "Union gunboats in the Roanoke and Albemarle Sound.",
+        wp: [W_("1864-04-17", 35.88, -76.72, "Off Plymouth"), W_("1864-04-19", 35.92, -76.65, "Southfield sunk; Miami driven off"),
+             W_("1864-05-05", 35.95, -76.55, "Battle of Albemarle Sound"), W_("1864-10-31", 35.8686, -76.748, "Retake Plymouth")] },
+      { id: "cushing", name: "Cushing's launch", ab: "WC", c: "fx-un", side: "un", ship: true, desc: "Lt. William B. Cushing's steam launch with a spar torpedo.",
+        wp: [W_("1864-10-27", 35.92, -76.68, "Steam up the Roanoke at night"), W_("1864-10-28", 35.8686, -76.748, "Torpedo sinks the Albemarle")] }] },
+  { id: "nc-fisher", area: "carolinas", era: "cw", name: "Fort Fisher and Wilmington, 1864–65", start: "1864-12-15", end: "1865-02-28", at: "1865-01-15",
+    bbox: [33.7, -78.3, 34.45, -77.6], fit: [33.8, -78.15, 34.35, -77.7], band: ["1865-01-13", "1865-01-15", "Second battle of Fort Fisher"],
+    events: [
+      { iso: "1864-12-24", d: "Dec 24, 1864", t: "First attack", s: "Porter's fleet bombards; Butler's landing is called off.", site: "fortfisher" },
+      { iso: "1865-01-13", d: "Jan 13, 1865", t: "The fleet returns", s: "The heaviest naval bombardment of the war.", site: "fortfisher" },
+      { iso: "1865-01-15", d: "Jan 15", t: "Fort Fisher falls", s: "Terry's troops storm the fort.", site: "fortfisher" },
+      { iso: "1865-02-19", d: "Feb 19", t: "Fort Anderson", s: "Confederates abandon the west bank.", site: "fortanderson" },
+      { iso: "1865-02-22", d: "Feb 22", t: "Wilmington falls", s: "The last major Confederate port is gone.", site: "wilmington65" }],
+    forces: [
+      { id: "porter", name: "Porter's fleet", ab: "DP", c: "fx-navy", side: "un", ship: true, desc: "Rear Admiral David Dixon Porter's fleet of nearly 60 warships.",
+        wp: [W_("1864-12-20", 33.90, -77.80, "Gather off New Inlet"), W_("1864-12-24", 33.975, -77.895, "First bombardment"), W_("1864-12-27", 33.90, -77.80, "Withdraw"),
+             W_("1865-01-13", 33.975, -77.895, "Return; heaviest naval bombardment of the war"), W_("1865-01-15", 33.975, -77.895, "Support the assault"),
+             W_("1865-02-18", 34.035, -77.935, "Shell Fort Anderson"), W_("1865-02-22", 34.20, -77.95, "Up the river to Wilmington")] },
+      { id: "terry", name: "Terry's troops", ab: "AT", c: "fx-un", side: "un", desc: "Gen. Alfred Terry's Union infantry, including U.S. Colored Troops.",
+        wp: [W_("1865-01-13", 34.02, -77.90, "Land north of the fort"), W_("1865-01-15", 33.9717, -77.9176, "Storm Fort Fisher"),
+             W_("1865-02-19", 34.10, -77.92, "Advance up the peninsula"), W_("1865-02-22", 34.236, -77.946, "Enter Wilmington")] },
+      { id: "lamb", name: "Fort Fisher garrison", ab: "WL", c: "fx-cs", side: "cs", desc: "Col. William Lamb's garrison.",
+        wp: [W_("1864-12-15", 33.9717, -77.9176, "Lamb's garrison"), W_("1865-01-15", 33.9717, -77.9176, "Overrun; Lamb and Whiting wounded")] },
+      { id: "hoke65", name: "Hoke's division", ab: "RH", c: "fx-cs", side: "cs", desc: "Gen. Robert Hoke's troops, sent from Virginia.",
+        wp: [W_("1864-12-24", 34.05, -77.90, "Rush to the Sugar Loaf lines"), W_("1865-01-15", 34.05, -77.90, "Stay in their lines"),
+             W_("1865-02-21", 34.15, -77.93, "Fall back"), W_("1865-02-22", 34.30, -77.95, "Evacuate Wilmington northward")] },
+      { id: "andersongar", name: "Fort Anderson garrison", ab: "CS", c: "fx-cs", side: "cs", desc: "Confederates holding the west bank of the Cape Fear.",
+        wp: [W_("1865-02-17", 34.0398, -77.9462, "Hold the west bank"), W_("1865-02-19", 34.0398, -77.9462, "Evacuate")] }] },
+  { id: "sc-portroyal", area: "carolinas", era: "cw", name: "Port Royal and the Sea Islands, 1861–63", start: "1861-11-01", end: "1863-07-01", at: "1861-11-07",
+    bbox: [32.0, -81.2, 32.8, -80.3], fit: [32.0, -81.1, 32.8, -80.3], band: ["1861-11-07", "1861-11-08", "Battle of Port Royal"],
+    events: [
+      { iso: "1861-11-07", d: "Nov 7, 1861", t: "Port Royal", s: "Du Pont's fleet drives out the fort garrisons.", site: "portroyal61" },
+      { iso: "1861-11-09", d: "Nov 9", t: "Beaufort occupied", s: "Planters flee; thousands of enslaved people are freed in practice." },
+      { iso: "1862-04-15", d: "Spring 1862", t: "Penn School", s: "Teachers open a school for the freed people of St. Helena.", site: "penn" },
+      { iso: "1863-06-02", d: "June 2, 1863", t: "Combahee River raid", s: "Harriet Tubman guides the raid; over 700 people freed.", site: "combahee63" }],
+    forces: [
+      { id: "dupont61", name: "Du Pont's fleet", ab: "SD", c: "fx-navy", side: "un", ship: true, desc: "Flag Officer Samuel Du Pont's squadron, the largest U.S. fleet yet assembled.",
+        wp: [W_("1861-11-04", 32.08, -80.55, "Gather off Port Royal Sound"), W_("1861-11-07", 32.22, -80.67, "Steam in an oval past the forts"),
+             W_("1861-11-08", 32.24, -80.70, "Anchor in the sound"), W_("1863-07-01", 32.24, -80.70, "Main base of the southern blockade")] },
+      { id: "shermantw", name: "Union occupation troops", ab: "US", c: "fx-un", side: "un", desc: "Gen. Thomas W. Sherman's troops.",
+        wp: [W_("1861-11-07", 32.215, -80.68, "Occupy Hilton Head"), W_("1861-11-09", 32.4316, -80.6698, "Occupy Beaufort"), W_("1863-07-01", 32.4316, -80.6698, "Hold the Sea Islands")] },
+      { id: "srgarrison", name: "Confederate fort garrisons", ab: "CS", c: "fx-cs", side: "cs", desc: "Defenders of Forts Walker and Beauregard.",
+        wp: [W_("1861-11-07", 32.215, -80.68, "Abandon the forts"), W_("1861-11-12", 32.62, -80.85, "Fall back to the mainland")] },
+      { id: "combahee", name: "Combahee raid gunboats", ab: "HT", c: "fx-un", side: "un", ship: true, desc: "Gunboats carrying the 2nd South Carolina Volunteers, guided by Harriet Tubman.",
+        wp: [W_("1863-06-01", 32.4316, -80.6698, "Leave Beaufort"), W_("1863-06-02", 32.64, -80.55, "Up the Combahee; over 700 people freed"),
+             W_("1863-06-03", 32.4316, -80.6698, "Return to Beaufort")] }] },
+  { id: "clt-cw", area: "charlotte", era: "cw", name: "1865: Sherman and the end in the Carolinas", start: "1865-02-01", end: "1865-05-12", at: "1865-04-19",
+    band: ["1865-04-18", "1865-04-26", "Davis in Charlotte"], fit: "carolinas", bbox: [31.5, -84.0, 37.6, -76.5],
+    events: [
+      { iso: "1865-02-03", d: "Feb 3, 1865", t: "Rivers' Bridge", s: "A Confederate stand on the Salkehatchie.", site: "riversbridge" },
+      { iso: "1865-02-11", d: "Feb 11", t: "Aiken", s: "Wheeler turns back Kilpatrick's cavalry.", site: "aiken" },
+      { iso: "1865-02-17", d: "Feb 17, 1865", t: "Columbia burns", s: "Sherman's armies take South Carolina's capital.", site: "columbia65" },
+      { iso: "1865-02-22", d: "Feb 22", t: "Wilmington falls", s: "Schofield's army can now march inland.", site: "wilmington65" },
+      { iso: "1865-03-01", d: "Mar 1", t: "Harvest Moon sunk", s: "Dahlgren's flagship hits a torpedo in Winyah Bay.", site: "harvestmoon" },
+      { iso: "1865-03-10", d: "Mar 10", t: "Monroe's Crossroads; Wyse Fork", s: "Hampton surprises Kilpatrick; Bragg fails to stop Schofield.", site: "monroes" },
+      { iso: "1865-03-16", d: "Mar 16", t: "Averasboro", s: "Hardee delays Sherman's left wing.", site: "averasboro" },
+      { iso: "1865-03-03", d: "Mar 3", t: "Cheraw", s: "Sherman crosses into the Pee Dee country.", site: "cheraw65" },
+      { iso: "1865-03-11", d: "Mar 11", t: "Fayetteville", s: "The arsenal is destroyed.", site: "arsenal" },
+      { iso: "1865-03-19", d: "Mar 19–21", t: "Bentonville", s: "Johnston's last attack fails.", site: "bentonville" },
       { iso: "1865-04-02", d: "Apr 2", t: "Richmond falls", s: "Davis and his cabinet flee by train." },
       { iso: "1865-04-09", d: "Apr 9", t: "Appomattox", s: "Lee surrenders in Virginia." },
       { iso: "1865-04-12", d: "Apr 12", t: "Salisbury captured", s: "Stoneman's cavalry burns the prison.", site: "salisbury" },
@@ -1583,14 +1831,28 @@ const SCENARIOS = [
       { iso: "1865-05-10", d: "May 10", t: "Davis captured", s: "Union cavalry catch him near Irwinville, Georgia." }],
     forces: [
       { id: "sherman", name: "Sherman's armies", ab: "WS", c: "fx-un", side: "un", desc: "About 60,000 men under Gen. William T. Sherman.",
-        wp: [W_("1865-02-01", 32.650, -80.950, "March north from the coast"), W_("1865-02-17", 34.0007, -81.0348, "Columbia"),
-             W_("1865-03-03", 34.6976, -79.8834, "Cheraw"), W_("1865-03-11", 35.0527, -78.8784, "Fayetteville"),
-             W_("1865-03-19", 35.310, -78.320, "Bentonville"), W_("1865-03-23", 35.3849, -77.9928, "Goldsboro"),
-             W_("1865-04-13", 35.7796, -78.6382, "Raleigh"), W_("1865-04-26", 35.9993, -78.8975, "Bennett Place: Johnston surrenders")] },
+        wp: [W_("1865-02-01", 32.650, -80.950, "March north from the coast"), W_("1865-02-03", 33.040, -81.100, "Rivers' Bridge"), W_("1865-02-17", 34.0007, -81.0348, "Columbia"),
+             W_("1865-03-03", 34.6976, -79.8834, "Cheraw"), W_("1865-03-11", 35.0527, -78.8784, "Fayetteville"), W_("1865-03-16", 35.2660, -78.6720, "Averasboro"),
+             W_("1865-03-19", 35.3022, -78.3224, "Bentonville"), W_("1865-03-23", 35.3849, -77.9928, "Goldsboro"),
+             W_("1865-04-13", 35.7796, -78.6382, "Raleigh"), W_("1865-04-26", 36.0295, -78.9737, "Bennett Place: Johnston surrenders")] },
       { id: "johnston", name: "Johnston's army", ab: "JJ", c: "fx-cs", side: "cs", desc: "Gen. Joseph E. Johnston's Army of Tennessee and gathered garrisons.",
         wp: [W_("1865-02-25", 35.2265, -80.8433, "Johnston takes command near Charlotte"), W_("1865-03-15", 35.050, -78.800, "Gather to strike Sherman"),
-             W_("1865-03-19", 35.310, -78.320, "Bentonville"), W_("1865-04-13", 35.850, -79.000, "Fall back west of Raleigh"),
-             W_("1865-04-26", 35.9993, -78.8975, "Surrender at Bennett Place")] },
+             W_("1865-03-19", 35.3022, -78.3224, "Bentonville"), W_("1865-04-13", 35.850, -79.000, "Fall back west of Raleigh"),
+             W_("1865-04-26", 36.0295, -78.9737, "Surrender at Bennett Place")] },
+      { id: "kilpatrick", name: "Kilpatrick's cavalry", ab: "JK", c: "fx-drag", side: "un", desc: "Gen. Judson Kilpatrick's Union cavalry, screening Sherman.",
+        wp: [W_("1865-02-05", 33.10, -81.30, "Screen Sherman's left"), W_("1865-02-11", 33.5604, -81.7196, "Aiken: checked by Wheeler"),
+             W_("1865-03-10", 35.12, -79.13, "Monroe's Crossroads: surprised by Hampton"), W_("1865-03-16", 35.266, -78.672, "Averasboro"),
+             W_("1865-04-13", 35.78, -78.64, "Raleigh")] },
+      { id: "hampton", name: "Hampton and Wheeler", ab: "WH", c: "fx-cs", side: "cs", desc: "Confederate cavalry under Wade Hampton and Joseph Wheeler.",
+        wp: [W_("1865-02-11", 33.5604, -81.7196, "Aiken"), W_("1865-02-17", 34.0007, -81.0348, "Leave Columbia"), W_("1865-03-10", 35.12, -79.13, "Monroe's Crossroads"),
+             W_("1865-03-16", 35.266, -78.672, "Averasboro"), W_("1865-03-19", 35.3022, -78.3224, "Bentonville"), W_("1865-04-26", 36.0295, -78.9737, "Bennett Place")] },
+      { id: "schofield", name: "Schofield's army", ab: "JS", c: "fx-un", side: "un", desc: "Gen. John Schofield's Union troops from the coast.",
+        wp: [W_("1865-02-22", 34.236, -77.946, "From Wilmington"), W_("1865-03-08", 35.23, -77.50, "Wyse Fork"), W_("1865-03-21", 35.3849, -77.9928, "Join Sherman at Goldsboro")] },
+      { id: "bragg", name: "Bragg's troops", ab: "BB", c: "fx-cs", side: "cs", desc: "Gen. Braxton Bragg's command, including Hoke's division.",
+        wp: [W_("1865-02-22", 34.30, -77.95, "Leave Wilmington"), W_("1865-03-08", 35.23, -77.50, "Wyse Fork"), W_("1865-03-12", 35.2604, -77.5814, "Kinston; CSS Neuse scuttled"),
+             W_("1865-03-19", 35.3022, -78.3224, "Join Johnston at Bentonville")] },
+      { id: "harvestmoon", name: "USS Harvest Moon", ab: "HM", c: "fx-navy", side: "un", ship: true, desc: "Rear Admiral John Dahlgren's flagship.",
+        wp: [W_("1865-02-25", 33.22, -79.15, "Enters Winyah Bay"), W_("1865-03-01", 33.28, -79.20, "Sunk by a Confederate torpedo")] },
       { id: "stoneman", name: "Stoneman's cavalry", ab: "GS", c: "fx-drag", side: "un", desc: "About 6,000 Union cavalry under Gen. George Stoneman.",
         wp: [W_("1865-03-20", 36.290, -82.470, "Leave east Tennessee"), W_("1865-03-28", 36.2168, -81.6746, "Boone"),
              W_("1865-04-04", 36.730, -80.700, "Raid southwest Virginia"), W_("1865-04-10", 36.100, -80.250, "Through Salem (Winston)"),
@@ -1701,6 +1963,46 @@ const PEOPLE = [
     b: "Engineer who ran the siege of Morris Island, the reduction of Fort Sumter and the Swamp Angel battery that shelled the city." },
   { n: "Samuel F. Du Pont", r: "Rear Admiral, U.S. Navy", side: "un", site: "c-keokuk", area: "charleston", era: "cw",
     b: "Led the ironclad attack on Fort Sumter on April 7, 1863. Its failure cost him his command." },
+  // ---------- The Carolinas: Revolution ----------
+  { n: "Richard Caswell", r: "Patriot militia colonel; first governor of North Carolina", side: "nc", site: "moorescreek", area: "carolinas",
+    b: "Led the minutemen who held Moores Creek Bridge in February 1776 and became the state's first governor that December." },
+  { n: "Flora MacDonald", r: "Highland Loyalist", side: "gb", site: "moorescreek", area: "carolinas", nolike: false,
+    b: "Famous in Scotland for helping Bonnie Prince Charlie escape in 1746. In North Carolina she rallied Highlanders for the King; her husband was captured after Moores Creek." },
+  { n: "Francis Marion", r: "Brigadier General · SC militia, the 'Swamp Fox'", side: "nc", site: "snowsisland", area: "carolinas", nolike: true,
+    b: "Led partisans from hideouts like Snow's Island, cutting British supply lines. With Lee he took Fort Watson and Fort Motte in 1781 and fought at Eutaw Springs. No portrait from life is known." },
+  { n: "Henry 'Light-Horse Harry' Lee", r: "Lieutenant Colonel · Lee's Legion", side: "us", site: "fortwatson", area: "carolinas",
+    b: "His Legion of cavalry and light infantry fought at Pyle's Defeat, Guilford, Fort Watson, Fort Motte, Fort Granby and Eutaw Springs. He was the father of Robert E. Lee." },
+  { n: "David Fanning", r: "Loyalist partisan", side: "gb", site: "lindley", area: "carolinas",
+    b: "The most feared Loyalist leader in North Carolina. In September 1781 he raided Hillsborough and captured Governor Thomas Burke." },
+  { n: "Thomas Burke", r: "Governor of North Carolina", side: "nc", site: "hillsborough", area: "carolinas",
+    b: "Captured by Fanning at Hillsborough in 1781 and held on James Island near Charleston. He escaped on parole, a decision that damaged his reputation." },
+  { n: "Alexander Stewart", r: "Lieutenant Colonel · British commander at Eutaw Springs", side: "gb", site: "eutaw", area: "carolinas",
+    b: "Held the field at Eutaw Springs after his camp was overrun, then fell back to Charleston." },
+  { n: "John Laurens", r: "Lieutenant Colonel · Continental Army", side: "us", site: "combahee82", area: "carolinas",
+    b: "Washington's aide and son of Henry Laurens, who argued for freeing enslaved men who would fight. He was killed at Combahee Ferry in August 1782." },
+  // ---------- The Carolinas: Civil War ----------
+  { n: "William T. Sherman", r: "Union general", side: "un", site: "columbia65", area: "carolinas", era: "cw", img: "William_Tecumseh_Sherman.jpg", credit: "Brady-Handy, Library of Congress",
+    b: "Marched about 60,000 men north through both Carolinas in 1865, through Columbia, Cheraw, Fayetteville and Bentonville, and accepted Johnston's surrender at Bennett Place." },
+  { n: "Joseph E. Johnston", r: "Confederate general", side: "cs", site: "bennett", area: "carolinas", era: "cw",
+    b: "Took command of the scattered forces facing Sherman in February 1865, attacked at Bentonville, and surrendered at Bennett Place against Davis's wishes." },
+  { n: "Wade Hampton III", r: "Confederate cavalry general", side: "cs", site: "monroes", area: "carolinas", era: "cw", img: "Wade_Hampton_III_-_Brady-Handy.jpg", credit: "Brady-Handy, Library of Congress",
+    b: "South Carolina planter who led the cavalry against Sherman, including the surprise at Monroe's Crossroads. He later became governor and a leader in ending Reconstruction." },
+  { n: "Ambrose Burnside", r: "Union general", side: "un", site: "roanoke", area: "carolinas", era: "cw",
+    b: "Led the 1862 expedition that took Roanoke Island and New Bern and gave the Union a lasting foothold in eastern North Carolina." },
+  { n: "Harriet Tubman", r: "Scout, spy and raid leader", side: "un", site: "combahee63", area: "carolinas", era: "cw",
+    b: "Working for the Union army at Beaufort, she guided the Combahee River raid of June 1863, which freed more than 700 people, the first armed raid in U.S. history planned and led by a woman." },
+  { n: "William B. Cushing", r: "Lieutenant, U.S. Navy", side: "un", site: "plymouth", area: "carolinas", era: "cw",
+    b: "Steamed a small launch up the Roanoke River at night in October 1864 and sank the CSS Albemarle with a spar torpedo, escaping by swimming." },
+  { n: "William Lamb", r: "Colonel · commander of Fort Fisher", side: "cs", site: "fortfisher", area: "carolinas", era: "cw",
+    b: "Designed and built much of Fort Fisher's earthworks and was badly wounded when it fell in January 1865." },
+  { n: "David Dixon Porter", r: "Rear Admiral, U.S. Navy", side: "un", site: "fortfisher", area: "carolinas", era: "cw",
+    b: "Commanded the fleet of nearly 60 warships that bombarded Fort Fisher in the war's largest naval operation." },
+  { n: "Alfred H. Terry", r: "Union general", side: "un", site: "fortfisher", area: "carolinas", era: "cw",
+    b: "Led the troops, including U.S. Colored Troops, who stormed Fort Fisher and then took Wilmington." },
+  { n: "Robert F. Hoke", r: "Confederate general", side: "cs", site: "plymouth", area: "carolinas", era: "cw",
+    b: "North Carolinian who retook Plymouth in 1864, then defended Wilmington and fought at Bentonville." },
+  { n: "James W. Cooke", r: "Commander, Confederate Navy · CSS Albemarle", side: "cs", site: "plymouth", area: "carolinas", era: "cw",
+    b: "Oversaw the building of the Albemarle and commanded her at Plymouth and in the battle of Albemarle Sound." },
   // ---------- Revolutionary Charlotte ----------
   { n: "Thomas Polk", r: "Colonel · Mecklenburg militia and commissary", side: "nc", site: "settlers",
     b: "Leading Charlotte merchant and surveyor whose house at Trade and Tryon became Cornwallis's headquarters in September 1780. As commissary he struggled to feed the army at New Providence and resigned in December, when Greene turned to Davie. He is buried in Settlers' Cemetery." },
@@ -1776,7 +2078,7 @@ function buildHomes(raw) { HOMES = raw.map((r, i) => {
 }); }
 let selHome = null, popAt = null, pin = null;
 let era = "rev", area = "charlotte";
-try { if (localStorage.getItem("cnp-area") === "charleston") area = "charleston"; } catch { /* storage unavailable */ }
+try { const a = localStorage.getItem("cnp-area"); if (a === "charleston" || a === "carolinas") area = a; } catch { /* storage unavailable */ }
 try { if (localStorage.getItem("cnp-era") === "cw") era = "cw"; } catch { /* storage unavailable */ }
 function el(tag, attrs, parent, text) {
   const e = document.createElementNS(NS, tag);
@@ -1793,7 +2095,8 @@ const PRESETS = {
   cw: [34.98, -80.99, 35.70, -80.44],
   campaign: [32.7, -82.6, 37.3, -77.3],
   harbor: [32.69, -79.98, 32.80, -79.74],
-  lowcountry: [32.60, -80.30, 33.25, -79.60]
+  lowcountry: [32.60, -80.30, 33.25, -79.60],
+  carolinas: [32.0, -84.0, 36.7, -75.4]
 };
 function fit(b, animate) {
   const [la1, lo1, la2, lo2] = b;
@@ -1985,7 +2288,7 @@ function render() {
   // sites
   const gs = el("g", {}, svg);
   const labelQueue = [];
-  const drawSites = SITES.filter(st => ((st.area || "charlotte") === area && ((st.layer === "sites" && layers.sites) || (st.layer === "later" && layers.later))) || (st.id === selected));
+  const drawSites = SITES.filter(st => (st.layer === "sites" && layers.sites) || (st.layer === "later" && layers.later) || (st.id === selected));
   // draw selected last
   drawSites.sort((a, b) => (a.id === selected) - (b.id === selected));
   for (const st of drawSites) {
@@ -2028,6 +2331,7 @@ function render() {
   if (layers.moves) drawForces(boxes, free);
   drawPin();
   drawAttribution();
+  scheduleAutoScenario();
 
   // scale bar
   const target = 90 / (s / M_PER_DEG); // metres in 90px
@@ -2088,14 +2392,14 @@ function prepBase(b) {
              return { ...pl, n, wx, wy }; }) };
 }
 const onScreen = (r, pad = 0) => !(sx_(r.x1) < -pad || sx_(r.x0) > W + pad || sy_(r.y1) < -pad || sy_(r.y0) > H + pad);
-const partD = (r) => { let d = ""; const step = view.s < 400 ? 3 : view.s < 1200 ? 2 : 1;
+const partD = (r, poly) => { let d = ""; const step = poly ? 1 : view.s < 400 ? 3 : view.s < 1200 ? 2 : 1;   // polygons keep every vertex (corners matter)
   for (let i = 0; i < r.w.length; i += step) d += (i ? "L" : "M") + sx_(r.w[i][0]).toFixed(1) + "," + sy_(r.w[i][1]).toFixed(1);
   const l = r.w[r.w.length - 1]; return d + "L" + sx_(l[0]).toFixed(1) + "," + sy_(l[1]).toFixed(1); };
 function drawBaseUnder() {
   if (!BASE) return;
   const s = view.s, g = el("g", {}, svg);
   if (layers.terrain) {
-    let d = ""; for (const r of BASE.water) if (onScreen(r) && (sx_(r.x1) - sx_(r.x0) > 2)) d += partD(r) + "Z";
+    let d = ""; for (const r of BASE.water) if (onScreen(r) && (sx_(r.x1) - sx_(r.x0) > 2)) d += partD(r, true) + "Z";
     if (d) {
       // the detailed Charleston water covers its own box; keep the coarse regional water out of it
       const [a1, o1, a2, o2] = COAST_BOX, [cx1, cy1] = toScreen(a2, o1), [cx2, cy2] = toScreen(a1, o2);
@@ -2217,7 +2521,8 @@ const ZONE_NAMES = { "": "Inside the conjectural camp layout" };
 const siteOf = (id) => SITES.find(x => x.id === id);
 const RATING_TEXT = { hi: "High · private", mid: "Moderate · private", low: "Low · built over", off: "Off-limits" };
 for (const st of SITES) (st.dz || []).forEach((d, n) => ZONES.push({ id: `z-${st.id}-${n}`, site: st.id, lat: st.lat, lon: st.lon, r: d[0], rating: d[1], ratingText: RATING_TEXT[d[1]], name: d[2], text: d[3] }));
-const zoneInEra = (z) => { const st = siteOf(z.site); return !st || ((st.layer === "later") === (era === "cw") && (st.area || "charlotte") === area); };
+const zoneInEra = (z) => { const st = siteOf(z.site); return !st || (st.layer === "later") === (era === "cw"); };
+const zoneInArea = (z) => { const st = siteOf(z.site); return zoneInEra(z) && (area === "carolinas" || !st || (st.area || "charlotte") === area); };
 const pop = document.getElementById("homepop");
 const homeState = (hm) => ((siteOf(hm.site) || {}).area === "charleston" ? "SC" : "NC");
 function homeFull(hm) { return hm.addr + ", " + (hm.city || hm.county + " County") + ", " + homeState(hm) + (hm.zip ? " " + hm.zip : ""); }
@@ -2332,16 +2637,18 @@ function drawPin() {
 /* ---------- era toggle ---------- */
 function setArea(a, quiet) {
   area = a;
-  const chs = a === "charleston";
-  document.getElementById("areasw").setAttribute("aria-checked", chs);
-  document.getElementById("area-l-clt").dataset.on = !chs; document.getElementById("area-l-chs").dataset.on = chs;
+  for (const n of ["charlotte", "charleston", "carolinas"]) document.getElementById("area-" + n).setAttribute("aria-pressed", n === a);
   try { localStorage.setItem("cnp-area", a); } catch { /* storage unavailable */ }
   if (popAt) { popAt = null; selHome = null; pop.hidden = true; }
   setEra(era, quiet);
 }
 document.getElementById("notice").addEventListener("click", (e) => e.currentTarget.classList.toggle("open"));
-document.getElementById("areasw").addEventListener("click", () => setArea(area === "charlotte" ? "charleston" : "charlotte"));
+for (const n of ["charlotte", "charleston", "carolinas"]) document.getElementById("area-" + n).addEventListener("click", () => { if (area !== n) { scenLock = null; setArea(n); } });
 const ERA = {
+  "car-rev": { sub: "North and South Carolina · the Revolution from the Regulators to the evacuation of Charleston, 1771–1782",
+               note: "<b>The Carolinas in the Revolution.</b> Every site, army and fleet in both states. The time slider follows the part of the map you're looking at, or the site you select." },
+  "car-cw":  { sub: "North and South Carolina · from secession to Bennett Place, 1860–1865",
+               note: "<b>The Carolinas in the Civil War.</b> Every site, army and fleet in both states. The time slider follows the part of the map you're looking at, or the site you select." },
   "chs-rev": { sub: "Charleston and the Lowcountry · Sullivan's Island 1776, the sieges of 1779–80 and the occupation to 1782",
                note: "<b>Revolutionary Charleston.</b> Forts, siege lines, plantations and the wreck of HMS Actaeon. Switch to Civil War for Fort Sumter, Fort Wagner and the Hunley." },
   "chs-cw":  { sub: "Charleston Harbor · Fort Sumter, Fort Wagner, the Hunley and the wrecks of the blockade, 1860–1865",
@@ -2356,7 +2663,7 @@ function setEra(e, quiet) {
   const rev = e === "rev";
   document.getElementById("era-rev").setAttribute("aria-pressed", rev);
   document.getElementById("era-cw").setAttribute("aria-pressed", !rev);
-  const key = area === "charleston" ? "chs-" + e : e;
+  const key = area === "charleston" ? "chs-" + e : area === "carolinas" ? "car-" + e : e;
   document.getElementById("subtitle").textContent = ERA[key].sub;
   document.getElementById("notice").innerHTML = ERA[key].note;
   Object.assign(layers, rev ? { sites: true, later: false, camp: area === "charlotte", moves: true } : { sites: false, later: true, camp: false, moves: true });
@@ -2368,14 +2675,15 @@ function setEra(e, quiet) {
   document.getElementById("timebar").hidden = !layers.moves; stopPlay(); playFitted = false;
   renderFlagKey();
   setScenario((scenarioFor(area, e) || SCENARIOS[0]).id);
-  const clt = area === "charlotte";
+  const clt = area === "charlotte", car = area === "carolinas";
   document.getElementById("v-campaign").hidden = !(rev && clt); document.getElementById("v-camp").hidden = !(rev && clt);
-  document.getElementById("v-charlotte").hidden = !clt;
-  document.getElementById("v-harbor").hidden = clt; document.getElementById("v-lowcountry").hidden = clt;
-  selForce = null; selected = clt ? (rev ? "camp" : "bates") : (rev ? "c-moultrie76" : "c-sumter");
+  document.getElementById("v-charlotte").hidden = !(clt || car);
+  document.getElementById("v-harbor").hidden = clt; document.getElementById("v-lowcountry").hidden = clt || car;
+  document.getElementById("v-carolinas").hidden = !car;
+  selForce = null; selected = car ? (rev ? "moorescreek" : "fortfisher") : clt ? (rev ? "camp" : "bates") : (rev ? "c-moultrie76" : "c-sumter");
   if (popAt) { popAt = null; selHome = null; pop.hidden = true; }
   try { localStorage.setItem("cnp-era", e); } catch { /* storage unavailable */ }
-  if (!quiet) { if (!clt) setPreset(rev ? "lowcountry" : "harbor"); else if (rev) setPreset("camp"); else fit(PRESETS.cw, true); showTab(currentTab); }
+  if (!quiet) { if (car) setPreset("carolinas"); else if (!clt) setPreset(rev ? "lowcountry" : "harbor"); else if (rev) setPreset("camp"); else fit(PRESETS.cw, true); showTab(currentTab); }
 }
 document.getElementById("era-rev").addEventListener("click", () => era !== "rev" && setEra("rev"));
 document.getElementById("era-cw").addEventListener("click", () => era !== "cw" && setEra("cw"));
@@ -2453,16 +2761,64 @@ function setScenario(id, keepDay) {
     lab.push(`<span style="left:${pct(dd)};transform:translateX(${dd < DAYS * .05 ? "0" : dd > DAYS * .95 ? "-100%" : "-50%"})">${txt}</span>`);
   }
   document.getElementById("tlabels").innerHTML = lab.join("");
-  // timeline picker for this area and war
-  const opts = SCENARIOS.filter(x => x.area === area && x.era === era);
+  // timeline picker: every timeline of this war, in date order
+  const opts = SCENARIOS.filter(x => x.era === era).sort((a, b) => a.start < b.start ? -1 : 1);
   tscen.innerHTML = opts.map(x => `<option value="${x.id}"${x.id === sc.id ? " selected" : ""}>${esc(x.name)}</option>`).join("");
   tscen.hidden = opts.length < 2;
   if (!tscen.hidden) tscen.title = "Choose a timeline";
   selForce = null;
   setDay(keepDay ? tDay : dayOf(sc.at), true);
 }
-tscen.addEventListener("change", () => { stopPlay(); setScenario(tscen.value); render(); });
-function scenarioFor(a, e) { return SCENARIOS.find(x => x.area === a && x.era === e); }
+tscen.addEventListener("change", () => { stopPlay(); scenLock = tscen.value; lockSite = null; setScenario(tscen.value); render(); });
+const DEFAULT_SCEN = { "charlotte-rev": "clt-rev", "charlotte-cw": "clt-cw", "charleston-rev": "chs-1780", "charleston-cw": "chs-cw", "carolinas-rev": "sc-1781", "carolinas-cw": "clt-cw" };
+function scenarioFor(a, e) { return SCENARIOS.find(x => x.id === DEFAULT_SCEN[a + "-" + e]) || SCENARIOS.find(x => x.era === e); }
+/* The slider follows the map: among this war's timelines whose box holds the view centre,
+   take the one whose box is closest in size to the view. A timeline picked by hand stays
+   until the view centre leaves its box. Nothing switches while a timeline is playing. */
+let scenLock = null, lockSite = null, autoT = 0;
+const inBox = (b, la, lo) => la >= b[0] && la <= b[2] && lo >= b[1] && lo <= b[3];
+function viewInfo() {
+  const [la1, lo1] = toLatLon(0, 0), [la2, lo2] = toLatLon(W, H), [cla, clo] = toLatLon(W / 2, H / 2);
+  return { la: cla, lo: clo, box: [la2, lo1, la1, lo2], area: Math.abs((la1 - la2) * (lo2 - lo1)) };
+}
+/* How much of a timeline is on screen: its armies' stops and its events' sites. */
+function scenOnScreen(x, v) {
+  let n = 0;
+  const fs = x.forces || (x.id === "clt-rev" ? CLT_REV_FORCES : []), evs = x.events || (x.id === "clt-rev" ? TIMELINE : []);
+  for (const f of fs) for (const w of f.wp) if (inBox(v.box, w[1], w[2])) n++;
+  for (const e of evs) { const st = e.site && SITES.find(s => s.id === e.site); if (st && inBox(v.box, st.lat, st.lon)) n += 3; }
+  return n;
+}
+function bestScenarioForView() {
+  const v = viewInfo();
+  let c = SCENARIOS.filter(x => x.era === era && x.bbox && inBox(x.bbox, v.la, v.lo)).map(x => ({ x, n: scenOnScreen(x, v) }));
+  if (!c.some(o => o.n)) return c.length ? c.sort((a, b) => sizeFit(a.x, v) - sizeFit(b.x, v))[0].x : null;
+  c = c.filter(o => o.n);
+  const top = Math.max(...c.map(o => o.n));
+  const close = c.filter(o => o.n >= top * 0.75);            // the timelines with the most going on here
+  close.sort((a, b) => sizeFit(a.x, v) - sizeFit(b.x, v) || (b.x.primary ? 1 : 0) - (a.x.primary ? 1 : 0));
+  if (SCEN && close.some(o => o.x === SCEN)) return SCEN;     // a good fit already: don't flip
+  return close[0].x;
+}
+const sizeFit = (x, v) => Math.abs(Math.log(((x.bbox[2] - x.bbox[0]) * (x.bbox[3] - x.bbox[1])) / v.area));
+function autoScenario() {
+  if (playT || !layers.moves) return;
+  const v = viewInfo();
+  if (scenLock) {
+    const L = SCENARIOS.find(x => x.id === scenLock), ls = lockSite && siteOf(lockSite);
+    if (L && L.era === era && L.bbox && (inBox(L.bbox, v.la, v.lo) || (ls && inBox(v.box, ls.lat, ls.lon) && v.area < 6 * (L.bbox[2] - L.bbox[0]) * (L.bbox[3] - L.bbox[1])))) return;
+    scenLock = null; lockSite = null;
+  }
+  const b = bestScenarioForView();
+  if (b && b !== SCEN) { setScenario(b.id); requestRender(); }
+}
+function scheduleAutoScenario() { clearTimeout(autoT); autoT = setTimeout(autoScenario, 450); }
+function scenarioForSite(st) {
+  const d = st.date;
+  const c = SCENARIOS.filter(x => x.era === (st.layer === "later" ? "cw" : "rev") && x.bbox && inBox(x.bbox, st.lat, st.lon) && (!d || (d >= x.start && d <= x.end)));
+  c.sort((a, b) => (a.bbox[2] - a.bbox[0]) * (a.bbox[3] - a.bbox[1]) - (b.bbox[2] - b.bbox[0]) * (b.bbox[3] - b.bbox[1]) || (b.primary ? 1 : 0) - (a.primary ? 1 : 0));
+  return d ? c[0] : null;
+}
 function setDay(d, quiet) {
   tDay = Math.max(0, Math.min(DAYS, d));
   tslider.value = Math.round(tDay);
@@ -2493,13 +2849,19 @@ playBtn.addEventListener("click", () => {
   if (playT) return stopPlay();
   if (tDay >= DAYS) setDay(0);
   if (!layers.moves) { layers.moves = true; document.getElementById("L-moves").checked = true; }
-  if (SCEN && SCEN.fit && !playFitted) { playFitted = true; setPreset(SCEN.fit); }
+  if (SCEN && SCEN.fit && !playFitted) { playFitted = true; if (typeof SCEN.fit === "string") setPreset(SCEN.fit); else fit(SCEN.fit, true); }
   playBtn.textContent = "❚❚"; playBtn.setAttribute("aria-label", "Pause");
   const stepDays = Math.max(1, Math.round(DAYS / 430));   // longer timelines advance several days per tick
   playT = setInterval(() => { if (tDay >= DAYS) return stopPlay(); setDay(tDay + stepDays); }, (reduceMotion ? 160 : 70) / playSpeed);
 });
 function goToDay(iso, siteId) {
   stopPlay();
+  const st0 = siteId && SITES.find(s => s.id === siteId);
+  if (!SCEN || iso < SCEN.start || iso > SCEN.end || (st0 && SCEN.bbox && !inBox(SCEN.bbox, st0.lat, st0.lon))) {
+    const c = SCENARIOS.filter(x => x.era === era && iso >= x.start && iso <= x.end && (!st0 || !x.bbox || inBox(x.bbox, st0.lat, st0.lon)));
+    c.sort((a, b) => (a.bbox[2] - a.bbox[0]) * (a.bbox[3] - a.bbox[1]) - (b.bbox[2] - b.bbox[0]) * (b.bbox[3] - b.bbox[1]));
+    if (c[0]) { scenLock = c[0].id; lockSite = siteId || null; setScenario(c[0].id); }
+  }
   if (!layers.moves) { layers.moves = true; document.getElementById("L-moves").checked = true; }
   setDay(dayOf(iso), true);
   const st = siteId && SITES.find(s => s.id === siteId);
@@ -2652,10 +3014,10 @@ document.getElementById("zin").onclick = () => zoomAt(1.6);
 document.getElementById("zout").onclick = () => zoomAt(1 / 1.6);
 
 function setPreset(name) {
-  for (const n of ["camp", "charlotte", "campaign", "harbor", "lowcountry"]) document.getElementById("v-" + n).setAttribute("aria-pressed", n === name);
+  for (const n of ["camp", "charlotte", "campaign", "harbor", "lowcountry", "carolinas"]) document.getElementById("v-" + n).setAttribute("aria-pressed", n === name);
   fit(PRESETS[name], true);
 }
-for (const n of ["camp", "charlotte", "campaign", "harbor", "lowcountry"]) document.getElementById("v-" + n).onclick = () => setPreset(n);
+for (const n of ["camp", "charlotte", "campaign", "harbor", "lowcountry", "carolinas"]) document.getElementById("v-" + n).onclick = () => setPreset(n);
 for (const k in layers) {
   const box = document.getElementById("L-" + k);
   box.checked = layers[k];
@@ -2685,8 +3047,9 @@ function selectSite(id, fromMap) {
   const st = SITES.find(s => s.id === id);
   if (!st) return;
   selected = id; selForce = null;
-  if ((st.area || "charlotte") !== area) { area = st.area || "charlotte"; era = st.layer === "later" ? "cw" : "rev"; setArea(area, true); }
   if ((st.layer === "later") !== (era === "cw")) setEra(st.layer === "later" ? "cw" : "rev", true);
+  const sc = scenarioForSite(st);
+  if (sc) { stopPlay(); scenLock = sc.id; lockSite = st.id; if (sc !== SCEN) setScenario(sc.id); setDay(dayOf(st.date), true); }
   if (!fromMap) flyToSite(st);
   else render();
   showTab("site");
@@ -2866,16 +3229,35 @@ const LIBRARY = [
   { a: "charleston", e: "cw", k: "read", t: "Is it the H. L. Hunley or the CSS Hunley?", src: "Friends of the Hunley", u: "https://www.hunley.org/whats-in-a-name-is-it-the-h-l-hunley-or-the-css-hunley/", d: "Why the submarine was never commissioned 'CSS'." },
   { a: "charleston", e: "cw", k: "read", t: "H. L. Hunley", src: "South Carolina Encyclopedia", u: "https://scencyclopedia.org/sce/?p=3208", d: "" },
   { a: "charleston", e: "cw", k: "video", t: "Robert Smalls: a daring escape", src: "PBS, Many Rivers to Cross", u: "https://www.pbs.org/wnet/african-americans-many-rivers-to-cross/?p=545", d: "" },
-  { a: "charleston", e: "cw", k: "video", t: "Charleston virtual field trip", src: "American Battlefield Trust", u: "https://battlefields.org/learn/charleston-virtual-field-trip", d: "Fort Sumter, Morris Island and the 54th Massachusetts in 360°." }
+  { a: "charleston", e: "cw", k: "video", t: "Charleston virtual field trip", src: "American Battlefield Trust", u: "https://battlefields.org/learn/charleston-virtual-field-trip", d: "Fort Sumter, Morris Island and the 54th Massachusetts in 360°." },
+  // The Carolinas
+  { a: "carolinas", e: "rev", k: "read", t: "Eutaw Springs: battle description", src: "American Battlefield Trust", u: "https://www.battlefields.org/learn/revolutionary-war/battles/eutaw-springs", d: "The last major battle in the Carolinas." },
+  { a: "carolinas", e: "rev", k: "map", t: "Eutaw Springs, September 8, 1781: battle map", src: "American Battlefield Trust", u: "https://www.battlefields.org/learn/maps/eutaw-springs-september-8-1781-phase-one", d: "" },
+  { a: "carolinas", e: "rev", k: "video", t: "Eutaw Springs virtual tour", src: "American Battlefield Trust", u: "https://www.battlefields.org/visit/virtual-tours/eutaw-springs-virtual-tour", d: "" },
+  { a: "carolinas", e: "rev", k: "read", t: "Moores Creek Bridge", src: "American Battlefield Trust", u: "https://www.battlefields.org/visit/battlefields/moores-creek-bridge", d: "Visiting the 1776 battlefield." },
+  { a: "carolinas", e: "rev", k: "read", t: "Fort Watson", src: "American Battlefield Trust", u: "https://www.battlefields.org/visit/battlefields/fort-watson", d: "The Maham tower siege on the Santee." },
+  { a: "carolinas", e: "rev", k: "read", t: "The Liberty Trail expands to North Carolina", src: "American Battlefield Trust", u: "https://www.battlefields.org/news/liberty-trail-expands-north-carolina", d: "Revolutionary sites across North Carolina." },
+  { a: "carolinas", e: "rev", k: "read", t: "North Carolina State Historic Sites catalog", src: "NC Dept. of Natural & Cultural Resources", u: "https://historicsites.nc.gov/all-sites-catalogs", d: "Alamance, Halifax, Tryon Palace, Brunswick Town and more." },
+  { a: "carolinas", e: "cw", k: "read", t: "North Carolina State Historic Sites catalog", src: "NC Dept. of Natural & Cultural Resources", u: "https://historicsites.nc.gov/all-sites-catalogs", d: "Fort Fisher, Bentonville, Bennett Place, CSS Neuse and more." },
+  { a: "carolinas", e: "rev", k: "read", t: "Military history from Murphy to Manteo", src: "NC Dept. of Natural & Cultural Resources", u: "https://www.dncr.nc.gov/things-do/trip-ideas/military-history-murphy-manteo", d: "A statewide trip guide." },
+  { a: "carolinas", e: "cw", k: "map", t: "Civil War maps of North Carolina", src: "Library of Congress", u: "https://www.loc.gov/collections/civil-war-maps/?fa=location%3Anorth+carolina&sb=shelf-id_desc", d: "Including Fort Fisher attack plans and the Roanoke Island battlefield." },
+  { a: "carolinas", e: "cw", k: "read", t: "Bentonville Battlefield", src: "American Battlefield Trust", u: "https://www.battlefields.org/visit/battlefields/bentonville-battlefield", d: "The largest battle in North Carolina." },
+  { a: "carolinas", e: "cw", k: "read", t: "Rivers Bridge State Historic Site", src: "American Battlefield Trust", u: "https://www.battlefields.org/visit/heritage-sites/rivers-bridge-state-historic-site", d: "" },
+  { a: "carolinas", e: "cw", k: "read", t: "\"We called ourselves Combee\": the Combahee River raid", src: "National Park Service", u: "https://www.nps.gov/articles/000/we-called-ourselves-combee.htm", d: "The people freed in Harriet Tubman's raid." },
+  { a: "carolinas", e: "cw", k: "read", t: "Harriet Tubman and the 54th Massachusetts", src: "National Park Service", u: "https://www.nps.gov/articles/harriet-tubman-and-the-54th-massachusetts.htm", d: "" },
+  { a: "carolinas", e: "cw", k: "read", t: "Harriet Tubman", src: "National Park Service", u: "https://www.nps.gov/people/harriet-tubman.htm", d: "Biography." },
+  { a: "carolinas", e: "cw", k: "read", t: "Combahee River Ferry / Harriet Tubman Bridge", src: "National Park Service", u: "https://www.nps.gov/places/combahee-river-ferry-harriet-tubman-bridge.htm", d: "" },
+  { a: "carolinas", e: "cw", k: "read", t: "Penn Center", src: "National Park Service", u: "https://www.nps.gov/places/south-carolina-penn-center.htm", d: "One of the first schools for the formerly enslaved." }
 ];
 const LIB_KINDS = { all: "All", doc: "Letters & documents", map: "Maps, plans & schematics", read: "Articles", video: "Video", audio: "Audio" };
 let libKind = "all";
 function renderLibrary() {
-  const items = LIBRARY.filter(x => x.a === area && x.e === era && (libKind === "all" || x.k === libKind));
-  const counts = Object.fromEntries(Object.keys(LIB_KINDS).map(k => [k, LIBRARY.filter(x => x.a === area && x.e === era && (k === "all" || x.k === k)).length]));
+  const inA = (x) => x.e === era && (area === "carolinas" || x.a === area);
+  const items = LIBRARY.filter(x => inA(x) && (libKind === "all" || x.k === libKind));
+  const counts = Object.fromEntries(Object.keys(LIB_KINDS).map(k => [k, LIBRARY.filter(x => inA(x) && (k === "all" || x.k === k)).length]));
   pane.innerHTML = `
     <h2>Library</h2>
-    <div class="kicker">Original letters, maps and fort plans, articles, documentaries and podcasts for ${area === "charleston" ? "Charleston" : "the Charlotte area"} in the ${era === "rev" ? "Revolutionary War" : "Civil War"}. Switch the area or war at the top to see more. Links open the source's own site.</div>
+    <div class="kicker">Original letters, maps and fort plans, articles, documentaries and podcasts for ${area === "carolinas" ? "the Carolinas" : area === "charleston" ? "Charleston" : "the Charlotte area"} in the ${era === "rev" ? "Revolutionary War" : "Civil War"}. Switch the area or war at the top to see more. Links open the source's own site.</div>
     <div class="lib-filters">${Object.entries(LIB_KINDS).filter(([k]) => counts[k]).map(([k, l]) => `<button class="btn" data-kind="${k}" aria-pressed="${k === libKind}">${l} (${counts[k]})</button>`).join("")}</div>
     ${items.length ? items.map(x => `
       <div class="libitem"><span class="lm">${esc(LIB_KINDS[x.k])} · ${esc(x.src)}</span>
@@ -2898,7 +3280,37 @@ function renderStoryCHS() {
         <span class="when">${esc(t.d)}</span><span class="what">${esc(t.t)}</span><span class="why">${esc(t.s)}</span></button></li>`).join("")}</ul>`;
   wireRows();
 }
+const CAR_PRELUDE = {
+  rev: [{ iso: "1766-02-21", d: "Feb 1766", t: "Stamp Act defied", s: "Armed colonists at Brunswick stop enforcement of the Stamp Act.", site: "brunswick" },
+        { iso: "1771-05-16", d: "May 16, 1771", t: "Alamance", s: "Governor Tryon's militia crush the Regulators.", site: "alamance" },
+        { iso: "1774-10-25", d: "Oct 25, 1774", t: "Edenton Tea Party", s: "Fifty-one women pledge a boycott of British goods.", site: "edenton" },
+        { iso: "1779-02-03", d: "Feb 3, 1779", t: "Port Royal Island", s: "Moultrie turns back a British landing.", site: "portroyal79" },
+        { iso: "1780-10-14", d: "Oct 14, 1780", t: "Shallow Ford", s: "Militia ambush Loyalists on the Yadkin.", site: "shallowford" },
+        { iso: "1782-08-27", d: "Aug 27, 1782", t: "Combahee Ferry", s: "John Laurens is killed in one of the war's last fights.", site: "combahee82" },
+        { iso: "1782-12-14", d: "Dec 14, 1782", t: "Charleston evacuated", s: "The British leave the Carolinas.", site: "c-evacuation" }],
+  cw: [{ iso: "1860-12-20", d: "Dec 20, 1860", t: "South Carolina secedes", s: "The first state to leave the Union.", site: "c-secession" },
+       { iso: "1861-05-20", d: "May 20, 1861", t: "North Carolina secedes", s: "The last state to join the Confederacy.", site: "ncmi" },
+       { iso: "1864-11-30", d: "Nov 30, 1864", t: "Honey Hill", s: "Union troops fail to cut the Charleston and Savannah Railroad.", site: "honeyhill" },
+       { iso: "1865-03-12", d: "Mar 12, 1865", t: "CSS Neuse scuttled", s: "Her crew burns the ironclad at Kinston.", site: "neuse" }]
+};
+function renderStoryCAR() {
+  const now = new Date(), md = String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
+  const seen = new Set(), rows = [];
+  const add = (t) => { const k = t.iso + "|" + t.t; if (!t.iso || seen.has(k)) return; seen.add(k); rows.push(t); };
+  CAR_PRELUDE[era].forEach(add);
+  for (const sc of SCENARIOS.filter(x => x.era === era)) (sc.events || (sc.id === "clt-rev" ? TIMELINE.filter(t => t.iso) : [])).forEach(t => add({ ...t, d: t.d.match(/\d{4}/) ? t.d : t.d + ", " + t.iso.slice(0, 4) }));
+  rows.sort((a, b) => a.iso < b.iso ? -1 : a.iso > b.iso ? 1 : 0);
+  pane.innerHTML = `
+    <h2>${era === "rev" ? "The Revolution in the Carolinas" : "The Civil War in the Carolinas"}</h2>
+    <div class="kicker">Every dated event on the map across both states. Select one to move the slider to that timeline and date and fly to the place.</div>
+    <p>${era === "rev" ? "The Carolinas saw some of the earliest resistance to British rule and some of the hardest fighting of the war. After Charleston fell in 1780, the war here became a civil war between neighbors as much as a fight between armies: Patriot and Loyalist militia, partisans like Marion and Sumter, and Greene's small Continental army wore down the British until they held only Charleston." : "South Carolina was the first state to secede and North Carolina the last. The war came first to the coast, where Union fleets took the sounds and sea islands and freedom-seekers by the thousands reached Union lines. It ended inland, as Sherman marched through both states and Johnston surrendered at Bennett Place, the largest surrender of the war."}</p>
+    <ul class="list">${rows.map(t => `
+      <li><button class="rowbtn${t.iso.slice(5) === md ? " today" : ""}" data-iso="${t.iso}" ${t.site ? `data-st="${t.site}"` : ""}>
+        <span class="when">${esc(t.d)}</span><span class="what">${esc(t.t)}</span><span class="why">${esc(t.s)}</span></button></li>`).join("")}</ul>`;
+  pane.querySelectorAll(".rowbtn[data-iso]").forEach(b => b.addEventListener("click", () => goToDay(b.dataset.iso, b.dataset.st)));
+}
 function renderStory() {
+  if (area === "carolinas") return renderStoryCAR();
   if (area === "charleston") return renderStoryCHS();
   if (era === "cw") return renderStoryCW();
   const now = new Date();
@@ -2965,10 +3377,10 @@ function portraitHTML(p, big) {
 }
 function renderPeople() {
   const sideChip = { us: `<span class="chip era-1780">${flagHTML("us", 15)} Continental</span>`, nc: `<span class="chip" style="color:var(--militia);border-color:var(--militia)">${flagHTML("pm", 15)} Patriot militia</span>`, gb: `<span class="chip" style="color:var(--hi);border-color:var(--hi)">${flagHTML("gb", 15)} British</span>`, cs: `<span class="chip" style="color:var(--later);border-color:var(--later)">${flagHTML("cs", 15)} Confederate</span>`, un: `<span class="chip era-1780">${flagHTML("un", 15)} Union</span>` };
-  const list = PEOPLE.filter(p => (p.era || "rev") === era && (p.area || "charlotte") === area);
+  const list = PEOPLE.filter(p => (p.era || "rev") === era && (area === "carolinas" || (p.area || "charlotte") === area));
   pane.innerHTML = `
-    <h2>${area === "charleston" ? (era === "rev" ? "Revolutionary Charleston" : "Civil War Charleston") : era === "rev" ? "Important figures" : "Civil War Charlotte"}</h2>
-    <div class="kicker">${area === "charleston" ? (era === "rev" ? "The defenders of 1776 and 1780, the British commanders, and the city's Patriot leaders." : "Commanders on both sides, the men of the 54th Massachusetts, Robert Smalls, and the Hunley's builders and crew.") : era === "rev" ? "Officers named on the state marker, the local commanders, Charlotte's Revolutionary leaders, and the men across the line." : "The people behind Charlotte's wartime industries and the Confederacy's last days."} Portraits load from Wikimedia Commons.</div>
+    <h2>${area === "carolinas" ? (era === "rev" ? "The Revolution in the Carolinas" : "The Civil War in the Carolinas") : area === "charleston" ? (era === "rev" ? "Revolutionary Charleston" : "Civil War Charleston") : era === "rev" ? "Important figures" : "Civil War Charlotte"}</h2>
+    <div class="kicker">${area === "carolinas" ? "Everyone on the map for this war, across both states." : area === "charleston" ? (era === "rev" ? "The defenders of 1776 and 1780, the British commanders, and the city's Patriot leaders." : "Commanders on both sides, the men of the 54th Massachusetts, Robert Smalls, and the Hunley's builders and crew.") : era === "rev" ? "Officers named on the state marker, the local commanders, Charlotte's Revolutionary leaders, and the men across the line." : "The people behind Charlotte's wartime industries and the Confederacy's last days."} Portraits load from Wikimedia Commons.</div>
     ${list.map(p => `
       <details class="person">
         <summary>${portraitHTML(p, false)}<span class="nm">${esc(p.n)}</span><span class="side">${sideChip[p.side]}</span><span class="rk">${esc(p.r)}</span></summary>
@@ -2995,8 +3407,23 @@ function attribution(d) {
   return "Larger than standard musket balls: wall gun, blunderbuss, or a ball deformed by impact. Measure across the roundest axis.";
 }
 
+function renderDetectCAR(rating) {
+  const sids = [...new Set(ZONES.filter(z => zoneInEra(z)).map(z => z.site))].filter(id => siteOf(id));
+  sids.sort((a, b) => siteOf(a).name.localeCompare(siteOf(b).name));
+  pane.innerHTML = `
+    <h2>Metal detecting</h2>
+    <div class="kicker">Every site for this war across both states, with zones rated by who owns the land.</div>
+    <div class="callout"><b>Read this first.</b> National parks, national wildlife refuges, military land, state historic sites and state parks are off-limits. Cemeteries and churchyards are never open. Shipwrecks and state bottomland are protected. Private land always needs the owner's written permission.</div>
+    <h3>Zones by site (${sids.length})</h3>
+    ${sids.map(sid => { const st = siteOf(sid), zs = ZONES.filter(z => z.site === sid), n = HOMES.filter(h => h.site === sid).length;
+      return `<details class="zonecard" style="border-left:4px solid ${rating[zs.some(z => z.rating === "hi") ? "hi" : zs.some(z => z.rating === "mid") ? "mid" : zs[0].rating]}">
+        <summary class="zh"><span class="zn">${esc(st.name)}</span><span class="zr">${zs.map(z => esc(RATING_SHORT[z.rating])).join(" · ")}${n ? ` · ${n} homes` : ""}</span></summary>
+        ${zs.map(z => `<p><b style="color:${rating[z.rating]}">${esc(z.name)}:</b> ${esc(z.text)}</p>`).join("")}
+        <button class="btn" data-zone="${zs[zs.length - 1].id}">Show on map</button></details>`; }).join("")}`;
+  wireRows();
+}
 function renderDetectCHS(rating) {
-  const sids = [...new Set(ZONES.filter(z => zoneInEra(z) && (siteOf(z.site) || {}).area === "charleston").map(z => z.site))];
+  const sids = [...new Set(ZONES.filter(z => zoneInArea(z) && (siteOf(z.site) || {}).area === "charleston").map(z => z.site))];
   pane.innerHTML = `
     <h2>Metal detecting</h2>
     <div class="kicker">Charleston's best-known sites are protected. Here is what is open, what isn't, and why.</div>
@@ -3020,6 +3447,7 @@ const RATING_SHORT = { hi: "High", mid: "Moderate", low: "Low", off: "Off-limits
 function renderDetect() {
   const rating = { hi: "var(--hi)", mid: "var(--mid)", low: "var(--low)", off: "var(--off)" };
   if (area === "charleston") return renderDetectCHS(rating);
+  if (area === "carolinas") return renderDetectCAR(rating);
   pane.innerHTML = `
     <h2>Metal detecting</h2>
     <div class="kicker">Where 1780 material is likely to be, and the rules that decide whether you can look.</div>
@@ -3034,7 +3462,7 @@ function renderDetect() {
 
     <h3>Around the other sites</h3>
     <p class="note">Every site on the map has zones rated by who owns the land: national and state parks, cemeteries, church grounds and built-over downtowns are off-limits, and private land around battlefields, crossings and camps needs the owner's permission. These are generated from ownership and the site's history, not from survey. Homes come from North Carolina's statewide parcel map and Charleston County's parcels. Guilford and Orange counties' state records lack street names, so Guilford Courthouse and Hillsborough have zones but no homes, and sites in other South Carolina counties, Tennessee and Virginia have none.</p>
-    ${[...new Set(ZONES.filter(z => z.site !== "camp" && z.id !== "z-church" && zoneInEra(z)).map(z => z.site))].map(sid => {
+    ${[...new Set(ZONES.filter(z => z.site !== "camp" && z.id !== "z-church" && zoneInArea(z)).map(z => z.site))].map(sid => {
       const st = siteOf(sid), zs = ZONES.filter(z => z.site === sid), n = HOMES.filter(h => h.site === sid).length;
       return `<details class="zonecard" style="border-left:4px solid ${rating[zs.some(z => z.rating === "hi") ? "hi" : zs.some(z => z.rating === "mid") ? "mid" : zs[0].rating]}">
         <summary class="zh"><span class="zn">${esc(st.name)}</span><span class="zr">${zs.map(z => esc(RATING_SHORT[z.rating])).join(" · ")}${n ? ` · ${n} homes` : ""}</span></summary>
@@ -3100,6 +3528,16 @@ function renderDetect() {
 }
 
 function renderVisit() {
+  if (area === "carolinas") {
+    const ids = era === "rev" ? ["moorescreek", "alamance", "halifax", "tryon", "brunswick", "edenton", "guilford", "kings", "cowpens", "musgrove", "camden", "ninetysix", "fortwatson", "eutaw", "c-moultrie76"]
+                              : ["fortfisher", "fortanderson", "bentonville", "bennett", "fortmacon", "plymouth", "neuse", "averasboro", "arsenal", "c-sumter", "riversbridge", "penn", "combahee63", "columbia65"];
+    pane.innerHTML = `
+      <h2>Visit today</h2>
+      <div class="kicker">${era === "rev" ? "National and state historic sites of the Revolution across both states." : "National and state historic sites of the Civil War across both states."}</div>
+      <ul class="list">${ids.map(id => SITES.find(x => x.id === id)).filter(Boolean).map(s =>
+        `<li><button class="rowbtn" data-site="${s.id}"><span class="when">${esc(s.statusText)}</span><span class="what">${esc(s.name)}</span><span class="why">${esc(s.today)}</span></button></li>`).join("")}</ul>`;
+    return wireRows();
+  }
   if (area === "charleston") {
     const ids = era === "rev" ? ["c-moultrie76", "c-breach76", "c-exchange", "c-stmichaels", "c-hornwork", "c-gadsden", "c-drayton", "c-middleton", "c-dorchester"]
                               : ["c-sumter", "c-moultrie61", "c-breach64", "c-battery", "c-citadel", "c-secessionville", "c-lasch", "c-magnolia"];
@@ -3185,6 +3623,8 @@ if (SITES.some(s => s.id === startId)) {
   const st = SITES.find(s => s.id === startId);
   if (st.layer === "later") { layers.later = true; document.getElementById("L-later").checked = true; }
   const [x, y] = world(st.lat, st.lon); flyTo(x, y, targetScale(st), false);
+} else if (area === "carolinas") {
+  fit(PRESETS.carolinas, false);
 } else if (area === "charleston") {
   fit(PRESETS[era === "rev" ? "lowcountry" : "harbor"], false);
 } else if (era === "cw") {
