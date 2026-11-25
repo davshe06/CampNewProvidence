@@ -17,7 +17,7 @@ The page loads two data files next to it, so opening it straight from disk
 (`file://`) shows the map without homes or the Charleston coastline:
 
 - `homes.json`: homes near North Carolina sites, one record per line.
-- `charleston-land.json`: Charleston-area land polygons.
+- `charleston-water.json`: Charleston-area water polygons.
 
 Contents:
 
@@ -45,8 +45,9 @@ Contents:
 
 ## Data
 
-**Charleston coastline**: OpenStreetMap land polygons via the `@geo-maps` package
-(© OpenStreetMap contributors, ODbL). Wreck positions are approximate.
+**Charleston water**: U.S. Census Bureau TIGER areal hydrography (harbor, rivers,
+creeks, sounds and the ocean to about 3 nautical miles, public domain), with open
+ocean added beyond that line. Wreck positions are approximate.
 Charleston has detecting zones but no homes, because the state parcel service used
 for homes covers North Carolina only.
 

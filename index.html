@@ -345,7 +345,7 @@ ul.tight li { margin: 3px 0; }
 .libitem .lm { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); }
 .libitem p { margin: 0; font-size: .86rem; }
 #map .attrib { font-family: var(--f-body); font-size: 10px; fill: var(--ink-soft); stroke: var(--paper); stroke-width: 3px; paint-order: stroke; }
-#map .water { fill: color-mix(in srgb, var(--water) 16%, var(--paper)); }
+#map .water { fill: color-mix(in srgb, var(--water) 34%, var(--paper)); stroke: color-mix(in srgb, var(--water) 55%, var(--paper)); stroke-width: .8; }
 #map .land { fill: var(--paper); stroke: color-mix(in srgb, var(--water) 60%, var(--paper)); stroke-width: 1; }
 .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--panel); padding: 7px 14px; border-radius: 3px; font-size: .82rem; z-index: 20; }
 </style>
@@ -1773,22 +1773,33 @@ function render() {
 
 function sx_(wx) { return (wx - view.cx) * view.s + W / 2; }
 function sy_(wy) { return (wy - view.cy) * view.s + H / 2; }
-/* Charleston coastline (OpenStreetMap land polygons, ODbL), loaded from charleston-land.json. */
-let LAND = null;
-const COAST_BOX = [32.45, -80.45, 33.05, -79.55];
+/* Charleston-area water (U.S. Census Bureau TIGER areal hydrography, public domain), loaded
+   from charleston-water.json. Each ring keeps a world-space bounding box so off-screen or
+   sub-pixel rings are skipped while zooming. */
+let WATER = null;
+function prepWater(rings) {
+  WATER = rings.map(r => { const pts = r.map(([la, lo]) => world(la, lo)); let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    for (const [x, y] of pts) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; } return { pts, x0, y0, x1, y1 }; });
+}
 function drawCoast() {
-  if (!LAND) return;
-  const [a1, o1, a2, o2] = COAST_BOX, [x1, y1] = toScreen(a2, o1), [x2, y2] = toScreen(a1, o2);
-  if (x2 < 0 || x1 > W || y2 < 0 || y1 > H) return;
-  const g = el("g", {}, svg);
-  el("rect", { x: x1, y: y1, width: x2 - x1, height: y2 - y1, class: "water" }, g);
-  el("path", { d: LAND.map(pathD).map(d => d + "Z").join(""), class: "land", "fill-rule": "evenodd" }, g);
+  if (!WATER) return;
+  const s = view.s; let d = "";
+  for (const r of WATER) {
+    const ax = sx_(r.x0), bx = sx_(r.x1), ay = sy_(r.y0), by = sy_(r.y1);
+    if (bx < 0 || ax > W || by < 0 || ay > H || (bx - ax < 1.5 && by - ay < 1.5)) continue;
+    const step = s < 3000 ? Math.max(1, Math.floor(r.pts.length / 40)) : 1;   // thin detail at regional zoom
+    let first = true;
+    for (let i = 0; i < r.pts.length; i += step) { const p = r.pts[i]; d += (first ? "M" : "L") + sx_(p[0]).toFixed(1) + "," + sy_(p[1]).toFixed(1); first = false; }
+    d += "Z";
+  }
+  if (!d) return;
+  el("path", { d, class: "water", "fill-rule": "evenodd" }, svg);
   coastShown = true;
 }
 let coastShown = false;
 function drawAttribution() {
   if (!coastShown) return;
-  el("text", { x: W - 10, y: H - (document.getElementById("timebar").hidden ? 10 : 112), "text-anchor": "end", class: "attrib" }, svg, "Coastline © OpenStreetMap contributors (ODbL)");
+  el("text", { x: W - 10, y: H - (document.getElementById("timebar").hidden ? 10 : 112), "text-anchor": "end", class: "attrib" }, svg, "Water: U.S. Census Bureau TIGER");
 }
 function drawHomes() {
   const s = view.s, mpx = s / M_PER_DEG;          // pixels per metre
@@ -2726,7 +2737,7 @@ function toast(msg) {
 if (innerWidth < 900) document.getElementById("layers").open = false;
 setDay(tDay, true);
 setArea(area, true);
-fetch("charleston-land.json").then(r => r.ok ? r.json() : null).then(j => { if (j) { LAND = j; render(); } }).catch(() => {});
+fetch("charleston-water.json").then(r => r.ok ? r.json() : null).then(j => { if (j) { prepWater(j); render(); } }).catch(() => {});
 fetch("homes.json").then(r => r.ok ? r.json() : Promise.reject(r.status)).then(raw => {
   buildHomes(raw); render();
   if (currentTab === "detect") renderDetect();
