@@ -2142,7 +2142,14 @@ function renderForce() {
 const pointers = new Map();
 const pos = (e) => { const r = svg.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
 let dragStart = null, moved = false, pinch0 = null;
+let lastPtrType = "mouse", downAt = 0, lastTap = null;
 svg.addEventListener("pointerdown", (e) => {
+  // A new primary pointer starts a fresh gesture. Phones can end a touch without
+  // sending pointerup (scrolls, system gestures), and a leftover entry made the next
+  // one-finger pan behave like a pinch and zoom.
+  if (e.isPrimary) { pointers.clear(); pinch0 = null; }
+  if (pointers.size >= 2) return;               // ignore a third finger
+  lastPtrType = e.pointerType; downAt = performance.now();
   try { svg.setPointerCapture(e.pointerId); } catch { /* pointer already gone */ }
   const [px, py] = pos(e);
   pointers.set(e.pointerId, [px, py]);
@@ -2191,6 +2198,13 @@ function endPointer(e) {
   }
   if (pointers.size === 0) {
     svg.classList.remove("dragging");
+    // Touch double-tap to zoom: two quick, stationary taps close together. Any drag cancels it.
+    if (e.type === "pointerup" && e.pointerType === "touch") {
+      const now = performance.now(), [tx, ty] = pos(e);
+      if (wasDrag || now - downAt > 250) lastTap = null;
+      else if (lastTap && now - lastTap.t < 320 && Math.hypot(tx - lastTap.x, ty - lastTap.y) < 25) { lastTap = null; dragStart = null; zoomAt(2, tx, ty); return; }
+      else lastTap = { t: now, x: tx, y: ty };
+    }
     if (!wasDrag && tgt && e.type === "pointerup") {
       const fgEl = tgt.closest && tgt.closest(".force");
       const g = !fgEl && tgt.closest && tgt.closest(".site");
@@ -2206,6 +2220,7 @@ function endPointer(e) {
 }
 svg.addEventListener("pointerup", endPointer);
 svg.addEventListener("pointercancel", endPointer);
+svg.addEventListener("lostpointercapture", (e) => { if (pointers.has(e.pointerId)) endPointer(e); });
 svg.addEventListener("keydown", (e) => {
   const g = e.target.closest && e.target.closest(".site");
   if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); selectSite(g.dataset.id, true); }
@@ -2242,7 +2257,8 @@ svg.addEventListener("wheel", (e) => {
 }, { passive: false });
 // Stop Safari's own page-zoom gestures from fighting the map's pinch.
 for (const ev of ["gesturestart", "gesturechange", "gestureend"]) svg.addEventListener(ev, (e) => e.preventDefault());
-svg.addEventListener("dblclick", (e) => zoomAt(2, ...pos(e)));
+// Mouse only: on touch screens the browser turns tap-then-drag into a dblclick.
+svg.addEventListener("dblclick", (e) => { if (lastPtrType === "mouse") zoomAt(2, ...pos(e)); });
 document.getElementById("zin").onclick = () => zoomAt(1.6);
 document.getElementById("zout").onclick = () => zoomAt(1 / 1.6);
 
