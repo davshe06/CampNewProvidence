@@ -28,7 +28,12 @@ Contents:
 - **Library** tab: original letters (Founders Online, American Revolution
   Institute), Library of Congress maps and fort plans, articles, documentaries and
   podcasts, filtered by area and war.
-- **Time slider** (Revolutionary War, Charlotte area), with ½×, 1× and 2× playback: April 20, 1780 to June 20, 1781, six months either
+- **Army and ship movements** for every area and war, with ½×, 1× and 2× playback and a
+  picker where an area has more than one timeline: the Southern Campaign 1780–81
+  (Charlotte), Sullivan's Island 1776 and the Siege of Charleston 1780, Fort Sumter
+  1860–61 and the harbor war 1862–65 (Charleston), and 1865 in the Carolinas: Sherman,
+  Johnston, Stoneman and Davis's flight (Charlotte). Ships are drawn as boats. The
+  original Charlotte timeline: April 20, 1780 to June 20, 1781, six months either
   side of the camp. Ten forces move along dated waypoints with trails; battles pulse as
   the date passes. Routes between waypoints are straight lines.
 - **Address lookup**: type any North Carolina address to drop a pin and see its distance

@@ -283,9 +283,10 @@ ul.tight li { margin: 3px 0; }
 .search { display: grid; gap: 4px; margin: 8px 0; }
 .search input { font: inherit; padding: 7px 9px; border: 1px solid var(--rule); border-radius: 3px; background: var(--panel); color: var(--ink); width: 100%; }
 /* time slider */
-:root { --fx-gb: #b03a2e; --fx-legion: #2f6b3f; --fx-loyal: #7a4f8a; --fx-over: #7a5a32; --fx-sc: #2b7473; --fx-davie: #5c7d22; --fx-drag: #4659a0; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --fx-gb: #ec7a5e; --fx-legion: #86c497; --fx-loyal: #c79be0; --fx-over: #cfa97a; --fx-sc: #7cc7c7; --fx-davie: #b0d470; --fx-drag: #a9b8ef; } }
-:root[data-theme="dark"] { --fx-gb: #ec7a5e; --fx-legion: #86c497; --fx-loyal: #c79be0; --fx-over: #cfa97a; --fx-sc: #7cc7c7; --fx-davie: #b0d470; --fx-drag: #a9b8ef; }
+:root { --fx-un: #2c4a86; --fx-cs: #6b665c; --fx-navy: #1d5f7c;
+  --fx-gb: #b03a2e; --fx-legion: #2f6b3f; --fx-loyal: #7a4f8a; --fx-over: #7a5a32; --fx-sc: #2b7473; --fx-davie: #5c7d22; --fx-drag: #4659a0; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --fx-un: #9db7ee; --fx-cs: #c9c3b4; --fx-navy: #7cc0dc; --fx-gb: #ec7a5e; --fx-legion: #86c497; --fx-loyal: #c79be0; --fx-over: #cfa97a; --fx-sc: #7cc7c7; --fx-davie: #b0d470; --fx-drag: #a9b8ef; } }
+:root[data-theme="dark"] { --fx-un: #9db7ee; --fx-cs: #c9c3b4; --fx-navy: #7cc0dc; --fx-gb: #ec7a5e; --fx-legion: #86c497; --fx-loyal: #c79be0; --fx-over: #cfa97a; --fx-sc: #7cc7c7; --fx-davie: #b0d470; --fx-drag: #a9b8ef; }
 .timebar {
   position: absolute; z-index: 2; left: max(12px, env(safe-area-inset-left, 0px)); right: 12px; bottom: 12px;
   display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: start;
@@ -294,6 +295,8 @@ ul.tight li { margin: 3px 0; }
 }
 .timebar .btn.sq { margin-top: 2px; }
 .trow { display: flex; gap: 6px 12px; align-items: baseline; flex-wrap: wrap; }
+.tscen { font: inherit; font-size: .78rem; font-weight: 600; padding: 2px 4px; border: 1px solid var(--rule); border-radius: 3px; background: var(--panel); color: var(--ink); max-width: 100%; }
+#map .force .hull { stroke: var(--paper); stroke-width: 1.5; }
 .tdate { font-family: var(--f-display); font-size: 1.15rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
 .tphase { font-size: .7rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
 .tphase.at { color: var(--continental); }
@@ -435,7 +438,7 @@ ul.tight li { margin: 3px 0; }
         <label><input type="checkbox" id="L-modern" checked> <span class="sw" style="background:var(--modern)"></span>Highways, roads &amp; towns</label>
         <label><input type="checkbox" id="L-homes" checked> <span class="sw" style="background:var(--modern);height:8px;width:8px"></span>Homes near the sites</label>
         <label><input type="checkbox" id="L-later"> <span class="sw" style="background:var(--later)"></span>Civil War &amp; later</label>
-        <label><input type="checkbox" id="L-moves" checked> <span class="sw" style="background:var(--fx-gb)"></span>Army movements (slider)</label>
+        <label><input type="checkbox" id="L-moves" checked> <span class="sw" style="background:var(--fx-gb)"></span>Army &amp; ship movements (slider)</label>
         <label><input type="checkbox" id="L-grid" checked> <span class="sw" style="background:var(--ink-soft)"></span>Lat/long graticule</label>
       </details>
     </div>
@@ -457,7 +460,7 @@ ul.tight li { margin: 3px 0; }
         </div>
       </div>
       <div>
-        <div class="trow"><span class="tdate" id="tdate">—</span><span class="tphase" id="tphase"></span></div>
+        <div class="trow"><select class="tscen" id="tscen" aria-label="Which timeline"></select><span class="tdate" id="tdate">—</span><span class="tphase" id="tphase"></span></div>
         <div class="ttrack" id="ttrack">
           <div class="tband" id="tband"></div>
           <input type="range" id="tslider" min="0" max="426" step="1" aria-label="Date, April 1780 to June 1781">
@@ -1239,7 +1242,7 @@ const TIMELINE = [
 
 /* Armies on the move. Waypoints: [iso date, lat, lon, what happened]. Positions between
    waypoints are interpolated in a straight line, so routes are schematic. */
-const FORCES = [
+const CLT_REV_FORCES = [
   { id: "mdde", name: "Maryland & Delaware Continentals", ab: "MD", c: "continental", side: "us",
     desc: "The Continental core of the Southern Army: sent south under de Kalb, broken at Camden, rebuilt at Hillsborough, camped at New Providence, then Greene's main body.",
     wp: [["1780-04-20", 39.60, -75.83, "Embark at Head of Elk, Maryland, under de Kalb to relieve Charleston"],
@@ -1368,12 +1371,166 @@ const FORCES = [
          ["1780-10-04", 35.22, -81.60, "Fall back toward Charlotte"],
          ["1780-10-07", 35.1414, -81.377, "Destroyed at Kings Mountain"]] }
 ];
-const DAY0 = Date.UTC(1780, 3, 20), DAYS = 426;
+/* ======================= TIMELINES (scenarios) =======================
+   Each area and war has one or more timelines. Waypoints: [iso date, lat, lon, note];
+   positions between dated points are straight-line interpolations. ship: true draws a boat. */
+const W_ = (iso, la, lo, n) => [iso, la, lo, n];
+const SCENARIOS = [
+  { id: "clt-rev", area: "charlotte", era: "rev", name: "Southern Campaign 1780–81", start: "1780-04-20", end: "1781-06-20", at: "1780-11-25",
+    band: ["1780-10-20", "1780-12-20", "Camp New Providence occupied"], fit: "campaign", forces: null /* CLT_REV_FORCES */, events: null /* TIMELINE */ },
+  { id: "chs-1776", area: "charleston", era: "rev", name: "Sullivan's Island, 1776", start: "1776-05-31", end: "1776-07-25", at: "1776-06-28",
+    band: ["1776-06-28", "1776-06-29", "Battle of Sullivan's Island"], fit: "harbor",
+    events: [
+      { iso: "1776-06-01", d: "June 1, 1776", t: "British fleet arrives", s: "Sir Peter Parker's squadron and Clinton's transports appear off the Charleston bar." },
+      { iso: "1776-06-08", d: "June 8–9", t: "Clinton lands on Long Island", s: "About 2,000 troops land on today's Isle of Palms to cross Breach Inlet." },
+      { iso: "1776-06-28", d: "June 28", t: "Battle of Sullivan's Island", s: "The fleet bombards the palmetto fort for nine hours and is beaten off; Clinton can't cross the inlet.", site: "c-moultrie76" },
+      { iso: "1776-06-29", d: "June 29", t: "Actaeon burned", s: "The grounded frigate is set on fire by her crew.", site: "c-actaeon" },
+      { iso: "1776-07-21", d: "Late July", t: "The British sail away", s: "The fleet leaves for New York. The South is safe for three years." }],
+    forces: [
+      { id: "parker", name: "Parker's squadron", ab: "RN", c: "fx-gb", side: "gb", ship: true, desc: "Commodore Sir Peter Parker's warships: two 50-gun ships, frigates and a bomb vessel.",
+        wp: [W_("1776-06-01", 32.680, -79.760, "Arrives off the Charleston bar"), W_("1776-06-10", 32.705, -79.800, "Crosses the bar into Five Fathom Hole"),
+             W_("1776-06-27", 32.715, -79.830, "Waits for a fair wind"), W_("1776-06-28", 32.757, -79.866, "Bombards Fort Sullivan for nine hours"),
+             W_("1776-06-30", 32.715, -79.830, "Falls back to repair"), W_("1776-07-21", 32.670, -79.760, "Sails for New York")] },
+      { id: "actaeon", name: "HMS Actaeon", ab: "AC", c: "fx-gb", side: "gb", ship: true, desc: "28-gun frigate that grounded on the Middle Ground.",
+        wp: [W_("1776-06-10", 32.705, -79.800, "With the squadron"), W_("1776-06-27", 32.715, -79.830, "With the squadron"),
+             W_("1776-06-28", 32.756, -79.878, "Runs aground on the Middle Ground"), W_("1776-06-29", 32.756, -79.878, "Burned by her crew")] },
+      { id: "clinton76", name: "Clinton's troops", ab: "HC", c: "fx-gb", side: "gb", desc: "About 2,000 British soldiers under Sir Henry Clinton.",
+        wp: [W_("1776-06-08", 32.790, -79.765, "Land on Long Island (Isle of Palms)"), W_("1776-06-28", 32.781, -79.803, "Try to cross Breach Inlet and fail"),
+             W_("1776-07-15", 32.790, -79.765, "Re-embark")] },
+      { id: "moultrie", name: "Moultrie's garrison", ab: "2SC", c: "continental", side: "us", desc: "About 400 men of the 2nd South Carolina under Col. William Moultrie.",
+        wp: [W_("1776-06-01", 32.7597, -79.8574, "Finishing the palmetto-log fort"), W_("1776-07-25", 32.7597, -79.8574, "Hold the fort")] },
+      { id: "thomson", name: "Thomson's riflemen", ab: "TR", c: "militia", side: "nc", desc: "Col. William Thomson's South Carolina rangers and riflemen.",
+        wp: [W_("1776-06-12", 32.7788, -79.8130, "Dig in at Breach Inlet"), W_("1776-07-15", 32.7788, -79.8130, "Hold the inlet")] }] },
+  { id: "chs-1780", area: "charleston", era: "rev", name: "Siege of Charleston, 1780", start: "1780-02-01", end: "1780-05-20", at: "1780-04-08",
+    band: ["1780-04-01", "1780-05-12", "Under siege"], fit: "lowcountry",
+    events: [
+      { iso: "1780-02-11", d: "Feb 11, 1780", t: "Clinton lands", s: "About 8,500 British troops land on Simmons (Seabrook) Island." },
+      { iso: "1780-03-29", d: "Mar 29", t: "The Ashley crossed", s: "The British cross above the city and close in on Charleston Neck." },
+      { iso: "1780-04-01", d: "Apr 1", t: "Siege lines opened", s: "The first parallel is dug across the Neck.", site: "c-siegelines" },
+      { iso: "1780-04-08", d: "Apr 8", t: "Fleet runs past Fort Moultrie", s: "Arbuthnot's ships enter the harbor under fire.", site: "c-moultrie76" },
+      { iso: "1780-04-14", d: "Apr 14", t: "Monck's Corner", s: "Tarleton routs Huger's cavalry and closes the last road out.", site: "c-monckscorner" },
+      { iso: "1780-05-06", d: "May 6", t: "Lenud's Ferry", s: "Tarleton scatters the remaining American cavalry on the Santee." },
+      { iso: "1780-05-12", d: "May 12", t: "Charleston surrenders", s: "Lincoln gives up the city and about 5,000 men.", site: "c-hornwork" }],
+    forces: [
+      { id: "clinton80", name: "Clinton's army", ab: "HC", c: "fx-gb", side: "gb", desc: "About 8,500 British, Hessian and Loyalist troops, later reinforced to over 10,000.",
+        wp: [W_("1780-02-11", 32.590, -80.175, "Land on Simmons (Seabrook) Island"), W_("1780-02-28", 32.700, -80.030, "Work across to James Island"),
+             W_("1780-03-29", 32.845, -80.040, "Cross the Ashley above the city"), W_("1780-04-01", 32.805, -79.945, "Open the first siege parallel"),
+             W_("1780-05-12", 32.790, -79.936, "Charleston surrenders")] },
+      { id: "arbuthnot", name: "Arbuthnot's fleet", ab: "RN", c: "fx-gb", side: "gb", ship: true, desc: "Vice Admiral Marriot Arbuthnot's warships and transports.",
+        wp: [W_("1780-02-11", 32.580, -80.120, "Off the North Edisto"), W_("1780-03-20", 32.700, -79.800, "Crosses the Charleston bar"),
+             W_("1780-04-08", 32.762, -79.880, "Runs past Fort Moultrie into the harbor"), W_("1780-05-12", 32.770, -79.905, "In the harbor at the surrender")] },
+      { id: "whipple", name: "Whipple's Continental squadron", ab: "CN", c: "fx-navy", side: "us", ship: true, desc: "Commodore Abraham Whipple's frigates of the Continental Navy.",
+        wp: [W_("1780-02-01", 32.745, -79.880, "Guards the harbor entrance"), W_("1780-03-25", 32.785, -79.915, "Pulls back; some ships scuttled to block the Cooper River"),
+             W_("1780-05-12", 32.790, -79.920, "Captured with the city")] },
+      { id: "lincoln", name: "Lincoln's garrison", ab: "BL", c: "continental", side: "us", desc: "About 5,000 Continentals and militia under Gen. Benjamin Lincoln.",
+        wp: [W_("1780-02-01", 32.7865, -79.9340, "Defending the city's lines"), W_("1780-05-12", 32.7865, -79.9340, "Surrenders")] },
+      { id: "tarleton80", name: "Tarleton's British Legion", ab: "BL", c: "fx-legion", side: "gb", desc: "British Legion cavalry under Banastre Tarleton.",
+        wp: [W_("1780-03-29", 32.845, -80.040, "Cross the Ashley with the army"), W_("1780-04-14", 33.195, -80.013, "Monck's Corner: surprise Huger's cavalry"),
+             W_("1780-05-06", 33.330, -79.670, "Lenud's Ferry: rout the last American horse"), W_("1780-05-14", 33.000, -79.960, "Back toward the city")] },
+      { id: "huger", name: "Huger's cavalry", ab: "IH", c: "fx-drag", side: "us", desc: "Gen. Isaac Huger's horsemen, keeping the road north open.",
+        wp: [W_("1780-04-01", 33.190, -80.010, "Holding Monck's Corner"), W_("1780-04-14", 33.195, -80.013, "Routed by Tarleton")] }] },
+  { id: "chs-1861", area: "charleston", era: "cw", name: "Fort Sumter, 1860–61", start: "1860-12-20", end: "1861-04-16", at: "1861-04-12",
+    band: ["1861-04-12", "1861-04-13", "Bombardment"], fit: "harbor",
+    events: [
+      { iso: "1860-12-20", d: "Dec 20, 1860", t: "Secession", s: "South Carolina leaves the Union.", site: "c-secession" },
+      { iso: "1860-12-26", d: "Dec 26", t: "Anderson moves to Sumter", s: "The Union garrison slips across from Fort Moultrie at night.", site: "c-sumter" },
+      { iso: "1861-01-09", d: "Jan 9, 1861", t: "Star of the West", s: "Cadets on Morris Island fire on the supply ship; it turns back.", site: "c-citadel" },
+      { iso: "1861-04-12", d: "Apr 12", t: "Bombardment begins", s: "A signal shell from Fort Johnson at 4:30 a.m.", site: "c-ftjohnson" },
+      { iso: "1861-04-13", d: "Apr 13", t: "Anderson surrenders", s: "After 34 hours, without a combat death.", site: "c-sumter" },
+      { iso: "1861-04-14", d: "Apr 14", t: "Evacuation", s: "The garrison sails north on the relief fleet." }],
+    forces: [
+      { id: "anderson", name: "Anderson's garrison", ab: "RA", c: "fx-un", side: "un", desc: "About 85 officers and men of the 1st U.S. Artillery under Maj. Robert Anderson.",
+        wp: [W_("1860-12-20", 32.7597, -79.8574, "At Fort Moultrie"), W_("1860-12-25", 32.7597, -79.8574, "At Fort Moultrie"),
+             W_("1860-12-26", 32.7523, -79.8747, "Move to Fort Sumter at night"), W_("1861-04-14", 32.7523, -79.8747, "Surrender and evacuate"),
+             W_("1861-04-15", 32.680, -79.770, "Sail north on the relief fleet")] },
+      { id: "starwest", name: "Star of the West", ab: "SW", c: "fx-un", side: "un", ship: true, desc: "Chartered steamer carrying troops and supplies to Fort Sumter.",
+        wp: [W_("1861-01-08", 32.665, -79.770, "Arrives off the bar"), W_("1861-01-09", 32.712, -79.858, "Fired on from Morris Island; turns back"),
+             W_("1861-01-11", 32.600, -79.650, "Heads back to New York")] },
+      { id: "fox", name: "Relief fleet", ab: "GF", c: "fx-navy", side: "un", ship: true, desc: "Gustavus Fox's expedition: USS Pawnee, Harriet Lane and the steamer Baltic.",
+        wp: [W_("1861-04-11", 32.640, -79.730, "Arrives off the bar"), W_("1861-04-14", 32.660, -79.760, "Watches the bombardment; takes the garrison aboard"),
+             W_("1861-04-16", 32.600, -79.650, "Sails north")] },
+      { id: "beauregard", name: "Beauregard's batteries", ab: "CS", c: "fx-cs", side: "cs", desc: "Confederate guns on James, Morris and Sullivan's islands under Gen. P. G. T. Beauregard.",
+        wp: [W_("1861-03-03", 32.7517, -79.8985, "Beauregard takes command"), W_("1861-04-16", 32.7517, -79.8985, "Fort Johnson and the ring of batteries")] }] },
+  { id: "chs-cw", area: "charleston", era: "cw", name: "The harbor war, 1862–65", start: "1862-05-01", end: "1865-02-28", at: "1864-02-17",
+    fit: "harbor",
+    events: [
+      { iso: "1862-05-13", d: "May 13, 1862", t: "The Planter", s: "Robert Smalls sails sixteen people to freedom.", site: "c-planter" },
+      { iso: "1862-06-16", d: "June 16, 1862", t: "Secessionville", s: "The Union attack on James Island fails.", site: "c-secessionville" },
+      { iso: "1863-04-07", d: "Apr 7, 1863", t: "Ironclad attack", s: "Du Pont's monitors are beaten off; the Keokuk sinks the next day.", site: "c-keokuk" },
+      { iso: "1863-07-16", d: "July 16, 1863", t: "Grimball's Landing", s: "The 54th Massachusetts in its first fight.", site: "c-grimball" },
+      { iso: "1863-07-18", d: "July 18, 1863", t: "Fort Wagner", s: "The 54th's assault.", site: "c-wagner" },
+      { iso: "1863-08-22", d: "Aug 22, 1863", t: "The Swamp Angel", s: "Union shells reach the city.", site: "c-swampangel" },
+      { iso: "1863-09-07", d: "Sept 7, 1863", t: "Wagner abandoned", s: "The Confederates leave Morris Island.", site: "c-wagner" },
+      { iso: "1863-12-06", d: "Dec 6, 1863", t: "Weehawken sinks", s: "A monitor founders at anchor.", site: "c-weehawken" },
+      { iso: "1864-02-17", d: "Feb 17, 1864", t: "Hunley sinks Housatonic", s: "The first submarine to sink a warship, lost with all hands.", site: "c-hunley" },
+      { iso: "1865-01-15", d: "Jan 15, 1865", t: "Patapsco sunk", s: "A monitor strikes a torpedo near Fort Sumter.", site: "c-patapsco" },
+      { iso: "1865-02-18", d: "Feb 18, 1865", t: "Charleston evacuated", s: "Union troops, including Black regiments, march in.", site: "c-battery" }],
+    forces: [
+      { id: "planter", name: "The Planter", ab: "RS", c: "fx-un", side: "un", ship: true, desc: "Confederate dispatch steamer taken to the Union fleet by Robert Smalls.",
+        wp: [W_("1862-05-12", 32.7745, -79.9245, "At Southern Wharf"), W_("1862-05-13", 32.700, -79.790, "Reaches the Union blockade"), W_("1862-05-20", 32.700, -79.790, "Now a Union vessel")] },
+      { id: "jamesisland", name: "Union troops on James Island", ab: "US", c: "fx-un", side: "un", desc: "Gen. Henry Benham's force, about 6,500 men.",
+        wp: [W_("1862-06-02", 32.700, -79.975, "Land on James Island"), W_("1862-06-16", 32.712, -79.942, "Assault at Secessionville fails"),
+             W_("1862-07-07", 32.700, -79.975, "Withdraw from James Island")] },
+      { id: "dupont", name: "Union ironclads", ab: "SD", c: "fx-navy", side: "un", ship: true, desc: "Monitors of the South Atlantic Blockading Squadron.",
+        wp: [W_("1863-04-05", 32.680, -79.820, "Gather off the bar"), W_("1863-04-07", 32.745, -79.866, "Attack Fort Sumter"),
+             W_("1863-04-09", 32.700, -79.840, "Withdraw; the Keokuk sinks"), W_("1863-07-18", 32.712, -79.870, "Shell Fort Wagner"),
+             W_("1863-12-06", 32.714, -79.868, "Weehawken founders at anchor"), W_("1865-01-15", 32.748, -79.865, "Patapsco mined near Sumter"),
+             W_("1865-02-18", 32.765, -79.900, "Enter the harbor")] },
+      { id: "54th", name: "54th Massachusetts", ab: "54", c: "fx-un", side: "un", desc: "One of the first Black regiments raised in the North, under Col. Robert Gould Shaw.",
+        wp: [W_("1863-07-08", 32.660, -79.945, "Arrive on Folly Island"), W_("1863-07-16", 32.728, -79.965, "Grimball's Landing, James Island"),
+             W_("1863-07-18", 32.708, -79.884, "Assault on Fort Wagner"), W_("1863-12-31", 32.700, -79.888, "Siege duty on Morris Island")] },
+      { id: "gillmore", name: "Gillmore's siege force", ab: "QG", c: "fx-un", side: "un", desc: "Gen. Quincy Gillmore's troops and siege guns on Morris Island.",
+        wp: [W_("1863-07-10", 32.690, -79.890, "Land on the south end of Morris Island"), W_("1863-08-22", 32.720, -79.905, "Swamp Angel fires on the city"),
+             W_("1863-09-07", 32.727, -79.882, "Take Batteries Wagner and Gregg"), W_("1865-02-17", 32.727, -79.882, "Hold Morris Island"),
+             W_("1865-02-18", 32.770, -79.930, "Enter Charleston")] },
+      { id: "hunley", name: "H. L. Hunley", ab: "HL", c: "fx-cs", side: "cs", ship: true, desc: "Hand-cranked submarine with a crew of eight under Lt. George Dixon.",
+        wp: [W_("1864-02-16", 32.7775, -79.8115, "At Battery Marshall, Breach Inlet"), W_("1864-02-17", 32.721, -79.774, "Sinks the Housatonic; lost with all hands")] },
+      { id: "housatonic", name: "USS Housatonic", ab: "HS", c: "fx-navy", side: "un", ship: true, desc: "Blockading sloop-of-war.",
+        wp: [W_("1863-09-01", 32.725, -79.770, "On blockade off Sullivan's Island"), W_("1864-02-17", 32.725, -79.770, "Sunk by the Hunley")] },
+      { id: "csgarrison", name: "Confederate garrison", ab: "CS", c: "fx-cs", side: "cs", desc: "The city's defenders under Beauregard and later Hardee.",
+        wp: [W_("1862-05-01", 32.7700, -79.9305, "Holding the city and harbor forts"), W_("1865-02-17", 32.7700, -79.9305, "Holding the city"),
+             W_("1865-02-18", 32.900, -79.990, "Evacuate Charleston")] }] },
+  { id: "clt-cw", area: "charlotte", era: "cw", name: "1865: the end in the Carolinas", start: "1865-02-01", end: "1865-05-12", at: "1865-04-19",
+    band: ["1865-04-18", "1865-04-26", "Davis in Charlotte"], fit: "campaign",
+    events: [
+      { iso: "1865-02-17", d: "Feb 17, 1865", t: "Columbia burns", s: "Sherman's armies take South Carolina's capital." },
+      { iso: "1865-03-03", d: "Mar 3", t: "Cheraw", s: "Sherman crosses into the Pee Dee country." },
+      { iso: "1865-03-11", d: "Mar 11", t: "Fayetteville", s: "The arsenal is destroyed." },
+      { iso: "1865-03-19", d: "Mar 19–21", t: "Bentonville", s: "Johnston's last attack fails." },
+      { iso: "1865-04-02", d: "Apr 2", t: "Richmond falls", s: "Davis and his cabinet flee by train." },
+      { iso: "1865-04-09", d: "Apr 9", t: "Appomattox", s: "Lee surrenders in Virginia." },
+      { iso: "1865-04-12", d: "Apr 12", t: "Salisbury captured", s: "Stoneman's cavalry burns the prison.", site: "salisbury" },
+      { iso: "1865-04-19", d: "Apr 19", t: "News of Lincoln's death", s: "Davis hears it in Charlotte.", site: "bates" },
+      { iso: "1865-04-26", d: "Apr 26", t: "Bennett Place; Davis leaves Charlotte", s: "Johnston surrenders near Durham; the cabinet moves south.", site: "phifer" },
+      { iso: "1865-05-10", d: "May 10", t: "Davis captured", s: "Union cavalry catch him near Irwinville, Georgia." }],
+    forces: [
+      { id: "sherman", name: "Sherman's armies", ab: "WS", c: "fx-un", side: "un", desc: "About 60,000 men under Gen. William T. Sherman.",
+        wp: [W_("1865-02-01", 32.650, -80.950, "March north from the coast"), W_("1865-02-17", 34.0007, -81.0348, "Columbia"),
+             W_("1865-03-03", 34.6976, -79.8834, "Cheraw"), W_("1865-03-11", 35.0527, -78.8784, "Fayetteville"),
+             W_("1865-03-19", 35.310, -78.320, "Bentonville"), W_("1865-03-23", 35.3849, -77.9928, "Goldsboro"),
+             W_("1865-04-13", 35.7796, -78.6382, "Raleigh"), W_("1865-04-26", 35.9993, -78.8975, "Bennett Place: Johnston surrenders")] },
+      { id: "johnston", name: "Johnston's army", ab: "JJ", c: "fx-cs", side: "cs", desc: "Gen. Joseph E. Johnston's Army of Tennessee and gathered garrisons.",
+        wp: [W_("1865-02-25", 35.2265, -80.8433, "Johnston takes command near Charlotte"), W_("1865-03-15", 35.050, -78.800, "Gather to strike Sherman"),
+             W_("1865-03-19", 35.310, -78.320, "Bentonville"), W_("1865-04-13", 35.850, -79.000, "Fall back west of Raleigh"),
+             W_("1865-04-26", 35.9993, -78.8975, "Surrender at Bennett Place")] },
+      { id: "stoneman", name: "Stoneman's cavalry", ab: "GS", c: "fx-drag", side: "un", desc: "About 6,000 Union cavalry under Gen. George Stoneman.",
+        wp: [W_("1865-03-20", 36.290, -82.470, "Leave east Tennessee"), W_("1865-03-28", 36.2168, -81.6746, "Boone"),
+             W_("1865-04-04", 36.730, -80.700, "Raid southwest Virginia"), W_("1865-04-10", 36.100, -80.250, "Through Salem (Winston)"),
+             W_("1865-04-12", 35.6676, -80.4746, "Capture Salisbury; burn the prison"), W_("1865-04-17", 35.745, -81.685, "Morganton"),
+             W_("1865-04-26", 35.5951, -82.5515, "Asheville")] },
+      { id: "davis", name: "Davis and the cabinet", ab: "JD", c: "fx-cs", side: "cs", desc: "Jefferson Davis, his cabinet and the Confederate treasury, fleeing south.",
+        wp: [W_("1865-04-02", 37.5407, -77.4360, "Leave Richmond by train"), W_("1865-04-03", 36.5860, -79.3950, "Danville"),
+             W_("1865-04-11", 36.0726, -79.7920, "Greensboro"), W_("1865-04-18", 35.2265, -80.8433, "Reach Charlotte"),
+             W_("1865-04-26", 35.2265, -80.8433, "Leave Charlotte"), W_("1865-04-27", 35.0070, -80.9440, "Fort Mill: Trenholm resigns"),
+             W_("1865-05-02", 34.1782, -82.3790, "Abbeville: last council of war"), W_("1865-05-04", 33.7376, -82.7390, "Washington, Georgia: the government dissolves"),
+             W_("1865-05-10", 31.650, -83.380, "Captured near Irwinville, Georgia")] }] }
+];
+let SCEN = null, FORCES = [], DAY0 = Date.UTC(1780, 3, 20), DAYS = 426;
 const dayOf = (iso) => (Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)) - DAY0) / 864e5;
 const isoOf = (d) => new Date(DAY0 + Math.round(d) * 864e5);
+const utc = (iso) => Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10));
 const fmtDay = (d) => isoOf(d).toLocaleDateString("en-US", { timeZone: "UTC", day: "numeric", month: "short", year: "numeric" });
-for (const f of FORCES) f.days = f.wp.map(w => dayOf(w[0]));
-let tDay = dayOf("1780-11-25");
+let tDay = 219;
 let selForce = null;
 function forceAt(f, t) {
   const D = f.days;
@@ -1760,7 +1917,7 @@ function render() {
     const g = el("g", { class: "site" + (st.id === selected ? " sel" : ""), transform: `translate(${x.toFixed(1)},${y.toFixed(1)})`, tabindex: 0, role: "button", "aria-label": st.name }, gs);
     g.dataset.id = st.id;
     if (st.id === selected) el("circle", { r: 14, class: "sel-ring" }, g);
-    if (layers.moves && st.date && Math.abs(dayOf(st.date) - tDay) <= 4) el("circle", { r: 13, class: "evt" }, g);
+    if (layers.moves && st.date && Math.abs(dayOf(st.date) - tDay) <= Math.max(2, DAYS / 100)) el("circle", { r: 13, class: "evt" }, g);
     marker(g, sty.shape, sty.c, st.type === "camp" ? 9 : 7);
     labelQueue.push({ g, x, y, st });
   }
@@ -2118,13 +2275,14 @@ function setEra(e, quiet) {
   const key = area === "charleston" ? "chs-" + e : e;
   document.getElementById("subtitle").textContent = ERA[key].sub;
   document.getElementById("notice").innerHTML = ERA[key].note;
-  Object.assign(layers, rev ? { sites: true, later: false, camp: area === "charlotte", moves: area === "charlotte" } : { sites: false, later: true, camp: false, moves: false });
+  Object.assign(layers, rev ? { sites: true, later: false, camp: area === "charlotte", moves: true } : { sites: false, later: true, camp: false, moves: true });
   for (const k of ["sites", "later", "camp", "moves", "zones"]) {
     if (k === "zones") { document.getElementById("L-zones").checked = layers.zones; document.getElementById("L-zones").closest("label").hidden = false; continue; }
     const b = document.getElementById("L-" + k); b.checked = layers[k];
-    b.closest("label").hidden = rev ? (k === "later" || (area === "charleston" && (k === "camp" || k === "moves"))) : !["later", "zones"].includes(k);
+    b.closest("label").hidden = rev ? (k === "later" || (area === "charleston" && k === "camp")) : !["later", "zones", "moves"].includes(k);
   }
-  document.getElementById("timebar").hidden = !layers.moves; stopPlay();
+  document.getElementById("timebar").hidden = !layers.moves; stopPlay(); playFitted = false;
+  setScenario((scenarioFor(area, e) || SCENARIOS[0]).id);
   const clt = area === "charlotte";
   document.getElementById("v-campaign").hidden = !(rev && clt); document.getElementById("v-camp").hidden = !(rev && clt);
   document.getElementById("v-charlotte").hidden = !clt;
@@ -2162,8 +2320,12 @@ function drawForces(boxes, free) {
   for (const m of marks) {
     const fg = el("g", { class: "force", transform: `translate(${m.x.toFixed(1)},${m.y.toFixed(1)})`, tabindex: 0, role: "button", "aria-label": m.f.name }, g);
     fg.dataset.id = m.f.id;
-    el("circle", { r: 9, fill: cssVar(m.f.c) }, fg);
-    el("text", { class: "ab", "text-anchor": "middle", y: 3 }, fg, m.f.ab);
+    if (m.f.ship) {
+      el("path", { d: "M-12,1 L12,1 L8,8 L-8,8 Z M-1,1 V-12 L9,-1 Z M-3,1 V-9 L-10,-1 Z", class: "hull", fill: cssVar(m.f.c) }, fg);
+    } else {
+      el("circle", { r: 9, fill: cssVar(m.f.c) }, fg);
+      el("text", { class: "ab", "text-anchor": "middle", y: 3 }, fg, m.f.ab);
+    }
     if (selForce === m.f.id) el("circle", { r: 13, class: "sel-ring" }, fg);
     const w = m.f.name.length * 6.1 + 4, b = { x: m.x + 11, y: m.y - 8, w, h: 15 };
     if (free(b)) { boxes.push(b); el("text", { x: 12, y: 4, class: "force-label", style: `fill:${cssVar(m.f.c)}` }, fg, m.f.name); }
@@ -2172,31 +2334,64 @@ function drawForces(boxes, free) {
 
 /* ---------- time slider ---------- */
 const tslider = document.getElementById("tslider");
-tslider.max = DAYS;
 const pct = (d) => (100 * d / DAYS).toFixed(2) + "%";
-document.getElementById("tband").style.cssText = `left:${pct(dayOf("1780-10-20"))};width:${pct(dayOf("1780-12-20") - dayOf("1780-10-20"))}`;
+const tscen = document.getElementById("tscen");
 const ttrack = document.getElementById("ttrack");
-document.getElementById("tlabels").innerHTML = [["1780-04-20", "Apr 1780", "translateX(0)"], ["1780-07-01", "Jul"], ["1780-10-01", "Oct"], ["1781-01-01", "Jan 1781"], ["1781-04-01", "Apr"], ["1781-06-20", "Jun 1781", "translateX(-100%)"]]
-  .map(([d, l, tf]) => `<span style="left:${pct(dayOf(d))}${tf ? ";transform:" + tf : ""}">${l}</span>`).join("");
-for (const t of TIMELINE) if (t.iso && SITES.some(s => s.id === t.site && s.type === "battle")) {
-  const tk = document.createElement("div"); tk.className = "ttick"; tk.style.left = pct(dayOf(t.iso)); tk.title = t.d + ": " + t.t; ttrack.appendChild(tk);
+const monthsBetween = (a, b) => (b.getUTCFullYear() - a.getUTCFullYear()) * 12 + b.getUTCMonth() - a.getUTCMonth();
+function setScenario(id, keepDay) {
+  const sc = SCENARIOS.find(x => x.id === id) || SCENARIOS[0];
+  SCEN = sc;
+  FORCES = sc.forces || CLT_REV_FORCES;
+  sc.evs = sc.events || TIMELINE.filter(t => t.iso);
+  DAY0 = utc(sc.start); DAYS = Math.round((utc(sc.end) - DAY0) / 864e5);
+  for (const f of FORCES) f.days = f.wp.map(w => dayOf(w[0]));
+  tslider.max = DAYS;
+  const band = document.getElementById("tband");
+  if (sc.band) { band.hidden = false; band.style.cssText = `left:${pct(dayOf(sc.band[0]))};width:${pct(Math.max(1, dayOf(sc.band[1]) - dayOf(sc.band[0])))}`; } else band.hidden = true;
+  ttrack.querySelectorAll(".ttick").forEach(t => t.remove());
+  for (const t of sc.evs) {
+    if (sc.id === "clt-rev" && !SITES.some(x => x.id === t.site && x.type === "battle")) continue;
+    const tk = document.createElement("div"); tk.className = "ttick"; tk.style.left = pct(dayOf(t.iso)); tk.title = t.d + ": " + t.t; ttrack.appendChild(tk);
+  }
+  // month labels spaced to scale
+  const a0 = new Date(DAY0), a1 = new Date(DAY0 + DAYS * 864e5), n = monthsBetween(a0, a1), stepM = n <= 3 ? 1 : n <= 8 ? 2 : n <= 18 ? 3 : 6;
+  const lab = [];
+  for (let m = 0; m <= n; m += stepM) {
+    const d = new Date(Date.UTC(a0.getUTCFullYear(), a0.getUTCMonth() + m, 1)), dd = (d - DAY0) / 864e5;
+    if (dd < 0 || dd > DAYS) continue;
+    const txt = d.toLocaleDateString("en-US", { timeZone: "UTC", month: "short" }) + (d.getUTCMonth() === 0 || !lab.length ? " " + d.getUTCFullYear() : "");
+    lab.push(`<span style="left:${pct(dd)};transform:translateX(${dd < DAYS * .05 ? "0" : dd > DAYS * .95 ? "-100%" : "-50%"})">${txt}</span>`);
+  }
+  document.getElementById("tlabels").innerHTML = lab.join("");
+  // timeline picker for this area and war
+  const opts = SCENARIOS.filter(x => x.area === area && x.era === era);
+  tscen.innerHTML = opts.map(x => `<option value="${x.id}"${x.id === sc.id ? " selected" : ""}>${esc(x.name)}</option>`).join("");
+  tscen.hidden = opts.length < 2;
+  if (!tscen.hidden) tscen.title = "Choose a timeline";
+  selForce = null;
+  setDay(keepDay ? tDay : dayOf(sc.at), true);
 }
+tscen.addEventListener("change", () => { stopPlay(); setScenario(tscen.value); render(); });
+function scenarioFor(a, e) { return SCENARIOS.find(x => x.area === a && x.era === e); }
 function setDay(d, quiet) {
   tDay = Math.max(0, Math.min(DAYS, d));
   tslider.value = Math.round(tDay);
   document.getElementById("tdate").textContent = fmtDay(tDay);
   const ph = document.getElementById("tphase");
-  const a = dayOf("1780-10-20"), b = dayOf("1780-12-20");
-  ph.textContent = tDay < a ? `${Math.ceil(a - tDay)} days before the camp` : tDay <= b ? "Camp New Providence occupied" : `${Math.floor(tDay - b)} days after the camp`;
-  ph.classList.toggle("at", tDay >= a && tDay <= b);
+  if (SCEN && SCEN.band) {
+    const a = dayOf(SCEN.band[0]), b = dayOf(SCEN.band[1]);
+    ph.textContent = SCEN.id === "clt-rev" ? (tDay < a ? `${Math.ceil(a - tDay)} days before the camp` : tDay <= b ? SCEN.band[2] : `${Math.floor(tDay - b)} days after the camp`) : (tDay >= a && tDay <= b ? SCEN.band[2] : "");
+    ph.classList.toggle("at", tDay >= a && tDay <= b);
+  } else { ph.textContent = ""; ph.classList.remove("at"); }
   let ev = null;
-  for (const t of TIMELINE) if (t.iso && dayOf(t.iso) <= tDay + 0.5 && tDay - dayOf(t.iso) <= 12) ev = t;
+  const win = Math.max(12, DAYS / 40);
+  for (const t of (SCEN ? SCEN.evs : [])) if (dayOf(t.iso) <= tDay + 0.5 && tDay - dayOf(t.iso) <= win) ev = t;
   document.getElementById("tcap").innerHTML = ev ? `<b>${esc(ev.d)}: ${esc(ev.t)}.</b> ${esc(ev.s)}` : "";
   if (!quiet) requestRender();
   if (selForce && currentTab === "site") renderForce();
 }
 tslider.addEventListener("input", () => { stopPlay(); setDay(+tslider.value); });
-let playT = 0, playSpeed = 1;
+let playT = 0, playSpeed = 1, playFitted = false;
 document.querySelectorAll(".speed .btn").forEach(b => b.addEventListener("click", () => {
   playSpeed = +b.dataset.speed;
   document.querySelectorAll(".speed .btn").forEach(x => x.setAttribute("aria-pressed", x === b));
@@ -2208,9 +2403,10 @@ playBtn.addEventListener("click", () => {
   if (playT) return stopPlay();
   if (tDay >= DAYS) setDay(0);
   if (!layers.moves) { layers.moves = true; document.getElementById("L-moves").checked = true; }
-  if (view.s > 3000) setPreset("campaign");
+  if (SCEN && SCEN.fit && !playFitted) { playFitted = true; setPreset(SCEN.fit); }
   playBtn.textContent = "❚❚"; playBtn.setAttribute("aria-label", "Pause");
-  playT = setInterval(() => { if (tDay >= DAYS) return stopPlay(); setDay(tDay + 1); }, (reduceMotion ? 160 : 70) / playSpeed);
+  const stepDays = Math.max(1, Math.round(DAYS / 430));   // longer timelines advance several days per tick
+  playT = setInterval(() => { if (tDay >= DAYS) return stopPlay(); setDay(tDay + stepDays); }, (reduceMotion ? 160 : 70) / playSpeed);
 });
 function goToDay(iso, siteId) {
   stopPlay();
