@@ -1,7 +1,8 @@
 # Carolina War History Interactive Map
 
-An interactive map of Revolutionary War and Civil War history across North and
-South Carolina. The header switches between three areas:
+An interactive map of Revolutionary War and Civil War history across seven
+Southern states: Virginia, West Virginia, North Carolina, South Carolina,
+Tennessee, Georgia and Florida. The header switches between three areas:
 
 - **Charlotte area**, centred on Camp New Providence, the Southern Continental
   Army's encampment on Six Mile Creek (Providence Road / NC 16, at the
@@ -10,7 +11,15 @@ South Carolina. The header switches between three areas:
 - **Charleston area**: Sullivan's Island 1776, the sieges of 1779–80 and the
   occupation; Fort Sumter, Secessionville, Fort Wagner, the Planter, the Hunley,
   and the shipwrecks of the blockade.
-- **Carolinas**: both whole states. About 50 more sites, from the Regulators at
+- **All states**: all seven states, with a **state filter** at the top of the
+  panel (All, or one state) that narrows the Story, People, Detecting, Visit and
+  Library tabs and flies the map to that state. About 110 sites were added for
+  Virginia (Great Bridge to Yorktown; Manassas to Appomattox), West Virginia (Point
+  Pleasant, Wheeling, Harpers Ferry, Philippi to Droop Mountain), Tennessee (the
+  Cherokee frontier; Fort Donelson, Shiloh, Stones River, Chattanooga, Franklin,
+  Nashville), Georgia (Savannah, Kettle Creek, Augusta; Chickamauga, Atlanta,
+  Andersonville, the March to the Sea) and Florida (East Florida, Pensacola 1781;
+  Fort Pickens, Olustee, Natural Bridge). The Carolinas: About 50 more sites, from the Regulators at
   Alamance (1771) and Moores Creek (1776) through Marion's partisan war and Eutaw
   Springs, to Hatteras, Roanoke Island, New Bern, Plymouth and the CSS Albemarle,
   Port Royal and the Combahee River raid, Fort Fisher, Sherman's march, Bentonville
@@ -48,6 +57,21 @@ Contents:
   zoom it switches to the timeline with the most going on in view. Selecting a site
   jumps to its timeline and date. The drop-down lists every timeline of the war; one
   picked by hand stays until you move out of its region.
+- **Battle results**: when the slider reaches a battle, a popup on the map shows the
+  winner's flag and colour and a short result. Paused, it shows the battles on that date.
+- **Territory held** (layer): a shaded overlay of who controlled the ground on the
+  slider's date, from who governed each state, dated garrisons and occupations, and the
+  armies on the map. Blue is American (with French and Spanish allies) in the
+  Revolution and the Union in the Civil War; red is British, Loyalist and allied
+  Native nations, and the Confederacy. It is approximate by design. Army markers and
+  trails use the same blue and red.
+- **Full screen**: the corner button fills the screen with the map (a fixed overlay on
+  phones that have no Fullscreen API).
+- **New timelines**: Virginia 1775–76 (Dunmore), Georgia and East Florida 1777–79,
+  Virginia 1781 (Yorktown), the frontier 1774–82, Gálvez on the Gulf Coast 1779–81;
+  Virginia 1861–62, 1862–63 and 1864–65, Western Virginia 1861–63, Tennessee 1862,
+  Chickamauga–Chattanooga–Knoxville 1863, Atlanta and the March to the Sea 1864, and
+  Florida 1861–65.
 - **The whole war**: the first entry in the timeline drop-down plays every army, fleet
   and event of the war on one slider (1775–82 or 1860–65), with year labels. An army
   that appears in several campaign timelines (Greene, Cornwallis, Lee, Sumter, Clinton,
