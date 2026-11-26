@@ -483,8 +483,10 @@ dl.nums dt { font-weight: 700; } dl.nums dd { margin: 0; }
     </select>
   </label>
   <div class="seg era" role="group" aria-label="Which war">
-    <button class="btn" id="era-rev" aria-pressed="true"><span class="long">Revolutionary War</span><span class="short">Revolution</span></button>
-    <button class="btn" id="era-cw" aria-pressed="false">Civil War</button>
+    <button class="btn" id="era-fiw" aria-pressed="false" title="French and Indian War, 1754–63"><span class="long">French &amp; Indian War</span><span class="short">1754</span></button>
+    <button class="btn" id="era-rev" aria-pressed="true" title="Revolutionary War, 1775–83"><span class="long">Revolutionary War</span><span class="short">1776</span></button>
+    <button class="btn" id="era-w12" aria-pressed="false" title="War of 1812, 1812–15"><span class="long">War of 1812</span><span class="short">1812</span></button>
+    <button class="btn" id="era-cw" aria-pressed="false" title="Civil War, 1861–65"><span class="long">Civil War</span><span class="short">1861</span></button>
   </div>
   </div>
   <p class="notice" id="notice"><b>A Revolutionary War camp, not a Civil War one.</b> The state marker and NC Archives date it to the fall of 1780; some online listings label it Civil War in error. Charlotte's Civil War sites are on the map as a separate layer.</p>
@@ -505,7 +507,7 @@ dl.nums dt { font-weight: 700; } dl.nums dd { margin: 0; }
         <summary>Layers</summary>
         <label><input type="checkbox" id="L-terrain" checked> <span class="sw" style="background:var(--water)"></span>Rivers, creeks, state lines &amp; 1780 road</label>
         <label><input type="checkbox" id="L-camp" checked> <span class="sw" style="background:var(--continental)"></span>Camp layout (conjectural)</label>
-        <label><input type="checkbox" id="L-sites" checked> <span class="sw" style="background:var(--militia)"></span>1780 campaign sites</label>
+        <label><input type="checkbox" id="L-sites" checked> <span class="sw" style="background:var(--militia)"></span><span id="L-sites-t">Revolutionary War sites</span></label>
         <label><input type="checkbox" id="L-zones"> <span class="sw" style="background:var(--hi)"></span>Detecting potential</label>
         <label><input type="checkbox" id="L-modern" checked> <span class="sw" style="background:var(--modern)"></span>Highways, roads &amp; towns</label>
         <label><input type="checkbox" id="L-homes" checked> <span class="sw" style="background:var(--modern);height:8px;width:8px"></span>Homes near the sites</label>
@@ -1315,6 +1317,47 @@ const SITES = [
   {"id": "ms-brices", "area": "carolinas", "date": "1864-06-10", "layer": "later", "era": "later", "type": "battle", "lat": 34.504, "lon": -88.729, "zl": 1500, "name": "Brice's Crossroads", "kind": "Battle · June 10, 1864", "status": "public", "statusText": "National battlefield site", "history": ["Forrest routed a Union force twice his size under Samuel Sturgis, his most celebrated victory."], "today": "Brices Cross Roads National Battlefield Site.", "access": "Open daily.", "detect": "Illegal. Federal land.", "dz": [[700, "off", "National battlefield site", "Federal land. Detecting and digging are illegal under the Archaeological Resources Protection Act."], [1500, "mid", "Land beyond the park", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["cs", "Sturgis routed"]},
   {"id": "ms-tupelo", "area": "carolinas", "date": "1864-07-14", "layer": "later", "era": "later", "type": "battle", "lat": 34.258, "lon": -88.735, "zl": 1500, "name": "Tupelo", "kind": "Battle · July 14–15, 1864", "status": "public", "statusText": "National battlefield", "history": ["A. J. Smith's Union troops beat off Forrest's attacks, keeping him away from Sherman's supply line in Georgia."], "today": "Tupelo National Battlefield.", "access": "Open daily.", "detect": "Illegal. Federal land.", "dz": [[700, "off", "National battlefield", "Federal land. Detecting and digging are illegal under the Archaeological Resources Protection Act."], [1500, "mid", "Land beyond the park", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["un", "Forrest beaten off"]},
 
+  // ======================= FRENCH AND INDIAN WAR, WAR OF 1812 =======================
+  {"id": "fiw-leboeuf", "area": "carolinas", "war": "fiw", "date": "1753-12-11", "layer": "sites", "era": "1753", "type": "house", "lat": 41.927, "lon": -80.04, "zl": 1500, "name": "Fort Le Boeuf", "kind": "Washington's mission · December 1753", "status": "public", "statusText": "Museum", "history": ["Twenty-one-year-old Major George Washington carried Virginia's demand that the French leave the Ohio country. The French commander politely refused."], "today": "Fort LeBoeuf Museum, Waterford, Pennsylvania.", "access": "Museum.", "detect": "No.", "dz": [[700, "low", "Built-up area", "Built over; private yards only, with written permission."]]},
+  {"id": "fiw-jumonville", "area": "carolinas", "war": "fiw", "date": "1754-05-28", "layer": "sites", "era": "1754", "type": "battle", "lat": 39.88, "lon": -79.65, "zl": 1500, "name": "Jumonville Glen", "kind": "Skirmish · May 28, 1754", "status": "public", "statusText": "National battlefield unit", "history": ["Washington's Virginians and Tanacharison's Mingo warriors surprised a French party; its commander, Joseph Coulon de Villiers de Jumonville, was killed. The clash helped start a world war."], "today": "Jumonville Glen, Fort Necessity National Battlefield.", "access": "Open in season.", "detect": "Illegal. Federal land.", "dz": [[700, "off", "National battlefield unit", "Federal land. Detecting and digging are illegal under the Archaeological Resources Protection Act."], [1500, "mid", "Land beyond the park", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["col", "French party destroyed"]},
+  {"id": "fiw-necessity", "area": "carolinas", "war": "fiw", "date": "1754-07-03", "layer": "sites", "era": "1754", "type": "battle", "lat": 39.8146, "lon": -79.5867, "zl": 1500, "name": "Fort Necessity", "kind": "Battle · July 3, 1754", "status": "public", "statusText": "National battlefield", "history": ["Jumonville's brother led about 600 French and Native troops against Washington's small stockade in the rain. Washington surrendered, the only time in his career."], "today": "Fort Necessity National Battlefield, Farmington, Pennsylvania.", "access": "Open daily.", "detect": "Illegal. Federal land.", "dz": [[700, "off", "National battlefield", "Federal land. Detecting and digging are illegal under the Archaeological Resources Protection Act."], [1500, "mid", "Land beyond the park", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["fr", "Washington surrenders"]},
+  {"id": "fiw-duquesne", "area": "carolinas", "war": "fiw", "date": "1758-11-25", "layer": "sites", "era": "1758", "type": "house", "lat": 40.4413, "lon": -80.011, "zl": 1500, "name": "Fort Duquesne / Fort Pitt", "kind": "The Forks of the Ohio · French 1754–58, British from 1758", "status": "public", "statusText": "State park", "history": ["The French built Fort Duquesne where the rivers meet. Forbes's army reached it in November 1758 to find it blown up and abandoned; the British built Fort Pitt, which held through a siege in Pontiac's War."], "today": "Point State Park and the Fort Pitt Museum, Pittsburgh.", "access": "Open daily.", "detect": "No. State property.", "dz": [[600, "off", "State park", "State-owned historic site. Detecting needs a state permit."], [1300, "mid", "Land beyond the site", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["gb", "French blow up the fort"]},
+  {"id": "fiw-monongahela", "area": "carolinas", "war": "fiw", "date": "1755-07-09", "layer": "sites", "era": "1755", "type": "battle", "lat": 40.404, "lon": -79.874, "zl": 1500, "name": "Monongahela (Braddock's Defeat)", "kind": "Battle · July 9, 1755", "status": "public", "statusText": "Town", "history": ["Gen. Edward Braddock's column was ambushed by French troops and many more Native warriors near the river. Over 900 of about 1,400 British engaged were killed or wounded; Braddock died days later. Washington had two horses shot under him."], "today": "Braddock, Pennsylvania; Braddock's Battlefield History Center.", "access": "Built over; small museum.", "detect": "No.", "dz": [[700, "low", "Built-up area", "Built over; private yards only, with written permission."]], "win": ["fr", "Braddock's army routed"]},
+  {"id": "fiw-cumberland", "area": "carolinas", "war": "fiw", "date": "1755-06-10", "layer": "sites", "era": "1755", "type": "house", "lat": 39.651, "lon": -78.763, "zl": 1500, "name": "Fort Cumberland", "kind": "Braddock's base · 1755", "status": "public", "statusText": "City", "history": ["The frontier fort at Wills Creek where Braddock's army gathered."], "today": "Cumberland, Maryland.", "access": "Built over.", "detect": "No.", "dz": [[700, "low", "Built-up area", "Built over; private yards only, with written permission."]]},
+  {"id": "fiw-kittanning", "area": "carolinas", "war": "fiw", "date": "1756-09-08", "layer": "sites", "era": "1756", "type": "battle", "lat": 40.8167, "lon": -79.5228, "zl": 1500, "name": "Kittanning", "kind": "Raid · September 8, 1756", "status": "public", "statusText": "Town", "history": ["Col. John Armstrong's Pennsylvania troops burned the Delaware town from which raids had struck the frontier. Location approximate."], "today": "Kittanning.", "access": "Built over.", "detect": "No.", "dz": [[700, "low", "Built-up area", "Built over; private yards only, with written permission."]], "win": ["col", "Delaware town burned"]},
+  {"id": "fiw-oswego", "area": "carolinas", "war": "fiw", "date": "1756-08-14", "layer": "sites", "era": "1756", "type": "battle", "lat": 43.46, "lon": -76.51, "zl": 1500, "name": "Oswego", "kind": "Captured August 14, 1756", "status": "public", "statusText": "State historic site", "history": ["Montcalm's first victory in America: the British forts on Lake Ontario surrendered after a short bombardment."], "today": "Fort Ontario State Historic Site.", "access": "Open in season.", "detect": "No. State property.", "dz": [[600, "off", "State historic site", "State-owned historic site. Detecting needs a state permit."], [1300, "mid", "Land beyond the site", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["fr", "British forts surrender"]},
+  {"id": "fiw-lakegeorge", "area": "carolinas", "war": "fiw", "date": "1755-09-08", "layer": "sites", "era": "1755", "type": "battle", "lat": 43.42, "lon": -73.71, "zl": 1500, "name": "Lake George", "kind": "Battle · September 8, 1755", "status": "public", "statusText": "State park", "history": ["William Johnson's colonials and Mohawk allies beat off Baron Dieskau's French and Native force and captured Dieskau."], "today": "Lake George Battlefield Park.", "access": "Open daily.", "detect": "No. State property.", "dz": [[600, "off", "State park", "State-owned historic site. Detecting needs a state permit."], [1300, "mid", "Land beyond the site", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["col", "Dieskau captured"]},
+  {"id": "fiw-fortwmhenry", "area": "carolinas", "war": "fiw", "date": "1757-08-09", "layer": "sites", "era": "1757", "type": "battle", "lat": 43.4186, "lon": -73.7117, "zl": 1500, "name": "Fort William Henry", "kind": "Siege · August 3–9, 1757", "status": "public", "statusText": "Museum", "history": ["Montcalm besieged the fort and accepted its surrender with honors of war, but his Native allies attacked the departing column; dozens were killed and hundreds taken captive. The basis of The Last of the Mohicans."], "today": "Fort William Henry Museum (reconstruction), Lake George.", "access": "Open in season.", "detect": "No at the park; private land around it.", "dz": [[400, "off", "Park", "Protected land."], [1200, "mid", "Surrounding land", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["fr", "Fort surrenders"]},
+  {"id": "fiw-snowshoes", "area": "carolinas", "war": "fiw", "date": "1758-03-13", "layer": "sites", "era": "1758", "type": "battle", "lat": 43.85, "lon": -73.45, "zl": 1500, "name": "Battle on Snowshoes", "kind": "March 13, 1758", "status": "public", "statusText": "Mountainside", "history": ["Robert Rogers's rangers were caught by a larger French and Native force on snowshoes; Rogers escaped down what is still called Rogers Rock. Location approximate."], "today": "Rogers Rock, Lake George.", "access": "State forest land.", "detect": "No. State property.", "dz": [[600, "off", "Mountainside", "State-owned historic site. Detecting needs a state permit."], [1300, "mid", "Land beyond the site", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["fr", "Rogers's rangers beaten"]},
+  {"id": "fiw-carillon", "area": "carolinas", "war": "fiw", "date": "1758-07-08", "layer": "sites", "era": "1758", "type": "battle", "lat": 43.842, "lon": -73.388, "zl": 1500, "name": "Carillon (Ticonderoga)", "kind": "Battle · July 8, 1758", "status": "public", "statusText": "Museum", "history": ["Gen. James Abercromby threw about 16,000 men against Montcalm's 3,600 behind a log wall and felled trees; nearly 2,000 British fell. A year later the French blew up the fort and withdrew."], "today": "Fort Ticonderoga.", "access": "Open in season.", "detect": "No at the park; private land around it.", "dz": [[400, "off", "Park", "Protected land."], [1200, "mid", "Surrounding land", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["fr", "Abercromby's assault fails"]},
+  {"id": "fiw-ligonier", "area": "carolinas", "war": "fiw", "date": "1758-10-12", "layer": "sites", "era": "1758", "type": "battle", "lat": 40.2437, "lon": -79.2337, "zl": 1500, "name": "Fort Ligonier", "kind": "Battle · October 12, 1758", "status": "public", "statusText": "Museum", "history": ["A French and Native attack on Forbes's advance base was beaten off."], "today": "Fort Ligonier (reconstructed), Ligonier.", "access": "Open in season.", "detect": "No at the park; private land around it.", "dz": [[400, "off", "Park", "Protected land."], [1200, "mid", "Surrounding land", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["gb", "Attack beaten off"]},
+  {"id": "fiw-niagara", "area": "carolinas", "war": "fiw", "date": "1759-07-26", "layer": "sites", "era": "1759", "type": "battle", "lat": 43.2628, "lon": -79.0636, "zl": 1500, "name": "Fort Niagara", "kind": "Siege · July 6–26, 1759", "status": "public", "statusText": "State park", "history": ["Sir William Johnson took the fort after defeating a French relief column at La Belle-Famille, cutting New France's link to the Ohio country."], "today": "Old Fort Niagara, Youngstown, New York.", "access": "Open daily.", "detect": "No. State property.", "dz": [[600, "off", "State park", "State-owned historic site. Detecting needs a state permit."], [1300, "mid", "Land beyond the site", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["gb", "Fort Niagara falls"]},
+  {"id": "fiw-crownpoint", "area": "carolinas", "war": "fiw", "date": "1759-07-31", "layer": "sites", "era": "1759", "type": "house", "lat": 44.0303, "lon": -73.4302, "zl": 1500, "name": "Crown Point", "kind": "French Fort St. Frédéric · abandoned July 31, 1759", "status": "public", "statusText": "State historic site", "history": ["The French blew up Fort St. Frédéric as Amherst approached; the British built a huge new fort beside it."], "today": "Crown Point State Historic Site.", "access": "Open in season.", "detect": "No. State property.", "dz": [[600, "off", "State historic site", "State-owned historic site. Detecting needs a state permit."], [1300, "mid", "Land beyond the site", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["gb", "French withdraw"]},
+  {"id": "fiw-loudoun", "area": "carolinas", "war": "fiw", "date": "1760-08-08", "layer": "sites", "era": "1760", "type": "battle", "lat": 35.5925, "lon": -84.2105, "zl": 1500, "name": "Fort Loudoun", "kind": "Surrender · August 8, 1760", "status": "public", "statusText": "State historic park", "history": ["During the Anglo-Cherokee War the starving British garrison surrendered; on the march out many were killed, in revenge for Cherokee hostages killed at Fort Prince George."], "today": "Fort Loudoun State Historic Park, Vonore, Tennessee.", "access": "Open daily.", "detect": "No. State property.", "dz": [[600, "off", "State historic park", "State-owned historic site. Detecting needs a state permit."], [1300, "mid", "Land beyond the site", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["naf", "Garrison surrenders"]},
+  {"id": "fiw-bushyrun", "area": "carolinas", "war": "fiw", "date": "1763-08-06", "layer": "sites", "era": "1763", "type": "battle", "lat": 40.36, "lon": -79.63, "zl": 1500, "name": "Bushy Run", "kind": "Pontiac's War · August 5–6, 1763", "status": "public", "statusText": "State historic site", "history": ["Col. Henry Bouquet's column marching to relieve Fort Pitt fought off Delaware, Shawnee and Mingo warriors in a two-day battle."], "today": "Bushy Run Battlefield, Jeannette, Pennsylvania.", "access": "Open in season.", "detect": "No. State property.", "dz": [[600, "off", "State historic site", "State-owned historic site. Detecting needs a state permit."], [1300, "mid", "Land beyond the site", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["gb", "Bouquet breaks through"]},
+  {"id": "w12-tippecanoe", "area": "carolinas", "war": "w12", "date": "1811-11-07", "layer": "sites", "era": "1811", "type": "battle", "lat": 40.5052, "lon": -86.8447, "zl": 1500, "name": "Tippecanoe", "kind": "Battle · November 7, 1811", "status": "public", "statusText": "Battlefield park", "history": ["Gov. William Henry Harrison's army fought warriors of Tecumseh's confederacy at Prophetstown while Tecumseh was away. It pushed Tecumseh toward the British."], "today": "Tippecanoe Battlefield Park, Battle Ground, Indiana.", "access": "Park.", "detect": "No at the park; private land around it.", "dz": [[400, "off", "Park", "Protected land."], [1200, "mid", "Surrounding land", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["us", "Prophetstown burned"]},
+  {"id": "w12-fortharrison", "area": "carolinas", "war": "w12", "date": "1812-09-05", "layer": "sites", "era": "1812", "type": "battle", "lat": 39.53, "lon": -87.41, "zl": 1500, "name": "Fort Harrison", "kind": "Siege · September 4–15, 1812", "status": "public", "statusText": "City", "history": ["Capt. Zachary Taylor, a future president, held the fort against Native attackers. Location approximate."], "today": "Terre Haute, Indiana.", "access": "Built over.", "detect": "No.", "dz": [[700, "low", "Built-up area", "Built over; private yards only, with written permission."]], "win": ["us", "Fort holds"]},
+  {"id": "w12-fortmeigs", "area": "carolinas", "war": "w12", "date": "1813-05-05", "layer": "sites", "era": "1813", "type": "battle", "lat": 41.5446, "lon": -83.6493, "zl": 1500, "name": "Fort Meigs", "kind": "Sieges · April–May and July 1813", "status": "public", "statusText": "State memorial", "history": ["Harrison's earthwork fort held against two sieges by British troops under Henry Procter and Tecumseh's warriors."], "today": "Fort Meigs (reconstructed), Perrysburg, Ohio.", "access": "Open in season.", "detect": "No. State property.", "dz": [[600, "off", "State memorial", "State-owned historic site. Detecting needs a state permit."], [1300, "mid", "Land beyond the site", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["us", "Fort holds"]},
+  {"id": "w12-sackets", "area": "carolinas", "war": "w12", "date": "1813-05-29", "layer": "sites", "era": "1813", "type": "battle", "lat": 43.9461, "lon": -76.1199, "zl": 1500, "name": "Sackets Harbor", "kind": "Battle · May 29, 1813", "status": "public", "statusText": "State historic site", "history": ["The American naval base on Lake Ontario beat off a British landing."], "today": "Sackets Harbor Battlefield State Historic Site.", "access": "Open in season.", "detect": "No. State property.", "dz": [[600, "off", "State historic site", "State-owned historic site. Detecting needs a state permit."], [1300, "mid", "Land beyond the site", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["us", "British landing beaten off"]},
+  {"id": "w12-fortstephenson", "area": "carolinas", "war": "w12", "date": "1813-08-02", "layer": "sites", "era": "1813", "type": "battle", "lat": 41.35, "lon": -83.12, "zl": 1500, "name": "Fort Stephenson", "kind": "Battle · August 2, 1813", "status": "public", "statusText": "City", "history": ["Major George Croghan's 160 men and one cannon, 'Old Betsy,' beat off a British assault."], "today": "Fremont, Ohio.", "access": "Built over.", "detect": "No.", "dz": [[700, "low", "Built-up area", "Built over; private yards only, with written permission."]], "win": ["us", "Assault beaten off"]},
+  {"id": "w12-lakeerie", "area": "carolinas", "war": "w12", "date": "1813-09-10", "layer": "sites", "era": "1813", "type": "battle", "lat": 41.65, "lon": -82.83, "zl": 1500, "name": "Battle of Lake Erie", "kind": "September 10, 1813", "status": "public", "statusText": "Memorial", "history": ["Oliver Hazard Perry's squadron captured the whole British squadron. 'We have met the enemy and they are ours.' The British had to abandon Detroit."], "today": "Perry's Victory and International Peace Memorial, Put-in-Bay.", "access": "Open daily.", "detect": "No.", "dz": [[600, "off", "Underwater site", "Underwater site, protected by state law (and, for U.S. Navy wrecks, the federal Sunken Military Craft Act)."]], "win": ["us", "British squadron captured"]},
+  {"id": "w12-niagara", "area": "carolinas", "war": "w12", "date": "1813-12-19", "layer": "sites", "era": "1813", "type": "battle", "lat": 43.2628, "lon": -79.0636, "zl": 1500, "name": "Fort Niagara, 1813", "kind": "Captured December 19, 1813", "status": "public", "statusText": "State park", "history": ["A British night attack took the fort, which they held to the end of the war, then burned towns along the river, including Buffalo."], "today": "Old Fort Niagara.", "access": "Open daily.", "detect": "No. State property.", "dz": [[600, "off", "State park", "State-owned historic site. Detecting needs a state permit."], [1300, "mid", "Land beyond the site", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["gb", "Fort Niagara taken"]},
+  {"id": "w12-buffalo", "area": "carolinas", "war": "w12", "date": "1813-12-30", "layer": "sites", "era": "1813", "type": "town", "lat": 42.8864, "lon": -78.8784, "zl": 1500, "name": "Buffalo burned", "kind": "December 30, 1813", "status": "public", "statusText": "City", "history": ["British troops and Native allies burned Buffalo and Black Rock in revenge for the American burning of Newark, Upper Canada."], "today": "Buffalo.", "access": "Built over.", "detect": "No.", "dz": [[700, "low", "Built-up area", "Built over; private yards only, with written permission."]], "win": ["gb", "Buffalo burned"]},
+  {"id": "w12-oswego", "area": "carolinas", "war": "w12", "date": "1814-05-06", "layer": "sites", "era": "1814", "type": "battle", "lat": 43.46, "lon": -76.51, "zl": 1500, "name": "Oswego, 1814", "kind": "Battle · May 6, 1814", "status": "public", "statusText": "State historic site", "history": ["A British raid captured naval stores at Fort Ontario."], "today": "Fort Ontario State Historic Site.", "access": "Open in season.", "detect": "No. State property.", "dz": [[600, "off", "State historic site", "State-owned historic site. Detecting needs a state permit."], [1300, "mid", "Land beyond the site", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["gb", "Stores captured"]},
+  {"id": "w12-plattsburgh", "area": "carolinas", "war": "w12", "date": "1814-09-11", "layer": "sites", "era": "1814", "type": "battle", "lat": 44.6995, "lon": -73.4529, "zl": 1500, "name": "Plattsburgh", "kind": "Battle · September 11, 1814", "status": "public", "statusText": "City", "history": ["Thomas Macdonough's squadron destroyed the British squadron on Lake Champlain, and Prevost's 10,000-man army turned back to Canada. It helped end the war on even terms."], "today": "Plattsburgh; the battle site is in Cumberland Bay.", "access": "Built over; bay protected.", "detect": "No.", "dz": [[700, "low", "Built-up area", "Built over; private yards only, with written permission."]], "win": ["us", "Invasion turned back"]},
+  {"id": "w12-havredegrace", "area": "carolinas", "war": "w12", "date": "1813-05-03", "layer": "sites", "era": "1813", "type": "town", "lat": 39.549, "lon": -76.091, "zl": 1500, "name": "Havre de Grace", "kind": "Raid · May 3, 1813", "status": "public", "statusText": "Town", "history": ["Admiral George Cockburn's sailors and marines burned much of the town; John O'Neill kept firing his cannon until captured."], "today": "Havre de Grace, Maryland.", "access": "Built over.", "detect": "No.", "dz": [[700, "low", "Built-up area", "Built over; private yards only, with written permission."]], "win": ["gb", "Town burned"]},
+  {"id": "w12-craneyisland", "area": "carolinas", "war": "w12", "date": "1813-06-22", "layer": "sites", "era": "1813", "type": "battle", "lat": 36.89, "lon": -76.34, "zl": 1500, "name": "Craney Island", "kind": "Battle · June 22, 1813", "status": "public", "statusText": "Harbor", "history": ["Virginia militia and sailors beat off a British attack on Norfolk."], "today": "Craney Island, Portsmouth.", "access": "Restricted.", "detect": "No. Military land.", "dz": [[800, "off", "Military land", "Federal military land."]], "win": ["us", "Norfolk saved"]},
+  {"id": "w12-hampton", "area": "carolinas", "war": "w12", "date": "1813-06-25", "layer": "sites", "era": "1813", "type": "town", "lat": 37.03, "lon": -76.34, "zl": 1500, "name": "Hampton", "kind": "Raid · June 25, 1813", "status": "public", "statusText": "City", "history": ["British troops sacked the town after Craney Island."], "today": "Hampton.", "access": "Built over.", "detect": "No.", "dz": [[700, "low", "Built-up area", "Built over; private yards only, with written permission."]], "win": ["gb", "Hampton sacked"]},
+  {"id": "w12-bladensburg", "area": "carolinas", "war": "w12", "date": "1814-08-24", "layer": "sites", "era": "1814", "type": "battle", "lat": 38.939, "lon": -76.94, "zl": 1500, "name": "Bladensburg", "kind": "Battle · August 24, 1814", "status": "public", "statusText": "Waterfront park", "history": ["Militia defending Washington broke and fled, the 'Bladensburg Races'; Joshua Barney's sailors and marines held longest."], "today": "Bladensburg Waterfront Park.", "access": "Park.", "detect": "No at the park; private land around it.", "dz": [[400, "off", "Park", "Protected land."], [1200, "mid", "Surrounding land", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["gb", "Road to Washington open"]},
+  {"id": "w12-washington", "area": "carolinas", "war": "w12", "date": "1814-08-25", "layer": "sites", "era": "1814", "type": "town", "lat": 38.8899, "lon": -77.0091, "zl": 1500, "name": "Washington burned", "kind": "August 24–25, 1814", "status": "public", "statusText": "City", "history": ["British troops burned the Capitol, the President's House and other public buildings. Dolley Madison saved Washington's portrait; a storm the next day helped put the fires out."], "today": "The Capitol and White House.", "access": "Public city.", "detect": "No.", "dz": [[700, "low", "Built-up area", "Built over; private yards only, with written permission."]], "win": ["gb", "The capital burned"]},
+  {"id": "w12-northpoint", "area": "carolinas", "war": "w12", "date": "1814-09-12", "layer": "sites", "era": "1814", "type": "battle", "lat": 39.25, "lon": -76.45, "zl": 1500, "name": "North Point", "kind": "Battle · September 12, 1814", "status": "public", "statusText": "State battlefield", "history": ["Baltimore militia delayed the British advance; Gen. Robert Ross, who burned Washington, was killed by a sharpshooter. Location approximate."], "today": "North Point State Battlefield.", "access": "Open daily.", "detect": "No. State property.", "dz": [[600, "off", "State battlefield", "State-owned historic site. Detecting needs a state permit."], [1300, "mid", "Land beyond the site", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["gb", "British advance; Ross killed"]},
+  {"id": "w12-fortmchenry", "area": "carolinas", "war": "w12", "date": "1814-09-14", "layer": "sites", "era": "1814", "type": "battle", "lat": 39.2628, "lon": -76.5797, "zl": 1500, "name": "Fort McHenry", "kind": "Bombardment · September 13–14, 1814", "status": "public", "statusText": "National monument", "history": ["The Royal Navy bombarded the fort for 25 hours and could not pass. At dawn Francis Scott Key saw the great flag still flying and wrote the words of 'The Star-Spangled Banner.'"], "today": "Fort McHenry National Monument and Historic Shrine, Baltimore.", "access": "Open daily.", "detect": "Illegal. Federal land.", "dz": [[700, "off", "National monument", "Federal land. Detecting and digging are illegal under the Archaeological Resources Protection Act."], [1500, "mid", "Land beyond the park", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["us", "The flag was still there"]},
+  {"id": "w12-stonington", "area": "carolinas", "war": "w12", "date": "1814-08-12", "layer": "sites", "era": "1814", "type": "battle", "lat": 41.336, "lon": -71.906, "zl": 1500, "name": "Stonington", "kind": "Battle · August 9–12, 1814", "status": "public", "statusText": "Town", "history": ["Townspeople with a few old cannon drove off a British squadron."], "today": "Stonington, Connecticut.", "access": "Built over.", "detect": "No.", "dz": [[700, "low", "Built-up area", "Built over; private yards only, with written permission."]], "win": ["us", "Squadron driven off"]},
+  {"id": "w12-castine", "area": "carolinas", "war": "w12", "date": "1814-09-01", "layer": "sites", "era": "1814", "type": "town", "lat": 44.388, "lon": -68.8, "zl": 1500, "name": "Castine, 1814", "kind": "British occupation · September 1814 – April 1815", "status": "public", "statusText": "Town", "history": ["The British occupied eastern Maine and governed it as New Ireland until after the peace."], "today": "Castine.", "access": "Built over.", "detect": "No.", "dz": [[700, "low", "Built-up area", "Built over; private yards only, with written permission."]], "win": ["gb", "Eastern Maine occupied"]},
+  {"id": "w12-hampden", "area": "carolinas", "war": "w12", "date": "1814-09-03", "layer": "sites", "era": "1814", "type": "battle", "lat": 44.744, "lon": -68.837, "zl": 1500, "name": "Hampden", "kind": "Battle · September 3, 1814", "status": "public", "statusText": "Town", "history": ["Militia broke before British troops, who burned the frigate Adams and took Bangor."], "today": "Hampden, Maine.", "access": "Built over.", "detect": "No.", "dz": [[700, "low", "Built-up area", "Built over; private yards only, with written permission."]], "win": ["gb", "British victory"]},
+  {"id": "w12-pensacola", "area": "carolinas", "war": "w12", "date": "1814-11-07", "layer": "sites", "era": "1814", "type": "battle", "lat": 30.4128, "lon": -87.218, "zl": 1500, "name": "Pensacola, 1814", "kind": "November 7, 1814", "status": "public", "statusText": "City", "history": ["Andrew Jackson stormed the Spanish town the British were using as a base; the British blew up the forts and sailed off."], "today": "Pensacola.", "access": "Built over.", "detect": "No.", "dz": [[700, "low", "Built-up area", "Built over; private yards only, with written permission."]], "win": ["us", "British base taken"]},
+  {"id": "w12-neworleans", "area": "carolinas", "war": "w12", "state": "LA", "date": "1815-01-08", "layer": "sites", "era": "1815", "type": "battle", "lat": 29.942, "lon": -89.99, "zl": 1500, "name": "New Orleans", "kind": "Battle · January 8, 1815", "status": "public", "statusText": "National historical park", "history": ["Jackson's army of regulars, militia, free Black soldiers, Choctaw warriors and Jean Lafitte's pirates cut down Pakenham's assault in under an hour; over 2,000 British fell. The peace treaty had been signed two weeks before."], "today": "Chalmette Battlefield, Jean Lafitte National Historical Park.", "access": "Open daily.", "detect": "Illegal. Federal land.", "dz": [[700, "off", "National historical park", "Federal land. Detecting and digging are illegal under the Archaeological Resources Protection Act."], [1500, "mid", "Land beyond the park", "Private land. Find the owner through the county parcel viewer and get written permission first."]], "win": ["us", "Pakenham's assault fails"]},
+
   // ---------- Civil War and later ----------
   { id: "navyyard", date: "1864-01-07", layer: "later", era: "later", type: "later", lat: 35.2292, lon: -80.8382, zl: 25000,
     name: "Confederate Navy Yard", kind: "Civil War · 1862–1865",
@@ -1731,7 +1774,8 @@ const SIDE_INFO = {
   gb: { flag: "gb", name: "British forces" },   lo: { flag: "gb", name: "Loyalists" },
   un: { flag: "us", name: "Union" },            cs: { flag: "cs", name: "Confederate" },
   fr: { flag: "fr", name: "French forces" },     es: { flag: "es", name: "Spanish forces" },
-  na: { flag: "na", name: "Native nations (allied with Britain)" }
+  na: { flag: "na", name: "Native nations (allied with Britain)" },
+  col: { flag: "gb", name: "Colonial troops (British)" }, naf: { flag: "na", name: "Native nations (allied with France)" }
 };
 const sideKey = (side) => side === "nc" ? "pm" : side;   // forces and people use "nc" for Patriot militia
 const flagHTML = (side, w = 21) => `<svg class="flag" width="${w}" height="${Math.round(w * 2 / 3)}" viewBox="0 0 30 20" aria-hidden="true">${FLAG_ART[(SIDE_INFO[sideKey(side)] || SIDE_INFO.us).flag]}</svg>`;
@@ -1765,6 +1809,45 @@ const SITE_SIDES = {
   "c-breach64": [["cs"], [], "Confederate battery"], "c-hunley": [["cs"], ["un"], "Housatonic sunk; Hunley lost"], "c-housatonic": [["un"], ["cs"], "Sunk by the Hunley"],
   "c-keokuk": [["un"], ["cs"], "Union attack beaten off"], "c-weehawken": [["un"], [], "Union monitor lost"], "c-patapsco": [["un"], ["cs"], "Sunk by a Confederate mine"],
   "c-stonefleet": [["un"], [], "Union blockade"],
+  "fiw-leboeuf": [["fr"], ["col"], "French refuse to leave"],
+  "fiw-jumonville": [["col", "naf"], ["fr"], "Virginians surprise the French"],
+  "fiw-necessity": [["fr"], ["col"], "Washington surrenders"],
+  "fiw-duquesne": [["gb"], ["fr"], "French abandon the Forks"],
+  "fiw-monongahela": [["fr", "naf"], ["gb", "col"], "French and Native victory"],
+  "fiw-cumberland": [["gb", "col"], [], "British base"],
+  "fiw-kittanning": [["col"], ["naf"], "Town burned"],
+  "fiw-oswego": [["fr"], ["gb", "col"], "French victory"],
+  "fiw-lakegeorge": [["col"], ["fr"], "Colonial victory"],
+  "fiw-fortwmhenry": [["fr"], ["gb", "col"], "French victory"],
+  "fiw-snowshoes": [["fr", "naf"], ["col"], "French victory"],
+  "fiw-carillon": [["fr"], ["gb", "col"], "French victory"],
+  "fiw-ligonier": [["gb", "col"], ["fr"], "British hold"],
+  "fiw-niagara": [["gb", "col"], ["fr"], "British victory"],
+  "fiw-crownpoint": [["gb"], ["fr"], "French withdraw"],
+  "fiw-loudoun": [["naf"], ["gb"], "Cherokee victory"],
+  "fiw-bushyrun": [["gb"], ["naf"], "British victory"],
+  "w12-tippecanoe": [["us"], ["na"], "American victory"],
+  "w12-fortharrison": [["us"], ["na"], "Fort holds"],
+  "w12-fortmeigs": [["us"], ["gb", "na"], "Fort holds"],
+  "w12-sackets": [["us"], ["gb"], "American victory"],
+  "w12-fortstephenson": [["us"], ["gb", "na"], "American victory"],
+  "w12-lakeerie": [["us"], ["gb"], "American victory"],
+  "w12-niagara": [["gb"], ["us"], "British victory"],
+  "w12-buffalo": [["gb"], ["us"], "Town burned"],
+  "w12-oswego": [["gb"], ["us"], "British raid succeeds"],
+  "w12-plattsburgh": [["us"], ["gb"], "American victory"],
+  "w12-havredegrace": [["gb"], ["us"], "Town burned"],
+  "w12-craneyisland": [["us"], ["gb"], "American victory"],
+  "w12-hampton": [["gb"], ["us"], "Town sacked"],
+  "w12-bladensburg": [["gb"], ["us"], "British victory"],
+  "w12-washington": [["gb"], ["us"], "Capital burned"],
+  "w12-northpoint": [["gb"], ["us"], "British advance; Ross killed"],
+  "w12-fortmchenry": [["us"], ["gb"], "Fort holds; Baltimore saved"],
+  "w12-stonington": [["us"], ["gb"], "American victory"],
+  "w12-castine": [["gb"], ["us"], "Eastern Maine occupied"],
+  "w12-hampden": [["gb"], ["us"], "British victory"],
+  "w12-pensacola": [["us"], ["gb"], "American victory"],
+  "w12-neworleans": [["us"], ["gb"], "American victory"],
   "ky-boonesborough": [["pm"], ["na"], "Fort holds"],
   "in-vincennes": [["pm"], ["gb"], "American victory"],
   "oh-gnadenhutten": [["pm"], [], "Massacre of noncombatants"],
@@ -1987,7 +2070,13 @@ function sidesHTML(st) {
 /* ======================= SIDES, COLOURS, TERRITORY, BATTLE RESULTS =======================
    Blue: Americans in the Revolution (and their French and Spanish allies), the Union in the Civil War.
    Red: the British and Loyalists (and allied Cherokee), the Confederacy. */
-const BLUE_SIDES = new Set(["us", "pm", "nc", "un", "fr", "es"]);
+const BLUE_SIDES = new Set(["us", "pm", "nc", "un", "fr", "es", "naf"]);
+/* Four wars. Sites carry "war" for the French and Indian War and the War of 1812; older data uses the layer. */
+const WARS = ["fiw", "rev", "w12", "cw"];
+const siteWar = (st) => st.war || (st.layer === "later" ? "cw" : "rev");
+const WAR_NAME = { fiw: "French and Indian War", rev: "Revolution", w12: "War of 1812", cw: "Civil War" };
+const WAR_LONG = { fiw: "French and Indian War", rev: "Revolutionary War", w12: "War of 1812", cw: "Civil War" };
+const WAR_TITLE = { fiw: "The French and Indian War", rev: "The Revolution", w12: "The War of 1812", cw: "The Civil War" };
 const team = (side) => BLUE_SIDES.has(side) ? "b" : "r";
 function forceCol(f) {
   const b = team(f.side) === "b";
@@ -2105,6 +2194,22 @@ const CONTROL = {
     [36.76, -89.10, 70, "cs", "1861-09-04", "1862-03-02"], [36.99, -86.44, 90, "cs", "1861-09-18", "1862-02-14"], [38.04, -84.50, 90, "cs", "1862-09-01", "1862-10-12"],
     [34.93, -88.52, 80, "un", "1862-05-30", "1866-01-01"], [35.0, -89.8, 70, "un", "1862-06-06", "1866-01-01"], [32.35, -90.87, 80, "un", "1863-07-04", "1866-01-01"],
     [31.56, -91.40, 40, "un", "1863-07-13", "1866-01-01"]
+  ],
+  // French and Indian War: blue = French-held, red = British-held
+  fiw: [
+    [40.44, -80.01, 90, "fr", "1754-04-17", "1758-11-25"], [40.44, -80.01, 70, "gb", "1758-11-25", "1764-01-01"],
+    [41.93, -80.04, 60, "fr", "1753-06-01", "1759-08-01"], [41.40, -79.80, 40, "fr", "1753-09-01", "1759-08-01"],
+    [43.84, -73.39, 45, "fr", "1755-10-01", "1759-07-27"], [44.03, -73.43, 60, "fr", "1753-01-01", "1759-07-31"],
+    [43.84, -73.39, 40, "gb", "1759-07-27", "1764-01-01"], [44.03, -73.43, 50, "gb", "1759-07-31", "1764-01-01"],
+    [43.26, -79.06, 60, "fr", "1753-01-01", "1759-07-26"], [43.26, -79.06, 50, "gb", "1759-07-26", "1764-01-01"],
+    [43.46, -76.51, 40, "fr", "1756-08-14", "1757-06-01"], [43.42, -73.71, 30, "fr", "1757-08-09", "1757-09-01"],
+    [35.59, -84.21, 50, "naf", "1760-08-08", "1761-12-01"]
+  ],
+  // War of 1812: blue = American-held, red = British-held
+  w12: [
+    [42.33, -83.05, 70, "gb", "1812-08-16", "1813-09-29"], [43.26, -79.06, 35, "gb", "1813-12-19", "1815-03-27"],
+    [44.60, -68.30, 110, "gb", "1814-09-01", "1815-04-25"], [38.89, -77.01, 20, "gb", "1814-08-24", "1814-08-26"],
+    [38.80, -77.05, 12, "gb", "1814-08-28", "1814-09-03"]
   ]
 };
 // who governed each state on a date, before garrisons and armies are counted
@@ -2122,6 +2227,8 @@ const TERR_DEFAULT = {
         KY: [["9999", "b"]], OH: [["9999", "b"]], IN: [["9999", "b"]], MS: [["1861-01-09", "b"], ["1865-05-10", "r"], ["9999", "b"]], TN: [["1861-06-08", "b"], ["1865-05-10", "r"], ["9999", "b"]],
         GA: [["1861-01-19", "b"], ["1865-05-10", "r"], ["9999", "b"]], FL: [["1861-01-10", "b"], ["1865-05-20", "r"], ["9999", "b"]] }
 };
+TERR_DEFAULT.fiw = { NC: [["9999", "r"]], SC: [["9999", "r"]], VA: [["9999", "r"]], MD: [["9999", "r"]], DE: [["9999", "r"]], PA: [["9999", "r"]], NJ: [["9999", "r"]], NY: [["9999", "r"]], CT: [["9999", "r"]], RI: [["9999", "r"]], MA: [["9999", "r"]], ME: [["9999", "r"]], NH: [["9999", "r"]], VT: [["9999", "r"]], GA: [["9999", "r"]], DC: [["9999", "r"]], WV: [["1758-11-25", "b"], ["9999", "r"]], OH: [["1760-11-29", "b"], ["9999", "r"]], IN: [["1761-01-01", "b"], ["9999", "r"]], MS: [["1763-02-10", "b"], ["9999", "r"]], FL: [["1763-02-10", "b"], ["9999", "r"]] };   // Spanish Florida and French Louisiana count as French-allied until the peace
+TERR_DEFAULT.w12 = { NC: [["9999", "b"]], SC: [["9999", "b"]], VA: [["9999", "b"]], WV: [["9999", "b"]], MD: [["9999", "b"]], DE: [["9999", "b"]], PA: [["9999", "b"]], NJ: [["9999", "b"]], NY: [["9999", "b"]], CT: [["9999", "b"]], RI: [["9999", "b"]], MA: [["9999", "b"]], ME: [["9999", "b"]], NH: [["9999", "b"]], VT: [["9999", "b"]], GA: [["9999", "b"]], DC: [["9999", "b"]], KY: [["9999", "b"]], OH: [["9999", "b"]], IN: [["9999", "b"]], TN: [["9999", "b"]], MS: [["9999", "b"]] };
 function terrDefault(st, iso) {
   const d = (TERR_DEFAULT[era] || {})[st];
   if (!d) return null;
@@ -2263,7 +2370,7 @@ const BATTLE_NUM = {
   bentonville: ["Union ~60,000 · Confederate ~21,000", "Union ~1,500 · Confederate ~2,600"],
   "fl-olustee": ["Union ~5,500 · Confederate ~5,000", "Union ~1,860 · Confederate ~950"]
 };
-const WIN_EVT = { "ninetysix@1781-06-19": ["gb", "Siege fails"], "plymouth@1864-10-27": ["un", "Albemarle sunk"], "plymouth@1864-04-19": null, "fortfisher@1864-12-24": ["cs", "First attack fails"] };
+const WIN_EVT = { "fiw-carillon@1759-07-27": ["gb", "French blow up the fort and withdraw"], "fiw-duquesne@1758-11-24": ["gb", "French blow up the fort"], "ninetysix@1781-06-19": ["gb", "Siege fails"], "plymouth@1864-10-27": ["un", "Albemarle sunk"], "plymouth@1864-04-19": null, "fortfisher@1864-12-24": ["cs", "First attack fails"] };
 function winnerFor(t) {
   if (!t.site) return null;
   const k = t.site + "@" + t.iso;
@@ -2338,11 +2445,15 @@ function drawBattlePops() {
 }
 
 function renderFlagKey() {
-  const keys = era === "rev" ? (area === "carolinas" ? ["us", "pm", "fr", "es", "gb", "na"] : ["us", "pm", "gb"]) : ["un", "cs"];
+  const keys = era === "fiw" ? ["fr", "naf", "gb", "col"] : era === "w12" ? ["us", "gb", "na"] : era === "rev" ? (area === "carolinas" ? ["us", "pm", "fr", "es", "gb", "na"] : ["us", "pm", "gb"]) : ["un", "cs"];
   const label = { us: "Continental Army (1777 flag)", pm: "Patriot militia (Moultrie flag)", gb: "British & Loyalists (Union Flag)", un: "Union (Stars and Stripes)", cs: "Confederate (Stars and Bars)",
-    fr: "French allies (royal white flag)", es: "Spanish allies (Cross of Burgundy)", na: "Native nations allied with Britain (no flag; symbol only)" };
+    fr: "French allies (royal white flag)", es: "Spanish allies (Cross of Burgundy)", na: "Native nations allied with Britain (no flag; symbol only)",
+    naf: "Native nations allied with France (no flag; symbol only)", col: "Colonial troops and rangers (British side)" };
+  if (era === "w12") { label.us = "United States (Stars and Stripes)"; label.gb = "British forces (Union Flag)"; }
+  if (era === "fiw") label.gb = "British regulars (Union Flag)";
+  const tk = { fiw: ["French-held", "British-held"], rev: ["American-held", "British-held"], w12: ["American-held", "British-held"], cw: ["Union-held", "Confederate-held"] }[era];
   document.getElementById("flagkey").innerHTML = `<b>Flags</b>` + keys.map(k => `<span>${flagHTML(k, 24)} ${label[k]}</span>`).join("") +
-    `<div class="terrkey"><span><i style="background:var(--terr-b)"></i>${era === "rev" ? "American-held" : "Union-held"}</span><span><i style="background:var(--terr-r)"></i>${era === "rev" ? "British-held" : "Confederate-held"}</span></div>`;
+    `<div class="terrkey"><span><i style="background:var(--terr-b)"></i>${tk[0]}</span><span><i style="background:var(--terr-r)"></i>${tk[1]}</span></div>`;
 }
 
 /* ======================= TIMELINES (scenarios) =======================
@@ -3458,6 +3569,169 @@ const SCENARIOS = [
         wp: [W_("1864-06-09", 34.66, -88.57, "Booneville"), W_("1864-06-10", 34.50, -88.73, "Brice's Crossroads"), W_("1864-07-14", 34.27, -88.77, "Tupelo"), W_("1864-07-16", 34.10, -88.80, "Withdraw")] },
       { id: "ajsmith", name: "A. J. Smith's corps", ab: "AS", c: "fx-un", side: "un", desc: "Gen. Andrew J. Smith.",
         wp: [W_("1864-07-05", 35.04, -89.24, "La Grange"), W_("1864-07-14", 34.26, -88.74, "Tupelo"), W_("1864-07-20", 35.04, -89.24, "Return")] }] },
+  // ======================= FRENCH AND INDIAN WAR =======================
+  { id: "fiw-ohio", area: "carolinas", era: "fiw", st: "PA", name: "The Forks of the Ohio, 1753–58", start: "1753-10-31", end: "1758-12-05", at: "1755-07-09",
+    bbox: [38.5, -81.2, 42.4, -76.6], fit: [38.8, -81.0, 42.2, -76.8], band: ["1755-06-10", "1755-07-13", "Braddock's march"],
+    events: [
+      { iso: "1753-12-11", d: "Dec 1753", t: "Washington's mission", s: "Virginia orders the French out; they refuse.", site: "fiw-leboeuf" },
+      { iso: "1754-04-17", d: "Apr 17, 1754", t: "The Forks taken", s: "The French seize the Virginians' half-built fort and build Fort Duquesne." },
+      { iso: "1754-05-28", d: "May 28, 1754", t: "Jumonville Glen", s: "Washington's ambush starts the war.", site: "fiw-jumonville" },
+      { iso: "1754-07-03", d: "July 3, 1754", t: "Fort Necessity", s: "Washington surrenders.", site: "fiw-necessity" },
+      { iso: "1755-07-09", d: "July 9, 1755", t: "Monongahela", s: "Braddock's army routed.", site: "fiw-monongahela" },
+      { iso: "1756-09-08", d: "Sept 8, 1756", t: "Kittanning", s: "Armstrong's raid.", site: "fiw-kittanning" },
+      { iso: "1758-10-12", d: "Oct 12, 1758", t: "Fort Ligonier", s: "The French attack fails.", site: "fiw-ligonier" },
+      { iso: "1758-11-25", d: "Nov 25, 1758", t: "Fort Duquesne", s: "The French blow it up and leave.", site: "fiw-duquesne" }],
+    forces: [
+      { id: "washington-fiw", name: "Washington's Virginians", ab: "GW", c: "militia", side: "col", desc: "George Washington, then a Virginia militia officer, and his Virginia Regiment.",
+        wp: [W_("1753-11-15", 39.65, -78.76, "Leave Wills Creek"), W_("1753-12-11", 41.93, -80.04, "Fort Le Boeuf"), W_("1754-01-10", 39.65, -78.76, "Back with the French answer"),
+             W_("1754-05-24", 39.82, -79.59, "Great Meadows"), W_("1754-05-28", 39.88, -79.65, "Jumonville Glen"), W_("1754-07-03", 39.8146, -79.5867, "Surrender at Fort Necessity"),
+             W_("1754-07-12", 39.65, -78.76, "Wills Creek"), W_("1755-06-10", 39.65, -78.77, "Join Braddock as an aide"), W_("1755-07-09", 40.40, -79.88, "Monongahela"),
+             W_("1758-11-25", 40.44, -80.02, "With Forbes at the Forks")] },
+      { id: "french-ohio", name: "French and Native forces at the Forks", ab: "FR", c: "fx-navy", side: "fr", desc: "Troupes de la Marine, Canadian militia and their Native allies at Fort Duquesne.",
+        wp: [W_("1754-04-17", 40.4413, -80.011, "Seize the Forks"), W_("1754-07-03", 39.8146, -79.5867, "Fort Necessity (Coulon de Villiers)"), W_("1754-07-06", 40.44, -80.01, "Fort Duquesne"),
+             W_("1755-07-09", 40.40, -79.87, "Ambush Braddock (Beaujeu, Dumas)"), W_("1755-07-11", 40.44, -80.01, "Fort Duquesne"), W_("1758-09-14", 40.44, -80.00, "Defeat Grant's raid"),
+             W_("1758-10-12", 40.24, -79.23, "Attack Fort Ligonier"), W_("1758-11-24", 40.4413, -80.011, "Blow up the fort"), W_("1758-11-28", 41.40, -79.80, "Withdraw to Venango")] },
+      { id: "jumonville", name: "Jumonville's party", ab: "JJ", c: "fx-navy", side: "fr", desc: "Ensign Joseph Coulon de Villiers de Jumonville's 35 men.",
+        wp: [W_("1754-05-23", 40.44, -80.01, "Leave the Forks"), W_("1754-05-28", 39.88, -79.65, "Ambushed; Jumonville killed")] },
+      { id: "braddock", name: "Braddock's army", ab: "EB", c: "fx-gb", side: "gb", big: true, desc: "Gen. Edward Braddock's British regulars and colonial troops.",
+        wp: [W_("1755-06-10", 39.65, -78.76, "Fort Cumberland"), W_("1755-06-25", 39.75, -79.30, "Cut a road west"), W_("1755-07-09", 40.40, -79.87, "Monongahela"),
+             W_("1755-07-13", 39.81, -79.64, "Braddock dies on the retreat"), W_("1755-07-20", 39.65, -78.76, "Fort Cumberland")] },
+      { id: "armstrong", name: "Armstrong's Pennsylvanians", ab: "JA", c: "militia", side: "col", desc: "Col. John Armstrong.",
+        wp: [W_("1756-08-30", 40.37, -77.95, "Fort Shirley"), W_("1756-09-08", 40.8167, -79.5228, "Burn Kittanning"), W_("1756-09-14", 40.37, -77.95, "Return")] },
+      { id: "forbes", name: "Forbes's army", ab: "JF", c: "fx-gb", side: "gb", big: true, desc: "Gen. John Forbes, with Bouquet and Washington.",
+        wp: [W_("1758-07-01", 40.20, -77.19, "Carlisle"), W_("1758-09-03", 40.02, -78.50, "Raystown"), W_("1758-10-12", 40.2437, -79.2337, "Fort Ligonier"),
+             W_("1758-11-25", 40.4413, -80.011, "The Forks: Fort Pitt begun"), W_("1758-12-05", 40.44, -80.01, "Garrison left behind")] }] },
+  { id: "fiw-lakes", area: "carolinas", era: "fiw", st: "NY", name: "Lake George, Lake Champlain and Niagara, 1755–59", start: "1755-08-01", end: "1759-08-10", at: "1758-07-08",
+    bbox: [42.6, -79.6, 45.2, -72.8], fit: [42.7, -79.5, 45.1, -72.9], band: ["1759-07-06", "1759-07-31", "The year of victories"],
+    events: [
+      { iso: "1755-09-08", d: "Sept 8, 1755", t: "Lake George", s: "Johnson captures Dieskau.", site: "fiw-lakegeorge" },
+      { iso: "1756-08-14", d: "Aug 14, 1756", t: "Oswego", s: "Montcalm takes the lake forts.", site: "fiw-oswego" },
+      { iso: "1757-08-09", d: "Aug 9, 1757", t: "Fort William Henry", s: "Surrender and massacre.", site: "fiw-fortwmhenry" },
+      { iso: "1758-03-13", d: "Mar 13, 1758", t: "Battle on Snowshoes", s: "Rogers's rangers beaten.", site: "fiw-snowshoes" },
+      { iso: "1758-07-08", d: "July 8, 1758", t: "Carillon", s: "Abercromby's assault fails.", site: "fiw-carillon" },
+      { iso: "1759-07-26", d: "July 26, 1759", t: "Fort Niagara", s: "The link to the Ohio is cut.", site: "fiw-niagara" },
+      { iso: "1759-07-27", d: "July 27, 1759", t: "Ticonderoga abandoned", s: "The French blow up the fort.", site: "fiw-carillon" },
+      { iso: "1759-07-31", d: "July 31, 1759", t: "Crown Point", s: "The French withdraw north.", site: "fiw-crownpoint" },
+      { iso: "1759-09-13", d: "Sept 13, 1759", t: "Quebec", s: "Wolfe and Montcalm both die on the Plains of Abraham." }],
+    forces: [
+      { id: "johnson55", name: "Johnson's colonials and Mohawks", ab: "WJ", c: "militia", side: "col", desc: "William Johnson's New England and New York troops and Mohawk allies under Hendrick.",
+        wp: [W_("1755-08-26", 43.27, -73.58, "Fort Edward"), W_("1755-09-08", 43.42, -73.71, "Battle of Lake George"), W_("1755-11-01", 43.42, -73.71, "Build Fort William Henry")] },
+      { id: "dieskau", name: "Dieskau's force", ab: "BD", c: "fx-navy", side: "fr", desc: "Baron Dieskau's French regulars, Canadians and Native allies.",
+        wp: [W_("1755-09-04", 44.03, -73.43, "Crown Point"), W_("1755-09-08", 43.40, -73.70, "Lake George: Dieskau captured"), W_("1755-09-12", 43.84, -73.39, "Survivors to Ticonderoga")] },
+      { id: "montcalm", name: "Montcalm's army", ab: "MM", c: "fx-navy", side: "fr", big: true, desc: "The Marquis de Montcalm.",
+        wp: [W_("1756-08-10", 43.46, -76.51, "Besiege Oswego"), W_("1756-08-14", 43.46, -76.51, "Oswego surrenders"), W_("1756-09-20", 44.03, -73.43, "Lake Champlain"),
+             W_("1757-08-03", 43.425, -73.71, "Besiege Fort William Henry"), W_("1757-08-09", 43.42, -73.71, "Surrender"), W_("1758-07-08", 43.84, -73.39, "Carillon"),
+             W_("1758-11-01", 44.90, -73.30, "To Canada")] },
+      { id: "munro", name: "Fort William Henry garrison", ab: "GM", c: "fx-gb", side: "gb", desc: "Lt. Col. George Munro.",
+        wp: [W_("1757-08-03", 43.4186, -73.7117, "Besieged"), W_("1757-08-09", 43.4186, -73.7117, "Surrender"), W_("1757-08-10", 43.30, -73.62, "Attacked on the march")] },
+      { id: "rogers", name: "Rogers's Rangers", ab: "RR", c: "militia", side: "col", desc: "Maj. Robert Rogers's scouts.",
+        wp: [W_("1758-03-10", 43.42, -73.71, "Leave Fort Edward"), W_("1758-03-13", 43.85, -73.45, "Battle on Snowshoes"), W_("1758-03-15", 43.42, -73.71, "Survivors return")] },
+      { id: "abercromby", name: "Abercromby's army", ab: "JA", c: "fx-gb", side: "gb", big: true, desc: "Gen. James Abercromby's 16,000 men, the largest army yet seen in America.",
+        wp: [W_("1758-07-05", 43.42, -73.71, "Embark on Lake George"), W_("1758-07-08", 43.84, -73.39, "Assault at Carillon"), W_("1758-07-10", 43.42, -73.71, "Retreat")] },
+      { id: "prideaux", name: "Niagara expedition", ab: "WJ", c: "fx-gb", side: "gb", desc: "Gen. John Prideaux, then Sir William Johnson after Prideaux was killed.",
+        wp: [W_("1759-06-27", 43.46, -76.51, "Leave Oswego"), W_("1759-07-06", 43.27, -79.05, "Besiege Fort Niagara"), W_("1759-07-24", 43.20, -79.05, "La Belle-Famille"),
+             W_("1759-07-26", 43.2628, -79.0636, "Fort Niagara surrenders")] },
+      { id: "amherst", name: "Amherst's army", ab: "JA", c: "fx-gb", side: "gb", big: true, desc: "Gen. Jeffery Amherst.",
+        wp: [W_("1759-07-21", 43.42, -73.71, "Lake George"), W_("1759-07-27", 43.84, -73.39, "Ticonderoga"), W_("1759-07-31", 44.03, -73.43, "Crown Point"), W_("1759-08-10", 44.03, -73.43, "Build a new fort")] }] },
+  { id: "fiw-pontiac", area: "carolinas", era: "fiw", st: "PA", name: "Pontiac's War, 1763", start: "1763-05-01", end: "1763-09-15", at: "1763-08-05",
+    bbox: [39.6, -84.0, 42.6, -76.8], fit: [39.7, -83.5, 42.5, -77.0], band: ["1763-08-05", "1763-08-06", "Bushy Run"],
+    events: [
+      { iso: "1763-05-07", d: "May 7", t: "Pontiac strikes", s: "Detroit besieged; British forts fall across the west." },
+      { iso: "1763-06-20", d: "June 20", t: "Presque Isle", s: "The fort at Erie surrenders." },
+      { iso: "1763-06-22", d: "June 22", t: "Fort Pitt besieged", s: "Its officers give smallpox-infected blankets to Delaware envoys." },
+      { iso: "1763-08-05", d: "Aug 5–6", t: "Bushy Run", s: "Bouquet breaks through.", site: "fiw-bushyrun" },
+      { iso: "1763-08-10", d: "Aug 10", t: "Fort Pitt relieved", s: "The siege ends." }],
+    forces: [
+      { id: "bouquet", name: "Bouquet's column", ab: "HB", c: "fx-gb", side: "gb", desc: "Col. Henry Bouquet's Highlanders and Royal Americans.",
+        wp: [W_("1763-07-18", 40.20, -77.19, "Carlisle"), W_("1763-08-02", 40.24, -79.23, "Fort Ligonier"), W_("1763-08-05", 40.36, -79.63, "Bushy Run"), W_("1763-08-10", 40.44, -80.01, "Relieve Fort Pitt")] },
+      { id: "guyasuta", name: "Delaware, Shawnee and Mingo warriors", ab: "GY", c: "fx-loyal", side: "naf", desc: "Warriors led by Guyasuta and others, fighting British rule after the French left.",
+        wp: [W_("1763-06-01", 40.70, -80.50, "Gather"), W_("1763-06-22", 40.45, -80.02, "Besiege Fort Pitt"), W_("1763-08-04", 40.40, -79.70, "Meet Bouquet's column"),
+             W_("1763-08-05", 40.36, -79.62, "Bushy Run"), W_("1763-08-10", 40.70, -80.60, "Withdraw west")] }] },
+  // ======================= WAR OF 1812 =======================
+  { id: "w12-north", area: "carolinas", era: "w12", st: "NY", name: "The Great Lakes and Lake Champlain, 1812–14", start: "1812-06-18", end: "1814-09-20", at: "1813-09-10",
+    bbox: [40.8, -84.6, 45.3, -72.8], fit: [40.9, -84.4, 45.2, -72.9], band: ["1813-09-10", "1813-10-05", "Lake Erie and the Thames"],
+    events: [
+      { iso: "1812-06-18", d: "June 18, 1812", t: "War declared", s: "Over impressment of sailors, trade and the frontier." },
+      { iso: "1812-08-16", d: "Aug 16", t: "Detroit surrendered", s: "Gen. William Hull gives up the town to Brock and Tecumseh." },
+      { iso: "1812-09-05", d: "Sept 1812", t: "Fort Harrison", s: "Zachary Taylor holds.", site: "w12-fortharrison" },
+      { iso: "1813-05-05", d: "May 5, 1813", t: "Fort Meigs", s: "The first siege fails.", site: "w12-fortmeigs" },
+      { iso: "1813-05-29", d: "May 29", t: "Sackets Harbor", s: "A British landing beaten off.", site: "w12-sackets" },
+      { iso: "1813-08-02", d: "Aug 2", t: "Fort Stephenson", s: "'Old Betsy' holds the fort.", site: "w12-fortstephenson" },
+      { iso: "1813-09-10", d: "Sept 10", t: "Lake Erie", s: "'We have met the enemy and they are ours.'", site: "w12-lakeerie" },
+      { iso: "1813-10-05", d: "Oct 5", t: "The Thames", s: "Tecumseh is killed in Upper Canada." },
+      { iso: "1813-12-19", d: "Dec 19", t: "Fort Niagara", s: "Taken at night.", site: "w12-niagara" },
+      { iso: "1813-12-30", d: "Dec 30", t: "Buffalo burned", s: "", site: "w12-buffalo" },
+      { iso: "1814-05-06", d: "May 6, 1814", t: "Oswego", s: "A British raid.", site: "w12-oswego" },
+      { iso: "1814-07-25", d: "July 25", t: "Lundy's Lane", s: "The bloodiest battle of the war, near Niagara Falls." },
+      { iso: "1814-09-11", d: "Sept 11, 1814", t: "Plattsburgh", s: "Macdonough wins on the lake; Prevost turns back.", site: "w12-plattsburgh" }],
+    forces: [
+      { id: "harrison", name: "Harrison's army", ab: "WH", c: "continental", side: "us", big: true, desc: "Gen. William Henry Harrison's Army of the Northwest.",
+        wp: [W_("1813-02-01", 41.5446, -83.6493, "Build Fort Meigs"), W_("1813-05-05", 41.5446, -83.6493, "Siege lifted"), W_("1813-09-20", 41.60, -82.90, "Gather at Put-in-Bay"),
+             W_("1813-09-27", 42.05, -83.10, "Cross into Canada"), W_("1813-10-05", 42.55, -82.00, "Battle of the Thames"), W_("1813-11-01", 42.33, -83.05, "Detroit")] },
+      { id: "procter", name: "Procter and Tecumseh", ab: "HP", c: "fx-gb", side: "gb", desc: "Gen. Henry Procter's British troops and Tecumseh's confederacy.",
+        wp: [W_("1812-08-16", 42.33, -83.05, "Take Detroit"), W_("1813-04-28", 41.55, -83.66, "Besiege Fort Meigs"), W_("1813-05-09", 42.10, -83.10, "Withdraw"),
+             W_("1813-08-02", 41.35, -83.12, "Fort Stephenson"), W_("1813-09-27", 42.33, -83.05, "Abandon Detroit"), W_("1813-10-05", 42.55, -82.00, "The Thames: Tecumseh killed")] },
+      { id: "perry", name: "Perry's squadron", ab: "OP", c: "fx-navy", side: "us", ship: true, desc: "Master Commandant Oliver Hazard Perry.",
+        wp: [W_("1813-08-12", 42.13, -80.09, "Leave Erie"), W_("1813-09-10", 41.65, -82.83, "Battle of Lake Erie"), W_("1813-09-27", 42.05, -83.10, "Ferry Harrison's army")] },
+      { id: "barclay", name: "Barclay's squadron", ab: "RB", c: "fx-gb", side: "gb", ship: true, desc: "Commander Robert Barclay.",
+        wp: [W_("1813-09-01", 42.10, -83.10, "Amherstburg"), W_("1813-09-10", 41.66, -82.86, "Captured")] },
+      { id: "chauncey", name: "Lake Ontario squadron", ab: "IC", c: "fx-navy", side: "us", ship: true, desc: "Commodore Isaac Chauncey.",
+        wp: [W_("1813-04-27", 43.65, -79.38, "Raid York (Toronto)"), W_("1813-05-27", 43.25, -79.07, "Fort George"), W_("1813-05-30", 43.946, -76.12, "Back to Sackets Harbor"), W_("1814-09-20", 43.946, -76.12, "Sackets Harbor")] },
+      { id: "prevost13", name: "British attack on Sackets Harbor", ab: "GP", c: "fx-gb", side: "gb", desc: "Sir George Prevost from Kingston.",
+        wp: [W_("1813-05-28", 44.23, -76.48, "Leave Kingston"), W_("1813-05-29", 43.94, -76.12, "Land at Sackets Harbor"), W_("1813-05-30", 44.23, -76.48, "Withdraw")] },
+      { id: "drummond", name: "Niagara raiders", ab: "GD", c: "fx-gb", side: "gb", desc: "British troops and Native allies under Gordon Drummond.",
+        wp: [W_("1813-12-18", 43.20, -79.05, "Cross the river at night"), W_("1813-12-19", 43.2628, -79.0636, "Take Fort Niagara"), W_("1813-12-30", 42.886, -78.878, "Burn Buffalo"), W_("1814-01-05", 43.20, -79.05, "Back across")] },
+      { id: "prevost14", name: "Prevost's army", ab: "GP", c: "fx-gb", side: "gb", big: true, desc: "Sir George Prevost's 10,000 veterans.",
+        wp: [W_("1814-08-31", 45.00, -73.45, "Cross the border"), W_("1814-09-06", 44.70, -73.46, "Reach Plattsburgh"), W_("1814-09-11", 44.70, -73.46, "Turn back"), W_("1814-09-14", 45.00, -73.45, "Back to Canada")] },
+      { id: "macdonough", name: "Macdonough's squadron", ab: "TM", c: "fx-navy", side: "us", ship: true, desc: "Master Commandant Thomas Macdonough.",
+        wp: [W_("1814-09-01", 44.69, -73.43, "Anchor in Plattsburgh Bay"), W_("1814-09-11", 44.69, -73.43, "Battle of Plattsburgh")] },
+      { id: "downie", name: "Downie's squadron", ab: "GD", c: "fx-gb", side: "gb", ship: true, desc: "Capt. George Downie.",
+        wp: [W_("1814-09-09", 44.95, -73.35, "Sail south"), W_("1814-09-11", 44.68, -73.42, "Captured; Downie killed")] }] },
+  { id: "w12-chesapeake", area: "carolinas", era: "w12", st: "MD", name: "The Chesapeake, 1813–14", start: "1813-04-20", end: "1814-09-20", at: "1814-09-13",
+    bbox: [36.7, -77.6, 39.8, -75.8], fit: [36.8, -77.5, 39.7, -75.9], band: ["1814-08-19", "1814-09-14", "Washington and Baltimore"],
+    events: [
+      { iso: "1813-05-03", d: "May 3, 1813", t: "Havre de Grace", s: "Cockburn burns the town.", site: "w12-havredegrace" },
+      { iso: "1813-06-22", d: "June 22", t: "Craney Island", s: "Norfolk saved.", site: "w12-craneyisland" },
+      { iso: "1813-06-25", d: "June 25", t: "Hampton", s: "The town sacked.", site: "w12-hampton" },
+      { iso: "1814-08-19", d: "Aug 19, 1814", t: "Landing at Benedict", s: "Ross and Cockburn march on Washington." },
+      { iso: "1814-08-24", d: "Aug 24", t: "Bladensburg", s: "The 'Bladensburg Races.'", site: "w12-bladensburg" },
+      { iso: "1814-08-25", d: "Aug 24–25", t: "Washington burned", s: "The Capitol and President's House in flames.", site: "w12-washington" },
+      { iso: "1814-09-12", d: "Sept 12", t: "North Point", s: "Ross killed.", site: "w12-northpoint" },
+      { iso: "1814-09-14", d: "Sept 13–14", t: "Fort McHenry", s: "'The Star-Spangled Banner.'", site: "w12-fortmchenry" }],
+    forces: [
+      { id: "cockburn", name: "Cockburn's squadron", ab: "GC", c: "fx-gb", side: "gb", ship: true, desc: "Rear Admiral George Cockburn's raiders.",
+        wp: [W_("1813-04-29", 39.40, -76.10, "Head of the Bay"), W_("1813-05-03", 39.55, -76.09, "Havre de Grace"), W_("1813-06-22", 36.92, -76.36, "Craney Island"),
+             W_("1813-06-25", 37.03, -76.34, "Hampton"), W_("1814-08-19", 38.51, -76.68, "Benedict"), W_("1814-09-13", 39.22, -76.52, "Patapsco River"), W_("1814-09-20", 38.80, -76.30, "Withdraw")] },
+      { id: "ross", name: "Ross's army", ab: "RR", c: "fx-gb", side: "gb", big: true, desc: "Gen. Robert Ross's veterans from Europe.",
+        wp: [W_("1814-08-19", 38.51, -76.68, "Land at Benedict"), W_("1814-08-24", 38.94, -76.94, "Bladensburg"), W_("1814-08-25", 38.89, -77.01, "Burn Washington"),
+             W_("1814-08-30", 38.51, -76.68, "Back to the ships"), W_("1814-09-12", 39.25, -76.45, "North Point: Ross killed"), W_("1814-09-14", 39.20, -76.40, "Re-embark")] },
+      { id: "winder", name: "Winder's militia", ab: "WW", c: "continental", side: "us", desc: "Gen. William Winder's army defending Washington.",
+        wp: [W_("1814-08-22", 38.85, -76.90, "Long Old Fields"), W_("1814-08-24", 38.94, -76.94, "Bladensburg"), W_("1814-08-25", 39.08, -77.15, "Scattered")] },
+      { id: "barney", name: "Barney's flotillamen", ab: "JB", c: "fx-navy", side: "us", desc: "Commodore Joshua Barney's Chesapeake Flotilla; Charles Ball and other Black sailors among them.",
+        wp: [W_("1814-06-10", 38.39, -76.48, "St. Leonard Creek"), W_("1814-08-22", 38.75, -76.70, "Scuttle the flotilla"), W_("1814-08-24", 38.94, -76.94, "Last stand at Bladensburg")] },
+      { id: "stricker", name: "Baltimore militia", ab: "JS", c: "continental", side: "us", desc: "Gen. John Stricker's brigade and Sam Smith's defenses.",
+        wp: [W_("1814-09-11", 39.27, -76.50, "March out"), W_("1814-09-12", 39.25, -76.46, "North Point"), W_("1814-09-13", 39.29, -76.57, "Hampstead Hill lines")] },
+      { id: "armistead", name: "Fort McHenry garrison", ab: "GA", c: "continental", side: "us", desc: "Major George Armistead.",
+        wp: [W_("1814-09-12", 39.2628, -76.5797, "Fort McHenry"), W_("1814-09-14", 39.2628, -76.5797, "The flag at dawn")] },
+      { id: "cochrane", name: "Cochrane's bombardment squadron", ab: "AC", c: "fx-gb", side: "gb", ship: true, desc: "Vice Admiral Alexander Cochrane's ships and rocket vessels.",
+        wp: [W_("1814-09-12", 39.15, -76.48, "Up the Patapsco"), W_("1814-09-13", 39.21, -76.53, "Bombard Fort McHenry"), W_("1814-09-14", 39.10, -76.45, "Withdraw")] }] },
+  { id: "w12-south", area: "carolinas", era: "w12", name: "Pensacola and New Orleans, 1814–15", start: "1814-10-20", end: "1815-02-15", at: "1815-01-08",
+    bbox: [28.8, -92.2, 31.6, -86.5], fit: [29.0, -91.5, 31.3, -86.8], band: ["1814-12-23", "1815-01-08", "Battles for New Orleans"],
+    events: [
+      { iso: "1814-11-07", d: "Nov 7, 1814", t: "Pensacola", s: "Jackson takes the British base.", site: "w12-pensacola" },
+      { iso: "1814-12-14", d: "Dec 14", t: "Lake Borgne", s: "British boats capture the American gunboats." },
+      { iso: "1814-12-23", d: "Dec 23", t: "Night attack", s: "Jackson strikes the British camp." },
+      { iso: "1814-12-24", d: "Dec 24", t: "Treaty of Ghent", s: "Peace signed in Belgium; the news takes weeks to arrive." },
+      { iso: "1815-01-08", d: "Jan 8, 1815", t: "New Orleans", s: "Pakenham's assault fails.", site: "w12-neworleans" }],
+    forces: [
+      { id: "jackson12", name: "Jackson's army", ab: "AJ", c: "continental", side: "us", big: true, desc: "Gen. Andrew Jackson's regulars, Tennessee and Kentucky militia, free men of color, Choctaw warriors and Lafitte's Baratarians.",
+        wp: [W_("1814-11-01", 30.69, -88.04, "Mobile"), W_("1814-11-07", 30.41, -87.22, "Take Pensacola"), W_("1814-12-01", 29.95, -90.07, "New Orleans"),
+             W_("1814-12-23", 29.91, -89.96, "Night attack"), W_("1815-01-08", 29.942, -89.99, "Line at Chalmette")] },
+      { id: "pakenham", name: "Pakenham's army", ab: "EP", c: "fx-gb", side: "gb", big: true, desc: "Gen. Sir Edward Pakenham's veterans.",
+        wp: [W_("1814-12-13", 30.10, -89.55, "Lake Borgne"), W_("1814-12-23", 29.90, -89.94, "Villeré plantation"), W_("1815-01-08", 29.938, -89.993, "Assault: Pakenham killed"),
+             W_("1815-01-18", 30.10, -89.55, "Withdraw")] },
+      { id: "cochrane-gulf", name: "British fleet", ab: "AC", c: "fx-gb", side: "gb", ship: true, desc: "Vice Admiral Cochrane's fleet off the Louisiana coast.",
+        wp: [W_("1814-12-10", 30.22, -89.10, "Off Cat Island"), W_("1815-01-25", 30.22, -89.10, "Re-embark the army")] }] },
   { id: "clt-cw", area: "charlotte", era: "cw", name: "1865: Sherman and the end in the Carolinas", start: "1865-02-01", end: "1865-05-12", at: "1865-04-19",
     band: ["1865-04-18", "1865-04-26", "Davis in Charlotte"], fit: "carolinas", bbox: [32.3, -82.8, 36.8, -76.8],
     events: [
@@ -3628,6 +3902,64 @@ const PEOPLE = [
     b: "A Tennessee newspaper editor and congressman killed at Mill Springs after riding into Union lines by mistake." },
   { n: "Earl Van Dorn", r: "Major General · Confederate army", side: "cs", site: "ms-hollysprings", area: "carolinas", era: "cw",
     b: "Lost at Corinth but wrecked Grant's depot at Holly Springs; he was shot dead by a jealous husband in 1863." },
+  // ---------- French and Indian War ----------
+  { n: "Lt. Col. George Washington", r: "Virginia Regiment · age 21–26", side: "col", site: "fiw-necessity", area: "carolinas", era: "fiw",
+    b: "Carried Virginia's warning to the French in 1753, fired the first shots at Jumonville Glen, surrendered Fort Necessity, survived Braddock's defeat and marched with Forbes to the Forks." },
+  { n: "Edward Braddock", r: "Major General · British commander in America", side: "gb", site: "fiw-monongahela", area: "carolinas", era: "fiw",
+    b: "Cut a road across the mountains toward Fort Duquesne and was mortally wounded when his column was ambushed on the Monongahela in July 1755." },
+  { n: "Marquis de Montcalm", r: "French commander in North America", side: "fr", site: "fiw-carillon", area: "carolinas", era: "fiw",
+    b: "Took Oswego and Fort William Henry and won at Carillon against odds of four to one; killed defending Quebec in 1759." },
+  { n: "Sir William Johnson", r: "Superintendent of Indian Affairs · New York", side: "col", site: "fiw-lakegeorge", area: "carolinas", era: "fiw",
+    b: "An Irish-born trader married into the Mohawk nation; he won at Lake George in 1755 and took Fort Niagara in 1759." },
+  { n: "Hendrick Theyanoguin", r: "Mohawk leader", side: "col", site: "fiw-lakegeorge", area: "carolinas", era: "fiw",
+    b: "Johnson's old ally, killed leading Mohawk warriors in the ambush that opened the Battle of Lake George." },
+  { n: "Robert Rogers", r: "Major · Rogers's Rangers", side: "col", site: "fiw-snowshoes", area: "carolinas", era: "fiw",
+    b: "New Hampshire woodsman whose rangers scouted and raided around Lake George; his 'rules of ranging' are still taught." },
+  { n: "Joseph Coulon de Villiers de Jumonville", r: "Ensign · Troupes de la Marine", side: "fr", site: "fiw-jumonville", area: "carolinas", era: "fiw",
+    b: "Killed when Washington's party attacked his camp; the French said he was on a diplomatic mission, and his brother Louis took revenge at Fort Necessity." },
+  { n: "John Forbes", r: "Brigadier General · British army", side: "gb", site: "fiw-duquesne", area: "carolinas", era: "fiw",
+    b: "Dying of illness, he carried on a slow, methodical advance across Pennsylvania and took the Forks in November 1758, naming it Pittsburgh." },
+  { n: "James Abercromby", r: "Major General · British commander in America", side: "gb", site: "fiw-carillon", area: "carolinas", era: "fiw",
+    b: "Ordered frontal attacks on Montcalm's log wall at Carillon; recalled after the defeat." },
+  { n: "Jeffery Amherst", r: "Major General · British commander in America", side: "gb", site: "fiw-crownpoint", area: "carolinas", era: "fiw",
+    b: "Took Louisbourg, Ticonderoga, Crown Point and Montreal; his harsh policy toward Native nations after the war helped set off Pontiac's War." },
+  { n: "Henry Bouquet", r: "Colonel · Royal American Regiment", side: "gb", site: "fiw-bushyrun", area: "carolinas", era: "fiw",
+    b: "A Swiss officer in British service; he won at Bushy Run in 1763 and relieved Fort Pitt." },
+  { n: "Pontiac", r: "Odawa war leader", side: "naf", site: "fiw-bushyrun", area: "carolinas", era: "fiw",
+    b: "Led the siege of Detroit in 1763, part of a wide uprising of nations that had been France's allies against British rule." },
+  { n: "Guyasuta", r: "Seneca and Mingo leader", side: "naf", site: "fiw-bushyrun", area: "carolinas", era: "fiw",
+    b: "Guided Washington in 1753, fought with the French against Braddock and led warriors against Fort Pitt and at Bushy Run in 1763." },
+  // ---------- War of 1812 ----------
+  { n: "William Henry Harrison", r: "Major General · Army of the Northwest", side: "us", site: "w12-fortmeigs", area: "carolinas", era: "w12",
+    b: "Fought Tecumseh's confederacy at Tippecanoe in 1811, held Fort Meigs and won at the Thames in 1813; elected President in 1840." },
+  { n: "Tecumseh", r: "Shawnee leader · British ally", side: "na", site: "w12-fortmeigs", area: "carolinas", era: "w12",
+    b: "Built an alliance of nations to stop American expansion and fought beside the British at Detroit and Fort Meigs; killed at the Thames in October 1813." },
+  { n: "Oliver Hazard Perry", r: "Master Commandant · U.S. Navy", side: "us", site: "w12-lakeerie", area: "carolinas", era: "w12",
+    b: "Built a squadron at Erie and captured the British squadron on Lake Erie: 'We have met the enemy and they are ours.'" },
+  { n: "Thomas Macdonough", r: "Master Commandant · U.S. Navy", side: "us", site: "w12-plattsburgh", area: "carolinas", era: "w12",
+    b: "Won the naval battle at Plattsburgh in September 1814, turning back the largest British invasion of the war." },
+  { n: "Zachary Taylor", r: "Captain · U.S. Army", side: "us", site: "w12-fortharrison", area: "carolinas", era: "w12",
+    b: "Held Fort Harrison against a night attack in 1812; elected President in 1848." },
+  { n: "George Cockburn", r: "Rear Admiral · Royal Navy", side: "gb", site: "w12-washington", area: "carolinas", era: "w12",
+    b: "Raided the Chesapeake for two years and, with Ross, burned Washington." },
+  { n: "Robert Ross", r: "Major General · British army", side: "gb", site: "w12-northpoint", area: "carolinas", era: "w12",
+    b: "Beat the Americans at Bladensburg and burned Washington; killed by a sharpshooter on the road to Baltimore." },
+  { n: "Dolley Madison", r: "First Lady", side: "us", site: "w12-washington", area: "carolinas", era: "w12",
+    b: "Stayed at the President's House until the last hours and saw that Gilbert Stuart's portrait of Washington was saved." },
+  { n: "Joshua Barney", r: "Commodore · Chesapeake Flotilla", side: "us", site: "w12-bladensburg", area: "carolinas", era: "w12",
+    b: "A Revolutionary War veteran whose flotillamen and marines made the last stand at Bladensburg, where he was wounded and captured." },
+  { n: "Charles Ball", r: "Sailor · Chesapeake Flotilla", side: "us", site: "w12-bladensburg", area: "carolinas", era: "w12",
+    b: "Born enslaved in Maryland, he fought with Barney at Bladensburg and later wrote a narrative of his life in slavery." },
+  { n: "George Armistead", r: "Major · Fort McHenry", side: "us", site: "w12-fortmchenry", area: "carolinas", era: "w12",
+    b: "Commanded the fort through the 25-hour bombardment and ordered the great flag that Key saw at dawn." },
+  { n: "Francis Scott Key", r: "Lawyer and poet", side: "us", site: "w12-fortmchenry", area: "carolinas", era: "w12",
+    b: "Held on a ship during the bombardment, he wrote 'Defence of Fort M'Henry,' later 'The Star-Spangled Banner,' the national anthem since 1931." },
+  { n: "Andrew Jackson", r: "Major General · U.S. Army", side: "us", site: "w12-neworleans", area: "carolinas", era: "w12",
+    b: "Took Pensacola and won the Battle of New Orleans in January 1815, a victory that made him a national hero and later President." },
+  { n: "Edward Pakenham", r: "Major General · British army", side: "gb", site: "w12-neworleans", area: "carolinas", era: "w12",
+    b: "Wellington's brother-in-law, killed leading the assault at New Orleans." },
+  { n: "Jean Lafitte", r: "Privateer and smuggler · Barataria", side: "us", site: "w12-neworleans", area: "carolinas", era: "w12",
+    b: "Refused a British offer and brought his men, guns and flints to Jackson's army in return for a pardon." },
   // ---------- The Northeast: Revolution ----------
   { n: "Paul Revere", r: "Express rider · artillery officer", side: "pm", site: "ma-lexington", area: "carolinas",
     b: "Rode to warn Lexington on April 18, 1775, after carrying the alarm to New Hampshire in 1774. He commanded the artillery on the Penobscot Expedition." },
@@ -3878,7 +4210,7 @@ function buildHomes(raw) { HOMES = raw.map((r, i) => {
 let selHome = null, popAt = null, pin = null;
 let era = "rev", area = "charlotte";
 area = "carolinas";   // one region; the state picker narrows it
-try { if (localStorage.getItem("cnp-era") === "cw") era = "cw"; } catch { /* storage unavailable */ }
+try { const v = localStorage.getItem("cnp-era"); if (["fiw", "w12", "cw"].includes(v)) era = v; } catch { /* storage unavailable */ }
 function el(tag, attrs, parent, text) {
   const e = document.createElementNS(NS, tag);
   for (const k in attrs) e.setAttribute(k, attrs[k]);
@@ -4117,7 +4449,7 @@ function renderScene() {
   // sites
   const gs = el("g", {}, svg);
   const labelQueue = [];
-  const drawSites = SITES.filter(st => (st.layer === "sites" && layers.sites) || (st.layer === "later" && layers.later) || (st.id === selected));
+  const drawSites = SITES.filter(st => (siteWar(st) === era && ((st.layer === "sites" && layers.sites) || (st.layer === "later" && layers.later))) || (st.id === selected));
   // draw selected last
   drawSites.sort((a, b) => (a.id === selected) - (b.id === selected));
   for (const st of drawSites) {
@@ -4276,7 +4608,7 @@ function drawBaseUnder() {
   if (!BASE) return;
   const s = view.s, g = el("g", {}, svg);
   if (layers.terrain) {
-    let d = ""; for (const r of BASE.water) if (onScreen(r) && (sx_(r.x1) - sx_(r.x0) > 2)) d += partD(r, true) + "Z";
+    let d = ""; for (const r of BASE.water) if (onScreen(r) && (sx_(r.x1) - sx_(r.x0) > 2)) { const pd = partD(r, true); if (pd) d += pd + "Z"; }
     if (d) {
       // the detailed Charleston water covers its own box; keep the coarse regional water out of it
       const [a1, o1, a2, o2] = COAST_BOX, [cx1, cy1] = toScreen(a2, o1), [cx2, cy2] = toScreen(a1, o2);
@@ -4398,7 +4730,7 @@ const ZONE_NAMES = { "": "Inside the conjectural camp layout" };
 const siteOf = (id) => SITES.find(x => x.id === id);
 const RATING_TEXT = { hi: "High · private", mid: "Moderate · private", low: "Low · built over", off: "Off-limits" };
 for (const st of SITES) (st.dz || []).forEach((d, n) => ZONES.push({ id: `z-${st.id}-${n}`, site: st.id, lat: st.lat, lon: st.lon, r: d[0], rating: d[1], ratingText: RATING_TEXT[d[1]], name: d[2], text: d[3] }));
-const zoneInEra = (z) => { const st = siteOf(z.site); return !st || (st.layer === "later") === (era === "cw"); };
+const zoneInEra = (z) => { const st = siteOf(z.site); return !st || siteWar(st) === era; };
 const zoneInArea = (z) => { const st = siteOf(z.site); return zoneInEra(z) && (area === "carolinas" || !st || (st.area || "charlotte") === area); };
 const pop = document.getElementById("homepop");
 const homeState = (hm) => ((siteOf(hm.site) || {}).area === "charleston" ? "SC" : "NC");
@@ -4511,7 +4843,7 @@ function openPin(g) {
   pin = { ...g, wx, wy }; popAt = pin; selHome = null;
   const mk = SITES.find(x => x.id === "marker");
   const dCamp = kmBetween(g.lat, g.lon, mk.lat, mk.lon);
-  const near = SITES.filter(x => (x.layer === "later") === (era === "cw"))
+  const near = SITES.filter(x => siteWar(x) === era)
     .map(x => ({ x, d: kmBetween(g.lat, g.lon, x.lat, x.lon) })).sort((a, b) => a.d - b.d)[0];
   const zone = ZONES.filter(z => kmBetween(g.lat, g.lon, z.lat, z.lon) * 1000 <= z.r).sort((a, b) => a.r - b.r)[0];
   const lot = HOMES.find(hm => { let c = false; const r = hm.lot;
@@ -4550,7 +4882,7 @@ function searchPlaces(qRaw) {
   for (const st of SITES) {
     const sc = score(st.name); if (!sc) continue;
     const code = siteState(st); if (stWant && code !== stWant) continue;
-    out.push({ kind: "site", label: st.name, sub: (st.layer === "later" ? "Civil War site" : "Revolution site") + (code ? " · " + code : ""), sc: sc + 0.2, id: st.id });
+    out.push({ kind: "site", label: st.name, sub: (WAR_NAME[siteWar(st)] + " site") + (code ? " · " + code : ""), sc: sc + 0.2, id: st.id });
   }
   if (BASE) for (const pl of BASE.places) {
     const sc = score(pl.n); if (!sc) continue;
@@ -4597,7 +4929,7 @@ sugg.addEventListener("mousedown", (e) => { const li = e.target.closest("li[data
 function openHere(g) {
   const [wx, wy] = world(g.lat, g.lon);
   pin = { ...g, wx, wy }; popAt = pin; selHome = null;
-  const near = SITES.filter(x => (x.layer === "later") === (era === "cw"))
+  const near = SITES.filter(x => siteWar(x) === era)
     .map(x => ({ x, d: kmBetween(g.lat, g.lon, x.lat, x.lon) })).sort((a, b) => a.d - b.d).slice(0, 5);
   const zone = ZONES.filter(z => kmBetween(g.lat, g.lon, z.lat, z.lon) * 1000 <= z.r).sort((a, b) => a.r - b.r)[0];
   const st = stateAt(g.lat, g.lon);
@@ -4609,7 +4941,7 @@ function openHere(g) {
     <div class="addr">You are here</div>
     <div class="meta">${g.lat.toFixed(5)}, ${g.lon.toFixed(5)}${g.acc ? ` · accurate to about ${g.acc < 1000 ? Math.round(g.acc) + " m" : (g.acc / 1000).toFixed(1) + " km"}` : ""}${st ? " · " + esc(STATE_NAMES[st]) : ""}</div>
     ${zoneBox}
-    <dl><dt>Nearest ${era === "cw" ? "Civil War" : "Revolutionary War"} sites</dt></dl>
+    <dl><dt>Nearest ${WAR_LONG[era]} sites</dt></dl>
     <ol class="near">${near.map(n => `<li><button data-site="${n.x.id}">${esc(n.x.name)}</button>, ${distTxt(n.d)}</li>`).join("")}</ol>
     <div class="acts"><a href="${gmaps(g.lat, g.lon)}" target="_blank" rel="noopener">Map ↗</a></div>`;
   pop.querySelector(".x").onclick = () => { pin = null; closeHome(); };
@@ -4673,6 +5005,10 @@ document.getElementById("notice").addEventListener("click", (e) => e.currentTarg
 const ERA = {
   "car-rev": { sub: "From Maine to Florida · the Revolution, 1770–1783",
                note: "<b>The Revolution, from Maine to Florida.</b> Every site, army and fleet. The time slider follows the part of the map you're looking at, or the site you select; choose a state at the top to focus on it." },
+  "car-fiw": { sub: "From Maine to Florida · the French and Indian War, 1754–1763",
+               note: "<b>The French and Indian War.</b> Britain and France fought for the Ohio country and the lakes between New York and Canada; George Washington fired some of the first shots. Blue is France and its Native allies, red is Britain and its colonists." },
+  "car-w12": { sub: "From Maine to Florida · the War of 1812, 1812–1815",
+               note: "<b>The War of 1812.</b> The Great Lakes, the burning of Washington, Fort McHenry and New Orleans. Blue is the United States, red is Britain and its Native allies." },
   "car-cw":  { sub: "From Maine to Florida · the Civil War, 1859–1865",
                note: "<b>The Civil War, from Maine to Florida.</b> Every site, army and fleet. The time slider follows the part of the map you're looking at, or the site you select; choose a state at the top to focus on it." },
   "chs-rev": { sub: "Charleston and the Lowcountry · Sullivan's Island 1776, the sieges of 1779–80 and the occupation to 1782",
@@ -4686,29 +5022,30 @@ const ERA = {
 };
 function setEra(e, quiet) {
   era = e;
-  const rev = e === "rev";
-  document.getElementById("era-rev").setAttribute("aria-pressed", rev);
-  document.getElementById("era-cw").setAttribute("aria-pressed", !rev);
+  const rev = e === "rev", civ = e === "cw";
+  if (!rev && !civ && area !== "carolinas") area = "carolinas";   // the two older wars and 1812 have no local deep-dives
+  for (const w of WARS) document.getElementById("era-" + w).setAttribute("aria-pressed", w === e);
+  SIDE_INFO.us.name = e === "w12" ? "American forces" : "Continental Army";
+  document.getElementById("L-sites-t").textContent = WAR_LONG[civ ? "rev" : e] + " sites";
   const key = area === "charleston" ? "chs-" + e : area === "carolinas" ? "car-" + e : e;
   document.getElementById("subtitle").textContent = ERA[key].sub;
   document.getElementById("notice").innerHTML = ERA[key].note;
-  Object.assign(layers, rev ? { sites: true, later: false, camp: area === "charlotte", moves: true } : { sites: false, later: true, camp: false, moves: true });
+  Object.assign(layers, !civ ? { sites: true, later: false, camp: rev && area === "charlotte", moves: true } : { sites: false, later: true, camp: false, moves: true });
   for (const k of ["sites", "later", "camp", "moves", "zones"]) {
     if (k === "zones") { document.getElementById("L-zones").checked = layers.zones; document.getElementById("L-zones").closest("label").hidden = false; continue; }
     const b = document.getElementById("L-" + k); b.checked = layers[k];
-    b.closest("label").hidden = rev ? (k === "later" || (area === "charleston" && k === "camp")) : !["later", "zones", "moves"].includes(k);
+    b.closest("label").hidden = !civ ? (k === "later" || (k === "camp" && (!rev || area === "charleston"))) : !["later", "zones", "moves"].includes(k);
   }
   document.getElementById("timebar").hidden = !layers.moves; stopPlay(); playFitted = false;
   renderFlagKey();
   setScenario((scenarioFor(area, e) || SCENARIOS[0]).id);
   const clt = area === "charlotte", car = area === "carolinas";
-  selForce = null; selected = car ? (rev ? "moorescreek" : "fortfisher") : clt ? (rev ? "camp" : "bates") : (rev ? "c-moultrie76" : "c-sumter");
+  selForce = null; selected = car ? ({ fiw: "fiw-necessity", rev: "moorescreek", w12: "w12-fortmchenry", cw: "fortfisher" })[e] : clt ? (rev ? "camp" : "bates") : (rev ? "c-moultrie76" : "c-sumter");
   if (popAt) { popAt = null; selHome = null; pop.hidden = true; }
   try { localStorage.setItem("cnp-era", e); } catch { /* storage unavailable */ }
   if (!quiet) { if (car) { if (stateF !== "all") fit(stateBox(stateF), true); else setPreset("region"); } else if (!clt) setPreset(rev ? "lowcountry" : "harbor"); else if (rev) setPreset("camp"); else fit(PRESETS.cw, true); showTab(currentTab); }
 }
-document.getElementById("era-rev").addEventListener("click", () => era !== "rev" && setEra("rev"));
-document.getElementById("era-cw").addEventListener("click", () => era !== "cw" && setEra("cw"));
+for (const w of WARS) document.getElementById("era-" + w).addEventListener("click", () => era !== w && setEra(w));
 
 function drawForces(boxes, free) {
   const g = el("g", {}, svg), marks = [];
@@ -4800,7 +5137,7 @@ tscen.addEventListener("change", () => {
   if (sc && sc.total && iso >= sc.start && iso <= sc.end) setDay(dayOf(iso), true);   // the whole war keeps the date you were on
   render();
 });
-const DEFAULT_SCEN = { "charlotte-rev": "clt-rev", "charlotte-cw": "clt-cw", "charleston-rev": "chs-1780", "charleston-cw": "chs-cw", "carolinas-rev": "sc-1781", "carolinas-cw": "clt-cw" };
+const DEFAULT_SCEN = { "charlotte-rev": "clt-rev", "charlotte-cw": "clt-cw", "charleston-rev": "chs-1780", "charleston-cw": "chs-cw", "carolinas-rev": "sc-1781", "carolinas-cw": "clt-cw", "carolinas-fiw": "fiw-ohio", "carolinas-w12": "w12-chesapeake" };
 function scenarioFor(a, e) { return SCENARIOS.find(x => x.id === DEFAULT_SCEN[a + "-" + e]) || SCENARIOS.find(x => x.era === e); }
 /* The slider follows the map: among this war's timelines whose box holds the view centre,
    take the one whose box is closest in size to the view. A timeline picked by hand stays
@@ -4857,7 +5194,7 @@ function autoScenario() {
 function scheduleAutoScenario() { clearTimeout(autoT); autoT = setTimeout(autoScenario, 450); }
 function scenarioForSite(st) {
   const d = st.date;
-  const c = SCENARIOS.filter(x => x.era === (st.layer === "later" ? "cw" : "rev") && x.bbox && inBox(x.bbox, st.lat, st.lon) && (!d || (d >= x.start && d <= x.end)));
+  const c = SCENARIOS.filter(x => x.era === siteWar(st) && x.bbox && inBox(x.bbox, st.lat, st.lon) && (!d || (d >= x.start && d <= x.end)));
   const lists = (x) => (x.events || (x.id === "clt-rev" ? TIMELINE : [])).some(e => e.site === st.id) ? 0 : 1;   // a timeline that tells this site's story comes first
   c.sort((a, b) => lists(a) - lists(b) || (a.bbox[2] - a.bbox[0]) * (a.bbox[3] - a.bbox[1]) - (b.bbox[2] - b.bbox[0]) * (b.bbox[3] - b.bbox[1]) || (b.primary ? 1 : 0) - (a.primary ? 1 : 0));
   return d ? c[0] : null;
@@ -5127,7 +5464,7 @@ document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () =>
 function selectSite(id, fromMap) {
   const st = SITES.find(s => s.id === id);
   if (!st) return;
-  if ((st.layer === "later") !== (era === "cw")) setEra(st.layer === "later" ? "cw" : "rev", true);   // first: switching wars resets the selection
+  if (siteWar(st) !== era) setEra(siteWar(st), true);   // first: switching wars resets the selection
   selected = id; selForce = null;
   const sc = scenarioForSite(st);
   if (sc) { stopPlay(); scenLock = sc.id; lockSite = st.id; if (sc !== SCEN) setScenario(sc.id); setDay(dayOf(st.date), true); }
@@ -5156,7 +5493,7 @@ function applyHash(h) {
   if (!h) return false;
   if (!h.includes("=")) { if (SITES.some(s => s.id === h)) { selectSite(h, false); return true; } return false; }
   const q = new URLSearchParams(h);
-  const e = q.get("e"); if (e === "rev" || e === "cw") { if (e !== era) setEra(e, true); }
+  const e = q.get("e"); if (WARS.includes(e)) { if (e !== era) setEra(e, true); }
   const stc = q.get("st"); if (stc && STATE_NAMES[stc]) { stateF = stc; stsel.value = stc; }
   const sid = q.get("s"); if (sid && SITES.some(x => x.id === sid)) selected = sid;
   const t = q.get("t"), d = q.get("d");
@@ -5403,6 +5740,11 @@ const LIBRARY = [
   { a: "carolinas", st: "MD", e: "cw", k: "read", t: "Monocacy National Battlefield", src: "National Park Service", u: "https://www.nps.gov/mono/index.htm", d: "" },
   { a: "carolinas", st: "DC", e: "cw", k: "read", t: "Civil War Defenses of Washington", src: "National Park Service", u: "https://www.nps.gov/cwdw/index.htm", d: "Fort Stevens and the ring of forts." },
   { a: "carolinas", st: "DC", e: "cw", k: "read", t: "Ford's Theatre National Historic Site", src: "National Park Service", u: "https://www.nps.gov/foth/index.htm", d: "" },
+  { a: "carolinas", st: "PA", e: "fiw", k: "read", t: "Fort Necessity National Battlefield", src: "National Park Service", u: "https://www.nps.gov/fone/index.htm", d: "Fort Necessity, Jumonville Glen and Braddock's grave." },
+  { a: "carolinas", st: "MD", e: "w12", k: "read", t: "Fort McHenry National Monument and Historic Shrine", src: "National Park Service", u: "https://www.nps.gov/fomc/index.htm", d: "" },
+  { a: "carolinas", st: "MD", e: "w12", k: "read", t: "Star-Spangled Banner National Historic Trail", src: "National Park Service", u: "https://www.nps.gov/stsp/index.htm", d: "The 1814 Chesapeake campaign by land and water." },
+  { a: "carolinas", st: "OH", e: "w12", k: "read", t: "Perry's Victory and International Peace Memorial", src: "National Park Service", u: "https://www.nps.gov/pevi/index.htm", d: "Put-in-Bay and the Battle of Lake Erie." },
+  { a: "carolinas", e: "w12", k: "read", t: "Chalmette Battlefield, Jean Lafitte National Historical Park", src: "National Park Service", u: "https://www.nps.gov/jela/index.htm", d: "The Battle of New Orleans (Louisiana)." },
   { a: "carolinas", st: "MS", e: "cw", k: "read", t: "Vicksburg National Military Park", src: "National Park Service", u: "https://www.nps.gov/vick/index.htm", d: "" },
   { a: "carolinas", st: "MS", e: "cw", k: "read", t: "Brices Cross Roads National Battlefield Site", src: "National Park Service", u: "https://www.nps.gov/brcr/index.htm", d: "" },
   { a: "carolinas", st: "MS", e: "cw", k: "read", t: "Tupelo National Battlefield", src: "National Park Service", u: "https://www.nps.gov/tupe/index.htm", d: "" },
@@ -5418,7 +5760,7 @@ function renderLibrary() {
   const counts = Object.fromEntries(Object.keys(LIB_KINDS).map(k => [k, LIBRARY.filter(x => inA(x) && (k === "all" || x.k === k)).length]));
   pane.innerHTML = `
     <h2>Library</h2>
-    <div class="kicker">Original letters, maps and fort plans, articles, documentaries and podcasts for ${area === "carolinas" ? (stateF === "all" ? "every state" : STATE_NAMES[stateF]) : area === "charleston" ? "Charleston" : "the Charlotte area"} in the ${era === "rev" ? "Revolutionary War" : "Civil War"}. Switch the area or war at the top to see more. Links open the source's own site.</div>
+    <div class="kicker">Original letters, maps and fort plans, articles, documentaries and podcasts for ${area === "carolinas" ? (stateF === "all" ? "every state" : STATE_NAMES[stateF]) : area === "charleston" ? "Charleston" : "the Charlotte area"} in the ${WAR_LONG[era]}. Switch the war at the top to see more. Links open the source's own site.</div>
     <div class="lib-filters">${Object.entries(LIB_KINDS).filter(([k]) => counts[k]).map(([k, l]) => `<button class="btn" data-kind="${k}" aria-pressed="${k === libKind}">${l} (${counts[k]})</button>`).join("")}</div>
     ${items.length ? items.map(x => `
       <div class="libitem"><span class="lm">${esc(LIB_KINDS[x.k])} · ${esc(x.src)}</span>
@@ -5447,13 +5789,15 @@ function renderStoryCHS() {
 const WHOLE_JOIN = { rev: [["mdde", "greene81", "greene-sc"], ["corn", "corn81", "corn-va"], ["lee81", "lee-sc"], ["sumter", "sumter81"], ["clinton76nc", "clinton76"], ["legion", "tarleton-va"],
                           ["washington75", "washington76", "washington77", "washington81"], ["gage75", "howe76", "howe77"], ["arnold75", "arnold77"], ["arnold", "arnoldct"]],
                      cw: [["hoke", "hoke65"], ["anv", "lee62", "lee-md", "lee-gb", "lee64"], ["mcclellan", "potomac63", "mcclellan-md", "meade-gb", "grant64"], ["stuart63", "stuart-gb"], ["jackson62", "jackson2"], ["rosecrans62", "cumberland"], ["bragg62", "bragg-ky", "bragg63"], ["buell", "buell-ky"], ["asjohnston", "beauregard-corinth"],
-                          ["sherman-vb", "sherman-mer", "sherman63", "sherman-ga", "sherman"], ["grant-vb"], ["porter-vb", "porter"], ["aot64", "johnston"], ["schofield64", "schofield"]] };
-const WHOLE_NAME = { washington75: "Washington's army", gage75: "British main army (Gage, Howe, Clinton)", arnold75: "Arnold (American)", arnold: "Arnold (British)",
+                          ["sherman-vb", "sherman-mer", "sherman63", "sherman-ga", "sherman"], ["grant-vb"], ["porter-vb", "porter"], ["aot64", "johnston"], ["schofield64", "schofield"]],
+                     fiw: [["montcalm"], ["johnson55", "prideaux"]], w12: [["prevost13", "prevost14"], ["cockburn"], ["cochrane", "cochrane-gulf"]] };
+const WHOLE_NAME = { johnson55: "Johnson's army (Lake George, Niagara)", prevost13: "Prevost (British, from Canada)", cochrane: "Cochrane's fleet", washington75: "Washington's army", gage75: "British main army (Gage, Howe, Clinton)", arnold75: "Arnold (American)", arnold: "Arnold (British)",
   anv: "Army of Northern Virginia", mcclellan: "Army of the Potomac", jackson62: "Jackson's corps", rosecrans62: "Army of the Cumberland",
   bragg62: "Bragg's Army of Tennessee", "sherman-ga": "Sherman's armies", aot64: "Army of Tennessee", schofield64: "Schofield's army", legion: "Tarleton's British Legion",
   mdde: "Greene's army (Maryland & Delaware Continentals)", corn: "Cornwallis's army", lee81: "Lee's Legion", sumter: "Sumter's SC militia", clinton76nc: "Clinton's expedition", hoke: "Hoke's division" };
 function buildWholeWar() {
-  for (const e of ["rev", "cw"]) {
+  const SPAN = { fiw: ["1753-10-01", "1763-12-31", "1753–63"], rev: ["1774-09-01", "1782-12-31", "1774–82"], w12: ["1811-10-01", "1815-03-01", "1811–15"], cw: ["1859-10-01", "1865-05-25", "1859–65"] };
+  for (const e of WARS) {
     const scs = SCENARIOS.filter(x => x.era === e && !x.total);
     const all = scs.flatMap(sc => sc.forces || CLT_REV_FORCES), byId = Object.fromEntries(all.map(f => [f.id, f])), used = new Set(), forces = [];
     for (const grp of WHOLE_JOIN[e]) {
@@ -5473,9 +5817,9 @@ function buildWholeWar() {
       const k = t.site ? t.site + "|" + t.iso : t.iso + "|" + t.t; if (seen.has(k)) continue; seen.add(k);
       events.push({ ...t, d: /\d{4}/.test(t.d) ? t.d : t.d + ", " + t.iso.slice(0, 4) });
     }
-    const start = e === "rev" ? "1774-09-01" : "1859-10-01", end = e === "rev" ? "1782-12-31" : "1865-05-25";
+    const [start, end, yrs] = SPAN[e];
     SCENARIOS.push({ id: "all-" + e, area: "carolinas", era: e, total: true, start, end, at: start,
-      name: e === "rev" ? "★ The whole war, 1774–82: every army and fleet" : "★ The whole war, 1859–65: every army and fleet",
+      name: `★ The whole war, ${yrs}: every army and fleet`,
       fit: "region", bbox: [24.0, -92.5, 48.0, -66.0], forces,
       events: events.filter(t => t.iso >= start && t.iso <= end).sort((a, b) => a.iso < b.iso ? -1 : a.iso > b.iso ? 1 : 0) });
   }
@@ -5503,6 +5847,15 @@ stsel.addEventListener("change", () => {
   showTab(currentTab === "site" ? "story" : currentTab);
 });
 const CAR_PRELUDE = {
+  fiw: [{ iso: "1755-06-10", d: "June 1755", t: "Braddock at Fort Cumberland", s: "The army gathers at Wills Creek.", site: "fiw-cumberland" },
+        { iso: "1760-08-08", d: "Aug 8, 1760", t: "Fort Loudoun", s: "The Cherokee force the garrison to surrender.", site: "fiw-loudoun" },
+        { iso: "1760-09-08", d: "Sept 8, 1760", t: "Montreal surrenders", s: "New France falls to Britain." },
+        { iso: "1763-02-10", d: "Feb 10, 1763", t: "Treaty of Paris", s: "France gives up Canada and the land east of the Mississippi; Spain gives Florida to Britain." },
+        { iso: "1763-10-07", d: "Oct 7, 1763", t: "Proclamation of 1763", s: "The Crown bars settlement west of the Appalachians, angering colonists." }],
+  w12: [{ iso: "1814-08-12", d: "Aug 9–12, 1814", t: "Stonington", s: "The town drives off a British squadron.", site: "w12-stonington" },
+        { iso: "1814-09-01", d: "Sept 1814", t: "Castine", s: "The British occupy eastern Maine.", site: "w12-castine" },
+        { iso: "1814-09-03", d: "Sept 3, 1814", t: "Hampden", s: "Militia routed; Bangor taken.", site: "w12-hampden" },
+        { iso: "1815-02-17", d: "Feb 17, 1815", t: "Peace ratified", s: "The Senate approves the Treaty of Ghent; the war ends." }],
   rev: [{ iso: "1766-02-21", d: "Feb 1766", t: "Stamp Act defied", s: "Armed colonists at Brunswick stop enforcement of the Stamp Act.", site: "brunswick" },
         { iso: "1771-05-16", d: "May 16, 1771", t: "Alamance", s: "Governor Tryon's militia crush the Regulators.", site: "alamance" },
         { iso: "1774-10-25", d: "Oct 25, 1774", t: "Edenton Tea Party", s: "Fifty-one women pledge a boycott of British goods.", site: "edenton" },
@@ -5532,6 +5885,20 @@ const CAR_PRELUDE = {
        { iso: "1865-04-14", d: "Apr 14, 1865", t: "Lincoln shot", s: "At Ford's Theatre in Washington.", site: "dc-fords" }]
 };
 const STATE_INTRO = {
+  fiw: { PA: "The war began in western Pennsylvania, where the French built Fort Duquesne at the Forks of the Ohio. Washington's defeat at Fort Necessity and Braddock's disaster on the Monongahela opened years of raids on the frontier, until Forbes's army took the Forks in 1758. Pontiac's War brought the fighting back in 1763.",
+         NY: "New York was the main road between the colonies and Canada. Armies fought up and down Lake George and Lake Champlain, at Fort William Henry and Ticonderoga, and around Lake Ontario at Oswego and Niagara.",
+         VA: "Virginia's claim to the Ohio country started the war; its governor sent the young George Washington to warn the French off in 1753. Its frontier counties were raided for years.",
+         MD: "Fort Cumberland at Wills Creek was the starting point for Washington's and Braddock's marches west.",
+         TN: "The Cherokee, British allies at first, turned on the colonies in 1759–61 and took Fort Loudoun on the Little Tennessee River.",
+         OH: "The Ohio country, claimed by France and Britain, was home to the Shawnee, Delaware, Mingo and Wyandot, who fought on both sides and then against the British in Pontiac's War." },
+  w12: { NY: "New York's long border with Canada saw the most fighting of the war: Sackets Harbor and Oswego on Lake Ontario, the Niagara frontier, the burning of Buffalo and the American victory at Plattsburgh that helped end the war.",
+         MD: "In 1814 a British army burned Washington and then turned on Baltimore. Fort McHenry held, and Francis Scott Key wrote the words that became the national anthem.",
+         DC: "British troops burned the Capitol, the President's House and other public buildings on August 24–25, 1814.",
+         VA: "British raiders struck all along the Chesapeake in 1813; Craney Island saved Norfolk, but Hampton was sacked.",
+         OH: "Fort Meigs and Fort Stephenson held off British and Native attacks in 1813, and Perry's victory on Lake Erie let Harrison invade Canada.",
+         IN: "Indiana Territory was the heart of Tecumseh's confederacy. Harrison's attack at Tippecanoe in 1811 helped bring on the war.",
+         ME: "The British occupied eastern Maine, then part of Massachusetts, from September 1814 until after the peace.",
+         CT: "Stonington's townspeople drove off a British squadron in August 1814." },
   rev: { VA: "Virginia's royal governor fled in 1775 and fought from his ships until 1776. The state then sent men and supplies north and south until 1781, when Arnold's raids, Cornwallis's army and finally the Franco-American siege of Yorktown brought the war's decisive campaign to it.",
          WV: "The mountains west of the Alleghenies were Virginia's frontier. Shawnee, Wyandot and Mingo warriors, armed by the British at Detroit, fought settlers there from Point Pleasant in 1774 to the siege of Wheeling in 1782.",
          TN: "Settlers on the Watauga and Holston lived on Cherokee land. War with Dragging Canoe's Cherokee began in 1776, and the same Overmountain men marched to Kings Mountain in 1780.",
@@ -5582,10 +5949,10 @@ function renderStoryCAR() {
   });
   rows.sort((a, b) => a.iso < b.iso ? -1 : a.iso > b.iso ? 1 : 0);
   pane.innerHTML = `
-    <h2>${era === "rev" ? "The Revolution" : "The Civil War"} in ${stateF === "all" ? "every state" : STATE_NAMES[stateF]}</h2>
+    <h2>${WAR_TITLE[era]} in ${stateF === "all" ? "every state" : STATE_NAMES[stateF]}</h2>
     <div class="kicker">Every dated event on the map${stateF === "all" ? "" : " in " + STATE_NAMES[stateF]}. Select one to move the slider to that timeline and date and fly to the place.</div>
     ${divesHTML()}
-    <p>${stateF !== "all" && STATE_INTRO[era][stateF] ? STATE_INTRO[era][stateF] : era === "rev" ? "The Carolinas saw some of the earliest resistance to British rule and some of the hardest fighting of the war. After Charleston fell in 1780, the war here became a civil war between neighbors as much as a fight between armies: Patriot and Loyalist militia, partisans like Marion and Sumter, and Greene's small Continental army wore down the British until they held only Charleston." : "South Carolina was the first state to secede and North Carolina the last. The war came first to the coast, where Union fleets took the sounds and sea islands and freedom-seekers by the thousands reached Union lines. It ended inland, as Sherman marched through both states and Johnston surrendered at Bennett Place, the largest surrender of the war."}</p>
+    <p>${stateF !== "all" && STATE_INTRO[era][stateF] ? STATE_INTRO[era][stateF] : era === "fiw" ? "Britain and France fought for control of North America from 1754 to 1763, each with Native allies who had their own reasons to fight. It began with a skirmish led by a young George Washington, went badly for the British for four years, then turned at Fort Duquesne, Niagara, Ticonderoga and Quebec. The victory left Britain deep in debt, and its new taxes on the colonies led to the Revolution." : era === "w12" ? "The United States declared war on Britain in June 1812 over the seizure of American sailors, trade restrictions and British support for Native resistance in the West. Invasions of Canada failed; the Navy won on Lake Erie and Lake Champlain; British raiders burned Washington but were stopped at Baltimore; and Andrew Jackson's victory at New Orleans came after the peace treaty had been signed." : era === "rev" ? "The Carolinas saw some of the earliest resistance to British rule and some of the hardest fighting of the war. After Charleston fell in 1780, the war here became a civil war between neighbors as much as a fight between armies: Patriot and Loyalist militia, partisans like Marion and Sumter, and Greene's small Continental army wore down the British until they held only Charleston." : "South Carolina was the first state to secede and North Carolina the last. The war came first to the coast, where Union fleets took the sounds and sea islands and freedom-seekers by the thousands reached Union lines. It ended inland, as Sherman marched through both states and Johnston surrendered at Bennett Place, the largest surrender of the war."}</p>
     <ul class="list">${rows.map(t => `
       <li><button class="rowbtn${t.iso.slice(5) === md ? " today" : ""}" data-iso="${t.iso}" ${t.site ? `data-st="${t.site}"` : ""}>
         <span class="when">${esc(t.d)}</span><span class="what">${esc(t.t)}</span><span class="why">${esc(t.s)}</span></button></li>`).join("")}</ul>`;
@@ -5602,6 +5969,7 @@ function renderDive(kind) {
 }
 function divesHTML() {
   const d = [];
+  if (era === "fiw" || era === "w12") return "";
   if (stateF === "all" || stateF === "NC") d.push(`<button class="btn" data-dive="charlotte">Charlotte${era === "rev" ? " and Camp New Providence" : ""}</button>`);
   if (stateF === "all" || stateF === "SC") d.push(`<button class="btn" data-dive="charleston">Charleston</button>`);
   return d.length ? `<div class="callout dives"><b>In depth:</b> ${d.join("")}</div>` : "";
@@ -5690,6 +6058,10 @@ const PERSON_FORCES = {
   "Comte de Rochambeau": ["rochambeau"], "Comte de Grasse": ["degrasse"], "Bernardo de Gálvez": ["galvez"], "Augustine Prevost": ["prevost"], "Lord Dunmore": ["dunmore"],
   "Dragging Canoe (Tsiyu Gansini)": ["dragging"], "John Sevier": ["sevier80"], "Henry Knox": ["knox"], "Ethan Allen": ["allen"],
   "William T. Sherman": ["sherman-vb", "sherman-mer", "sherman63", "sherman-ga", "sherman"], "Ulysses S. Grant": ["grant62", "grant-vb", "grant64"],
+  "Lt. Col. George Washington": ["washington-fiw"], "Edward Braddock": ["braddock"], "Marquis de Montcalm": ["montcalm"], "Sir William Johnson": ["johnson55", "prideaux"],
+  "Robert Rogers": ["rogers"], "John Forbes": ["forbes"], "Henry Bouquet": ["bouquet"], "Jeffery Amherst": ["amherst"], "James Abercromby": ["abercromby"], "Guyasuta": ["guyasuta"],
+  "William Henry Harrison": ["harrison"], "Tecumseh": ["procter"], "Oliver Hazard Perry": ["perry"], "Thomas Macdonough": ["macdonough"], "Robert Ross": ["ross"],
+  "George Cockburn": ["cockburn"], "Joshua Barney": ["barney"], "Andrew Jackson": ["jackson12"], "Edward Pakenham": ["pakenham"], "George Armistead": ["armistead"],
   "George Rogers Clark": ["clark"], "Daniel Boone": ["boone"], "John Hunt Morgan": ["morgan"], "John C. Pemberton": ["pemberton"], "Nathan Bedford Forrest": ["forrest64"], "Robert E. Lee": ["leewv", "lee62", "lee-md", "lee-gb", "lee64"],
   "Thomas J. 'Stonewall' Jackson": ["jackson62", "jackson2"], "George B. McClellan": ["mcclellan61", "mcclellan", "mcclellan-md"], "George G. Meade": ["meade-gb"],
   "J. E. B. Stuart": ["stuart63", "stuart-gb"], "Philip Sheridan": ["sheridan"], "Jubal Early": ["early"], "John Bell Hood": ["aot64"], "George H. Thomas": ["thomas62", "cumberland", "thomas64"],
@@ -5729,12 +6101,13 @@ function showPath(name) {
   document.getElementById("pathclear").hidden = false;
 }
 function renderPeople() {
-  const sideChip = { us: `<span class="chip era-1780">${flagHTML("us", 15)} Continental</span>`, nc: `<span class="chip" style="color:var(--militia);border-color:var(--militia)">${flagHTML("pm", 15)} Patriot militia</span>`, gb: `<span class="chip" style="color:var(--hi);border-color:var(--hi)">${flagHTML("gb", 15)} British</span>`, cs: `<span class="chip" style="color:var(--later);border-color:var(--later)">${flagHTML("cs", 15)} Confederate</span>`, un: `<span class="chip era-1780">${flagHTML("un", 15)} Union</span>`,
+  const sideChip = { us: `<span class="chip era-1780">${flagHTML("us", 15)} ${era === "w12" ? "American" : "Continental"}</span>`, nc: `<span class="chip" style="color:var(--militia);border-color:var(--militia)">${flagHTML("pm", 15)} Patriot militia</span>`, gb: `<span class="chip" style="color:var(--hi);border-color:var(--hi)">${flagHTML("gb", 15)} British</span>`, cs: `<span class="chip" style="color:var(--later);border-color:var(--later)">${flagHTML("cs", 15)} Confederate</span>`, un: `<span class="chip era-1780">${flagHTML("un", 15)} Union</span>`,
     pm: `<span class="chip" style="color:var(--militia);border-color:var(--militia)">${flagHTML("pm", 15)} Patriot</span>`, fr: `<span class="chip era-1780">${flagHTML("fr", 15)} French</span>`,
-    es: `<span class="chip era-1780">${flagHTML("es", 15)} Spanish</span>`, na: `<span class="chip" style="color:var(--hi);border-color:var(--hi)">${flagHTML("na", 15)} Native ally of Britain</span>` };
+    es: `<span class="chip era-1780">${flagHTML("es", 15)} Spanish</span>`, col: `<span class="chip" style="color:var(--hi);border-color:var(--hi)">${flagHTML("gb", 15)} British colonial</span>`,
+    naf: `<span class="chip era-1780">${flagHTML("na", 15)} Native ally of France</span>`, na: `<span class="chip" style="color:var(--hi);border-color:var(--hi)">${flagHTML("na", 15)} Native ally of Britain</span>` };
   const list = PEOPLE.filter(p => (p.era || "rev") === era && (area === "carolinas" ? siteIn(p.site) : (p.area || "charlotte") === area));
   pane.innerHTML = `
-    <h2>${area === "carolinas" ? (era === "rev" ? "The Revolution in " : "The Civil War in ") + (stateF === "all" ? "every state" : STATE_NAMES[stateF]) : area === "charleston" ? (era === "rev" ? "Revolutionary Charleston" : "Civil War Charleston") : era === "rev" ? "Important figures" : "Civil War Charlotte"}</h2>
+    <h2>${area === "carolinas" ? (WAR_TITLE[era] + " in ") + (stateF === "all" ? "every state" : STATE_NAMES[stateF]) : area === "charleston" ? (era === "rev" ? "Revolutionary Charleston" : "Civil War Charleston") : era === "rev" ? "Important figures" : "Civil War Charlotte"}</h2>
     <div class="kicker">${area === "carolinas" ? "People tied to places on the map" + (stateF === "all" ? "." : " in " + STATE_NAMES[stateF] + ".") : area === "charleston" ? (era === "rev" ? "The defenders of 1776 and 1780, the British commanders, and the city's Patriot leaders." : "Commanders on both sides, the men of the 54th Massachusetts, Robert Smalls, and the Hunley's builders and crew.") : era === "rev" ? "Officers named on the state marker, the local commanders, Charlotte's Revolutionary leaders, and the men across the line." : "The people behind Charlotte's wartime industries and the Confederacy's last days."} Portraits load from Wikimedia Commons.</div>
     ${list.map(p => `
       <details class="person">
@@ -5888,7 +6261,7 @@ function renderDetect() {
 function renderVisit() {
   if (area === "carolinas") {
     const pubRe = /National|State|park|Museum|historic site|memorial/i;
-    const vis = SITES.filter(x => (x.layer === "later") === (era === "cw") && x.status === "public" && pubRe.test(x.statusText) && inStateF(siteState(x)))
+    const vis = SITES.filter(x => siteWar(x) === era && x.status === "public" && pubRe.test(x.statusText) && inStateF(siteState(x)))
       .sort((a, b) => siteState(a).localeCompare(siteState(b)) || a.name.localeCompare(b.name));
     pane.innerHTML = `
       <h2>Visit today</h2>
@@ -6018,7 +6391,7 @@ if (startId.includes("=") && applyHash(startId)) {
 } else if (SITES.some(s => s.id === startId)) {
   selected = startId;
   const st = SITES.find(s => s.id === startId);
-  if (st.layer === "later") { layers.later = true; document.getElementById("L-later").checked = true; }
+  if (siteWar(st) !== era) { setEra(siteWar(st), true); selected = startId; }
   const [x, y] = world(st.lat, st.lon); flyTo(x, y, targetScale(st), false);
 } else if (area === "carolinas") {
   fit(PRESETS.region, false);
