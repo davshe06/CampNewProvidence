@@ -104,8 +104,11 @@ Contents:
   historic sites and named views (Camp New Providence, Charleston Harbor, the
   Lowcountry), with suggestions as you type and arrow-key selection; "Richmond, VA" or
   "Springfield, MA" narrows by state. A city flies to the city and its surroundings, a
-  site opens with its timeline and date. Anything starting with a house number goes to
-  the State's AddressNC geocoder (North Carolina street addresses) or the built-in homes.
+  site opens with its timeline and date. Street addresses work in every state: North
+  Carolina addresses go first to the State's AddressNC geocoder, everything else to the
+  U.S. Census Bureau geocoder (called as JSONP, since it sends no CORS header), with
+  OpenStreetMap's Nominatim as a fallback. The pin shows the state, the nearest site and
+  any detecting zone it falls in.
 - **Portraits** load from Wikimedia Commons (public domain or freely licensed, credited
   per image). People with no known or verified likeness get a lettered placeholder.
 
