@@ -91,6 +91,14 @@ Contents:
   when you zoom to state level or start a search, `homes.json` when you zoom in close or
   open Detecting, and Charleston's detailed water near the harbor. On a simulated slow
   connection the map appeared in 5.5 s instead of 25 s.
+- **Strengths and losses**: about 60 major battles list the forces engaged and losses
+  (commonly cited round numbers; sources differ) in the site panel and battle popups.
+- **Follow an army**: in an army's panel, "Follow this army" keeps it centred while the
+  timeline plays; dragging the map stops following.
+- **Trace a path**: in People, "Trace their path" draws a person's whole route through the
+  war (about 40 people, from Washington and Cornwallis to Lee, Grant and Sherman), joining
+  the armies they led across timelines.
+- **On phones**: battle popups are compact (name and result) and one shows at a time.
 - **Full screen**: the corner button fills the screen with the map (a fixed overlay on
   phones that have no Fullscreen API).
 - **New timelines**: Virginia 1775–76 (Dunmore), Georgia and East Florida 1777–79,

@@ -176,6 +176,30 @@ await test("load: light base map first, detail and homes only when zoomed in", a
   await ctx.close();
 });
 
+await test("battles: strengths and losses show for major battles", async () => {
+  await p.evaluate(() => selectSite("pa-gettysburg", false)); await p.waitForTimeout(800);
+  const txt = await p.locator("#pane").innerText();
+  assert.match(txt, /Engaged/); assert.match(txt, /Union ~94,000/);
+});
+
+await test("follow: the followed army stays in view during playback", async () => {
+  await p.evaluate(() => { setEra("rev", true); scenLock = "clt-rev"; setScenario("clt-rev"); setDay(dayOf("1780-12-20")); selForce = "light"; showTab("site"); });
+  await p.click("#follow"); await p.waitForTimeout(900);
+  await p.evaluate(() => document.getElementById("tplay").click()); await p.waitForTimeout(3000);
+  const d = await p.evaluate(() => { stopPlay(); const f = FORCES.find(x => x.id === "light"), a = forceAt(f, tDay); const [x, y] = toScreen(a.lat, a.lon); return Math.hypot(x - W / 2, y - H / 2); });
+  assert.ok(d < 120, "army is " + Math.round(d) + " px from the centre");
+  await p.evaluate(() => { followF = null; });
+});
+
+await test("people: tracing Washington's path draws it", async () => {
+  await p.evaluate(() => { setEra("rev", true); showTab("people"); showPath("George Washington"); });
+  await p.waitForTimeout(1200);
+  assert.ok(await p.locator("#map .ppath-line").count() === 1);
+  assert.ok(await p.evaluate(() => PATH.wp.length) > 30);
+  await p.click("#pathclear"); await p.waitForTimeout(300);
+  assert.equal(await p.locator("#map .ppath-line").count(), 0);
+});
+
 await test("no script errors on desktop", async () => { assert.deepEqual(p.errors, []); });
 
 await test("phone: no horizontal scroll, no errors", async () => {
