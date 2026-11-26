@@ -339,7 +339,12 @@ ul.tight li { margin: 3px 0; }
 .era { margin-left: auto; }
 .era .btn { padding: 7px 12px; font-weight: 600; }
 .era .short { display: none; }
-.addr { display: flex; gap: 4px; width: 236px; max-width: calc(100vw - 40px); }
+.addr { display: flex; gap: 4px; width: 260px; max-width: calc(100vw - 40px); position: relative; }
+.sugg { position: absolute; top: calc(100% + 3px); left: 0; right: 0; z-index: 20; margin: 0; padding: 4px 0; list-style: none; background: var(--panel);
+  border: 1px solid var(--rule); border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.18); max-height: 320px; overflow-y: auto; }
+.sugg li { padding: 6px 10px; cursor: pointer; font-size: .85rem; line-height: 1.25; display: flex; justify-content: space-between; gap: 8px; }
+.sugg li[aria-selected="true"], .sugg li:hover { background: var(--chip, rgba(0,0,0,.07)); }
+.sugg .k { color: var(--ink-soft); font-size: .72rem; white-space: nowrap; align-self: center; }
 .addr input { flex: 1; min-width: 0; font: inherit; font-size: .82rem; padding: 6px 8px; border: 1px solid var(--rule); border-radius: 3px; background: var(--panel); color: var(--ink); }
 #map .pin path { fill: var(--hi); stroke: var(--paper); stroke-width: 1.5; }
 #map .pin circle { fill: var(--paper); }
@@ -473,18 +478,11 @@ body.fs .mapwrap { position: fixed !important; inset: 0; z-index: 900; height: a
     <svg id="map" role="application" aria-label="Interactive map. Drag to pan, scroll or pinch to zoom, select a marker for details."></svg>
 
     <div class="mapctl tl">
-      <div class="seg" role="group" aria-label="Map view">
-        <button class="btn" id="v-camp" aria-pressed="true">Camp</button>
-        <button class="btn" id="v-charlotte" aria-pressed="false">Charlotte area</button>
-        <button class="btn" id="v-campaign" aria-pressed="false">Campaign</button>
-        <button class="btn" id="v-harbor" aria-pressed="false" hidden>Harbor</button>
-        <button class="btn" id="v-lowcountry" aria-pressed="false" hidden>Lowcountry</button>
-        <button class="btn" id="v-carolinas" aria-pressed="false" hidden>Carolinas</button>
-        <button class="btn" id="v-region" aria-pressed="false" hidden>All states</button>
-      </div>
       <form class="addr" id="addrform" role="search">
-        <input id="addr-q" placeholder="Find a modern address" aria-label="Find a modern address" autocomplete="street-address">
+        <input id="addr-q" placeholder="Search a city, site or address" aria-label="Search for a city, state, historic site or street address"
+          autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="sugg">
         <button class="btn" type="submit">Go</button>
+        <ul class="sugg" id="sugg" role="listbox" hidden></ul>
       </form>
       <details class="layers" id="layers" open>
         <summary>Layers</summary>
@@ -4175,19 +4173,86 @@ function openPin(g) {
   pop.hidden = false;
   flyTo(wx, wy, Math.max(Math.min(view.s, 60000), dCamp < 3 ? 30000 : 9000));
 }
+/* Search: cities and towns (2020 Census places), states, historic sites and named views first;
+   anything that looks like a street address goes to the address lookup. */
+const VIEW_ALIASES = [["Camp New Providence", "camp"], ["Charleston Harbor", "harbor"], ["Lowcountry", "lowcountry"], ["The Carolinas", "carolinas"], ["Southern Campaign", "campaign"]];
+const STATE_ABBR = Object.fromEntries(Object.entries(STATE_NAMES).map(([k, v]) => [v.toLowerCase(), k]));
+const norm = (t) => t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim()
+  .replace(/\bst\b/g, "saint").replace(/\bmt\b/g, "mount").replace(/\bft\b/g, "fort");
+function searchPlaces(qRaw) {
+  let q = norm(qRaw), stWant = null;
+  const m = qRaw.match(/,\s*([A-Za-z .]+)$/);
+  if (m) { const t = m[1].trim(), up = t.toUpperCase().replace(/\./g, ""); stWant = STATE_NAMES[up] ? up : STATE_ABBR[t.toLowerCase()] || null; if (stWant) q = norm(qRaw.slice(0, m.index)); }
+  if (q.length < 2) return [];
+  const out = [];
+  const score = (name) => { const n = norm(name); return n === q ? 3 : n.startsWith(q) ? 2 : (" " + n).includes(" " + q) ? 1.2 : q.length >= 3 && n.includes(q) ? 1 : 0; };
+  if (!stWant) for (const [code, name] of Object.entries(STATE_NAMES)) { const sc = Math.max(score(name), q === code.toLowerCase() ? 3 : 0); if (sc) out.push({ kind: "state", label: name, sub: "State", sc: sc + 0.6, code }); }
+  for (const [name, preset] of VIEW_ALIASES) { const sc = score(name); if (sc) out.push({ kind: "view", label: name, sub: "Map view", sc: sc + 0.4, preset }); }
+  for (const st of SITES) {
+    const sc = score(st.name); if (!sc) continue;
+    const code = siteState(st); if (stWant && code !== stWant) continue;
+    out.push({ kind: "site", label: st.name, sub: (st.layer === "later" ? "Civil War site" : "Revolution site") + (code ? " · " + code : ""), sc: sc + 0.2, id: st.id });
+  }
+  if (BASE) for (const pl of BASE.places) {
+    const sc = score(pl.n); if (!sc) continue;
+    const code = pl.code !== undefined ? pl.code : (pl.code = stateAt(pl.lat, pl.lon) || pl.st || "");
+    if (stWant && code !== stWant) continue;
+    out.push({ kind: "place", label: pl.n, sub: (code ? code + " · " : "") + (pl.pop >= 1000 ? Math.round(pl.pop / 1000).toLocaleString() + "k people" : "town"), sc: sc + Math.min(0.5, Math.log10(pl.pop + 1) / 14), pl });
+  }
+  out.sort((a, b) => b.sc - a.sc);
+  return out.slice(0, 8);
+}
+function goToResult(r) {
+  pin = null; popAt = null; selHome = null; pop.hidden = true;
+  if (r.kind === "state") return fit(stateBox(r.code), true);
+  if (r.kind === "view") return setPreset(r.preset);
+  if (r.kind === "site") return selectSite(r.id, false);
+  const pl = r.pl, [wx, wy] = world(pl.lat, pl.lon);
+  const s = pl.pop > 500000 ? 330 : pl.pop > 150000 ? 620 : pl.pop > 40000 ? 1200 : 2400;   // the city and its surroundings
+  pin = { wx, wy, lat: pl.lat, lon: pl.lon, label: pl.n };
+  flyTo(wx, wy, s);
+}
+const addrQ = document.getElementById("addr-q"), sugg = document.getElementById("sugg");
+let suggList = [], suggSel = -1;
+function showSugg() {
+  const q = addrQ.value.trim();
+  suggList = /^\d/.test(q) ? [] : searchPlaces(q); suggSel = -1;
+  sugg.innerHTML = suggList.map((r, i) => `<li role="option" id="sg${i}" aria-selected="false" data-i="${i}"><span>${esc(r.label)}</span><span class="k">${esc(r.sub)}</span></li>`).join("");
+  sugg.hidden = !suggList.length; addrQ.setAttribute("aria-expanded", !sugg.hidden);
+}
+function pickSugg(i) { const r = suggList[i]; if (!r) return; addrQ.value = r.label; sugg.hidden = true; addrQ.setAttribute("aria-expanded", "false"); goToResult(r); }
+addrQ.addEventListener("input", showSugg);
+addrQ.addEventListener("focus", () => { if (addrQ.value.trim()) showSugg(); });
+addrQ.addEventListener("blur", () => setTimeout(() => { sugg.hidden = true; addrQ.setAttribute("aria-expanded", "false"); }, 150));
+addrQ.addEventListener("keydown", (e) => {
+  if (sugg.hidden || !suggList.length) return;
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    e.preventDefault();
+    suggSel = (suggSel + (e.key === "ArrowDown" ? 1 : -1) + suggList.length) % suggList.length;
+    sugg.querySelectorAll("li").forEach((li, i) => li.setAttribute("aria-selected", i === suggSel));
+    addrQ.setAttribute("aria-activedescendant", "sg" + suggSel);
+  } else if (e.key === "Escape") { sugg.hidden = true; }
+});
+sugg.addEventListener("mousedown", (e) => { const li = e.target.closest("li[data-i]"); if (li) { e.preventDefault(); pickSugg(+li.dataset.i); } });
 document.getElementById("addrform").addEventListener("submit", async (e) => {
   e.preventDefault();
   const q = document.getElementById("addr-q").value.trim();
   if (!q) return;
+  if (!sugg.hidden && suggSel >= 0) return pickSugg(suggSel);
+  if (!/^\d/.test(q)) {   // not a street address: the best place, state or site
+    const r = searchPlaces(q)[0];
+    sugg.hidden = true;
+    if (r) return goToResult(r);
+  }
   const local = HOMES.find(h => homeFull(h).toLowerCase().startsWith(q.toLowerCase()) || h.addr.toLowerCase() === q.toLowerCase());
   try {
     const g = await geocode(q);
     if (g) return openPin(g);
     if (local) return openHome(local, true);
-    toast("No North Carolina address matched. Try adding the city.");
+    toast("No match. Street addresses work in North Carolina; elsewhere, search a city, town or site.");
   } catch {
     if (local) return openHome(local, true);
-    toast("The address service didn't answer. Only homes on the camp ground can be searched right now.");
+    toast("The address service didn't answer. Cities, towns and sites can still be searched.");
   }
 });
 function drawPin() {
@@ -4237,10 +4302,6 @@ function setEra(e, quiet) {
   renderFlagKey();
   setScenario((scenarioFor(area, e) || SCENARIOS[0]).id);
   const clt = area === "charlotte", car = area === "carolinas";
-  document.getElementById("v-campaign").hidden = !(rev && clt); document.getElementById("v-camp").hidden = !(rev && clt);
-  document.getElementById("v-charlotte").hidden = !(clt || car);
-  document.getElementById("v-harbor").hidden = clt; document.getElementById("v-lowcountry").hidden = clt || car;
-  document.getElementById("v-carolinas").hidden = !car; document.getElementById("v-region").hidden = !car;
   selForce = null; selected = car ? (rev ? "moorescreek" : "fortfisher") : clt ? (rev ? "camp" : "bates") : (rev ? "c-moultrie76" : "c-sumter");
   if (popAt) { popAt = null; selHome = null; pop.hidden = true; }
   try { localStorage.setItem("cnp-era", e); } catch { /* storage unavailable */ }
@@ -4600,10 +4661,8 @@ document.getElementById("zin").onclick = () => zoomAt(1.6);
 document.getElementById("zout").onclick = () => zoomAt(1 / 1.6);
 
 function setPreset(name) {
-  for (const n of ["camp", "charlotte", "campaign", "harbor", "lowcountry", "carolinas", "region"]) document.getElementById("v-" + n).setAttribute("aria-pressed", n === name);
   fit(PRESETS[name], true);
 }
-for (const n of ["camp", "charlotte", "campaign", "harbor", "lowcountry", "carolinas", "region"]) document.getElementById("v-" + n).onclick = () => setPreset(n);
 for (const k in layers) {
   const box = document.getElementById("L-" + k);
   box.checked = layers[k];
@@ -4655,8 +4714,8 @@ document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () =>
 function selectSite(id, fromMap) {
   const st = SITES.find(s => s.id === id);
   if (!st) return;
+  if ((st.layer === "later") !== (era === "cw")) setEra(st.layer === "later" ? "cw" : "rev", true);   // first: switching wars resets the selection
   selected = id; selForce = null;
-  if ((st.layer === "later") !== (era === "cw")) setEra(st.layer === "later" ? "cw" : "rev", true);
   const sc = scenarioForSite(st);
   if (sc) { stopPlay(); scenLock = sc.id; lockSite = st.id; if (sc !== SCEN) setScenario(sc.id); setDay(dayOf(st.date), true); }
   if (!fromMap) flyToSite(st);
