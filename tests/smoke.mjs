@@ -116,6 +116,50 @@ await test("map: a drag leaves no transform behind", async () => {
   assert.ok(await p.evaluate(() => svg.style.transform === "" && !svg.classList.contains("moving")));
 });
 
+await test("links: a shared link reopens the same war, timeline, date, site and view", async () => {
+  await p.evaluate(() => selectSite("pa-gettysburg", false));
+  await p.waitForTimeout(1500);
+  const url = await p.evaluate(() => location.href.split("#")[0] + hashState());
+  assert.match(url, /e=cw/); assert.match(url, /t=pa-1863/); assert.match(url, /d=1863-07-03/); assert.match(url, /s=pa-gettysburg/);
+  const q = await page();
+  await q.goto("about:blank"); await q.goto(url);
+  await q.waitForFunction(() => typeof SCEN !== "undefined" && SCEN && SCEN.id === "pa-1863", null, { timeout: 20000 });
+  const got = await q.evaluate(() => [era, selected, document.getElementById("tdate").textContent, toLatLon(W / 2, H / 2).map(v => v.toFixed(1)).join(",")]);
+  assert.deepEqual(got.slice(0, 3), ["cw", "pa-gettysburg", "Jul 3, 1863"]);
+  assert.equal(got[3], "39.8,-77.2");
+  assert.deepEqual(q.errors, []);
+  // old-style links still work
+  await q.goto(base.replace("index.html", "") + "index.html#cowpens");
+  await q.waitForTimeout(1500);
+  assert.equal(await q.evaluate(() => selected), "cowpens");
+});
+
+await test("where am I: shows the location, nearest sites and the detecting zone", async () => {
+  const ctx = await browser.newContext({ viewport: { width: 1300, height: 860 }, geolocation: { latitude: 42.4685, longitude: -71.3505, accuracy: 12 }, permissions: ["geolocation"] });
+  await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
+  const g = await ctx.newPage(); const errs = []; g.on("pageerror", e => errs.push(e.message));
+  await g.goto(base); await g.waitForFunction(() => typeof SCEN !== "undefined" && SCEN, null, { timeout: 20000 });
+  await g.click("#locate"); await g.waitForSelector("#homepop:not([hidden])", { timeout: 10000 });
+  const txt = await g.locator("#homepop").innerText();
+  assert.match(txt, /You are here/); assert.match(txt, /Massachusetts/); assert.match(txt, /Concord, North Bridge/); assert.match(txt, /Off-limits/);
+  assert.deepEqual(errs, []);
+  await ctx.close();
+});
+
+await test("offline: after one visit the map opens with no network", async () => {
+  const ctx = await browser.newContext({ viewport: { width: 1000, height: 700 } });
+  await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
+  const o = await ctx.newPage();
+  await o.goto(base);
+  await o.waitForFunction(async () => { const r = await navigator.serviceWorker.getRegistration(); return !!(r && r.active); }, null, { timeout: 20000 });
+  await o.waitForTimeout(1500);
+  await ctx.setOffline(true);
+  await o.reload();
+  await o.waitForFunction(() => typeof BASE !== "undefined" && BASE && SITES.length > 200, null, { timeout: 20000 });
+  assert.ok(await o.evaluate(() => document.querySelectorAll("#map g.site").length > 10));
+  await ctx.close();
+});
+
 await test("no script errors on desktop", async () => { assert.deepEqual(p.errors, []); });
 
 await test("phone: no horizontal scroll, no errors", async () => {

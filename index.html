@@ -4,6 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Wars in America Map</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#1f3f7a">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -421,7 +425,13 @@ ul.tight li { margin: 3px 0; }
 /* full-screen map: real Fullscreen API where available, a fixed overlay otherwise (iPhone) */
 body.fs .mapwrap { position: fixed !important; inset: 0; z-index: 900; height: auto !important; min-height: 0 !important; }
 .mapwrap:fullscreen { width: 100vw; height: 100vh; }
-#fs svg { width: 16px; height: 16px; display: block; margin: auto; }
+#fs svg, #locate svg, #share svg { width: 16px; height: 16px; display: block; margin: auto; }
+#locate.busy svg { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.homepop .warn { margin: 8px 0 4px; padding: 7px 9px; border-radius: 6px; background: rgba(184,38,44,.1); border-left: 4px solid var(--red-side); font-size: .82rem; line-height: 1.35; }
+.homepop .okzone { margin: 8px 0 4px; padding: 7px 9px; border-radius: 6px; background: rgba(31,79,163,.08); border-left: 4px solid var(--blue-side); font-size: .82rem; line-height: 1.35; }
+.homepop ol.near { margin: 4px 0 0; padding-left: 18px; font-size: .82rem; }
+.homepop ol.near button { background: none; border: 0; padding: 1px 0; color: var(--ink); text-decoration: underline; cursor: pointer; font: inherit; text-align: left; }
 #map .terr-b { fill: var(--terr-b); } #map .terr-r { fill: var(--terr-r); }
 #map g.terr { opacity: .26; pointer-events: none; }
 #map { transform-origin: 0 0; will-change: transform; }
@@ -503,6 +513,8 @@ body.fs .mapwrap { position: fixed !important; inset: 0; z-index: 900; height: a
       <button class="btn sq" id="zin" aria-label="Zoom in">+</button>
       <button class="btn sq" id="zout" aria-label="Zoom out">−</button>
       <button class="btn sq" id="pshow" aria-label="Show the info panel" title="Show panel" hidden><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 3L5 8l5 5"/></svg></button>
+      <button class="btn sq" id="locate" aria-label="Show where I am" title="Where am I?"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="8" cy="8" r="4.2"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/><path d="M8 .8v2.4M8 12.8v2.4M.8 8h2.4M12.8 8h2.4"/></svg></button>
+      <button class="btn sq" id="share" aria-label="Share a link to this view" title="Share this view"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M6.6 9.4l2.8-2.8M7.2 4.6l1.5-1.5a2.6 2.6 0 0 1 3.7 3.7l-1.5 1.5M8.8 11.4l-1.5 1.5a2.6 2.6 0 0 1-3.7-3.7l1.5-1.5"/></svg></button>
       <button class="btn sq" id="fs" aria-label="Full-screen map" aria-pressed="false" title="Full screen"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1.5 5.5v-4h4M10.5 1.5h4v4M14.5 10.5v4h-4M5.5 14.5h-4v-4"/></svg></button>
     </div>
     <div class="mapctl bl">
@@ -3850,6 +3862,7 @@ function renderScene() {
   drawPin();
   drawAttribution();
   scheduleAutoScenario();
+  scheduleHash();
 
   // scale bar
   const target = 90 / (s / M_PER_DEG); // metres in 90px
@@ -4191,6 +4204,7 @@ async function geocode(q) {
   } finally { clearTimeout(t); }
 }
 function openPin(g) {
+  if (g.mine) return openHere(g);
   const [wx, wy] = world(g.lat, g.lon);
   pin = { ...g, wx, wy }; popAt = pin; selHome = null;
   const mk = SITES.find(x => x.id === "marker");
@@ -4277,6 +4291,42 @@ addrQ.addEventListener("keydown", (e) => {
   } else if (e.key === "Escape") { sugg.hidden = true; }
 });
 sugg.addEventListener("mousedown", (e) => { const li = e.target.closest("li[data-i]"); if (li) { e.preventDefault(); pickSugg(+li.dataset.i); } });
+/* Where am I: the device's location, the nearest sites, and the detecting zone it falls in. */
+function openHere(g) {
+  const [wx, wy] = world(g.lat, g.lon);
+  pin = { ...g, wx, wy }; popAt = pin; selHome = null;
+  const near = SITES.filter(x => (x.layer === "later") === (era === "cw"))
+    .map(x => ({ x, d: kmBetween(g.lat, g.lon, x.lat, x.lon) })).sort((a, b) => a.d - b.d).slice(0, 5);
+  const zone = ZONES.filter(z => kmBetween(g.lat, g.lon, z.lat, z.lon) * 1000 <= z.r).sort((a, b) => a.r - b.r)[0];
+  const st = stateAt(g.lat, g.lon);
+  const zoneBox = !zone ? `<div class="okzone">No mapped detecting zone here. Whoever owns this land decides: public land usually forbids it, private land needs written permission.</div>`
+    : zone.rating === "off" ? `<div class="warn"><b>Off-limits: ${esc(zone.name)}.</b> ${esc(zone.text)}</div>`
+    : `<div class="okzone"><b>${esc(zone.name)}</b> (${esc(zone.ratingText)}). ${esc(zone.text)}</div>`;
+  pop.innerHTML = `
+    <button class="x" aria-label="Close">×</button>
+    <div class="addr">You are here</div>
+    <div class="meta">${g.lat.toFixed(5)}, ${g.lon.toFixed(5)}${g.acc ? ` · accurate to about ${g.acc < 1000 ? Math.round(g.acc) + " m" : (g.acc / 1000).toFixed(1) + " km"}` : ""}${st ? " · " + esc(STATE_NAMES[st]) : ""}</div>
+    ${zoneBox}
+    <dl><dt>Nearest ${era === "cw" ? "Civil War" : "Revolutionary War"} sites</dt></dl>
+    <ol class="near">${near.map(n => `<li><button data-site="${n.x.id}">${esc(n.x.name)}</button>, ${distTxt(n.d)}</li>`).join("")}</ol>
+    <div class="acts"><a href="${gmaps(g.lat, g.lon)}" target="_blank" rel="noopener">Map ↗</a></div>`;
+  pop.querySelector(".x").onclick = () => { pin = null; closeHome(); };
+  pop.querySelectorAll("[data-site]").forEach(b => b.onclick = () => { pin = null; closeHome(); selectSite(b.dataset.site, false); });
+  pop.hidden = false;
+  flyTo(wx, wy, near[0] && near[0].d < 5 ? 9000 : 2200);
+}
+const locBtn = document.getElementById("locate");
+locBtn.addEventListener("click", () => {
+  if (!navigator.geolocation) return toast("This browser can't share its location.");
+  locBtn.classList.add("busy");
+  navigator.geolocation.getCurrentPosition((pos) => {
+    locBtn.classList.remove("busy");
+    openHere({ lat: pos.coords.latitude, lon: pos.coords.longitude, acc: pos.coords.accuracy, label: "You are here", mine: true });
+  }, (err) => {
+    locBtn.classList.remove("busy");
+    toast(err.code === 1 ? "Location is turned off for this site. Allow it in your browser's settings to use Where am I." : "Your location couldn't be found. Try again outdoors or with Wi-Fi on.");
+  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 20000 });
+});
 document.getElementById("addrform").addEventListener("submit", async (e) => {
   e.preventDefault();
   const q = document.getElementById("addr-q").value.trim();
@@ -4766,13 +4816,50 @@ function selectSite(id, fromMap) {
   if (!fromMap) flyToSite(st);
   else render();
   showTab("site");
-  if (location.hash !== "#" + id) { suppressHash = true; location.hash = id; }
+  scheduleHash();
 }
-let suppressHash = false;
-addEventListener("hashchange", () => {
-  if (suppressHash) { suppressHash = false; return; }
-  const id = location.hash.slice(1);
-  if (SITES.some(s => s.id === id)) selectSite(id, false);
+/* Shareable links. The URL hash holds the view: e (war), st (state picker), s (selected site),
+   t (timeline), d (date), v (lat,lon,zoom). It is rewritten quietly (replaceState) as you
+   explore, so copying the address bar or pressing Share gives a link to exactly this view.
+   Old links of the form #siteid still work. */
+let hashT = 0;
+function hashState() {
+  const [la, lo] = toLatLon(W / 2, H / 2), q = new URLSearchParams();
+  q.set("e", era);
+  if (stateF !== "all") q.set("st", stateF);
+  if (selected) q.set("s", selected);
+  if (SCEN) { q.set("t", SCEN.id); q.set("d", curIso()); }
+  q.set("v", `${la.toFixed(4)},${lo.toFixed(4)},${Math.round(view.s)}`);
+  return "#" + q.toString().replace(/%2C/g, ",");
+}
+function scheduleHash() { clearTimeout(hashT); hashT = setTimeout(() => { try { history.replaceState(null, "", hashState()); } catch { /* sandboxed */ } }, 400); }
+function applyHash(h) {
+  h = (h || "").replace(/^#/, "");
+  if (!h) return false;
+  if (!h.includes("=")) { if (SITES.some(s => s.id === h)) { selectSite(h, false); return true; } return false; }
+  const q = new URLSearchParams(h);
+  const e = q.get("e"); if (e === "rev" || e === "cw") { if (e !== era) setEra(e, true); }
+  const stc = q.get("st"); if (stc && STATE_NAMES[stc]) { stateF = stc; stsel.value = stc; }
+  const sid = q.get("s"); if (sid && SITES.some(x => x.id === sid)) selected = sid;
+  const t = q.get("t"), d = q.get("d");
+  if (t && SCENARIOS.some(x => x.id === t && x.era === era)) { scenLock = t; setScenario(t); if (d && /^\d{4}-\d\d-\d\d$/.test(d)) setDay(dayOf(d), true); }
+  const v = (q.get("v") || "").split(",").map(Number);
+  if (v.length === 3 && v.every(Number.isFinite)) { const [x, y] = world(v[0], v[1]); flyTo(x, y, clampS(v[2]), false); }
+  else if (selected) { const st = SITES.find(x => x.id === selected); const [x, y] = world(st.lat, st.lon); flyTo(x, y, targetScale(st), false); }
+  showTab(currentTab || "site");
+  return true;
+}
+addEventListener("hashchange", () => applyHash(location.hash));
+document.getElementById("share").addEventListener("click", async () => {
+  clearTimeout(hashT);
+  const url = location.href.split("#")[0] + hashState();
+  try { history.replaceState(null, "", url); } catch { /* sandboxed */ }
+  const st = SITES.find(x => x.id === selected);
+  if (navigator.share && matchMedia("(pointer: coarse)").matches) {
+    try { await navigator.share({ title: "Wars in America Map" + (st ? ": " + st.name : ""), url }); return; } catch { /* cancelled */ }
+  }
+  try { await navigator.clipboard.writeText(url); toast("Link copied. It opens this map view, war, timeline and date."); }
+  catch { prompt("Copy this link:", url); }
 });
 
 function renderSite() {
@@ -5517,7 +5604,9 @@ fetch("homes.json").then(r => r.ok ? r.json() : Promise.reject(r.status)).then(r
 }).catch(() => toast("Couldn't load the homes data (homes.json). Open the page from a web server, not as a local file."));
 W = wrap.clientWidth || 800; H = wrap.clientHeight || 600;
 const startId = location.hash.slice(1);
-if (SITES.some(s => s.id === startId)) {
+if (startId.includes("=") && applyHash(startId)) {
+  /* view restored from a shared link */
+} else if (SITES.some(s => s.id === startId)) {
   selected = startId;
   const st = SITES.find(s => s.id === startId);
   if (st.layer === "later") { layers.later = true; document.getElementById("L-later").checked = true; }
@@ -5532,7 +5621,9 @@ if (SITES.some(s => s.id === startId)) {
   selected = "camp";
   fit(PRESETS.camp, false);
 }
-showTab("site");
+if (!startId.includes("=")) showTab("site");
+// Offline: a service worker keeps the page and its data so the map opens without a signal.
+if ("serviceWorker" in navigator && location.protocol !== "file:") addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
 </script>
 </body>
 </html>
