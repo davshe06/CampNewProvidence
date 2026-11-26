@@ -62,7 +62,9 @@ Contents:
   jumps to its timeline and date. The drop-down lists every timeline of the war; one
   picked by hand stays until you move out of its region.
 - **Battle results**: when the slider reaches a battle, a popup on the map shows the
-  winner's flag and colour and a short result. Paused, it shows the battles on that date.
+  winner's flag and colour and a short result, and playback holds for about a second so
+  it can be read. Each battle pops up once per run, stays about five seconds, and up to
+  four show at once. Paused, it shows the battles on that date.
 - **Territory held** (layer): a shaded overlay of who controlled the ground on the
   slider's date, from who governed each state, dated garrisons and occupations, and the
   armies on the map. Blue is American (with French and Spanish allies) in the
