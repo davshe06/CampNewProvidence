@@ -2,8 +2,8 @@
    The page and its data files are cached on first visit. Same-site requests are served from the
    cache at once and refreshed in the background (stale-while-revalidate), so the map opens with
    no signal and picks up updates on the next visit. Portraits from Wikimedia are cached as they load. */
-const CACHE = "wiam-v1", IMAGES = "wiam-images-v1";
-const CORE = ["./", "index.html", "basemap.json", "homes.json", "charleston-water.json", "manifest.webmanifest", "icon.svg", "icon-192.png", "icon-512.png"];
+const CACHE = "wiam-v2", IMAGES = "wiam-images-v1";
+const CORE = ["./", "index.html", "basemap-lo.json", "basemap.json", "homes.json", "charleston-water.json", "manifest.webmanifest", "icon.svg", "icon-192.png", "icon-512.png"];
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
 });

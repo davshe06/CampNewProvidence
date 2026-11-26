@@ -83,6 +83,8 @@ await test("timelines: the slider follows the map view", async () => {
 });
 
 await test("search: cities, states, sites and 'City, ST'", async () => {
+  await p.evaluate(() => needBase());
+  await p.waitForFunction(() => baseFull, null, { timeout: 20000 });
   const top = async (q) => p.evaluate(q => searchPlaces(q).slice(0, 2).map(r => r.kind + ":" + r.label), q);
   assert.equal((await top("Boston"))[0], "place:Boston");
   assert.equal((await top("Virginia"))[0], "state:Virginia");
@@ -157,6 +159,20 @@ await test("offline: after one visit the map opens with no network", async () =>
   await o.reload();
   await o.waitForFunction(() => typeof BASE !== "undefined" && BASE && SITES.length > 200, null, { timeout: 20000 });
   assert.ok(await o.evaluate(() => document.querySelectorAll("#map g.site").length > 10));
+  await ctx.close();
+});
+
+await test("load: light base map first, detail and homes only when zoomed in", async () => {
+  const ctx = await browser.newContext({ viewport: { width: 1300, height: 860 } });
+  await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
+  const q = await ctx.newPage(); const got = [];
+  q.on("request", r => { const f = r.url().split("/").pop(); if (f.endsWith(".json")) got.push(f); });
+  await q.goto(base + "#e=rev&v=37,-80,40");
+  await q.waitForFunction(() => typeof BASE !== "undefined" && BASE, null, { timeout: 20000 });
+  await q.waitForTimeout(1200);
+  assert.deepEqual(got.filter(f => f !== "manifest.webmanifest"), ["basemap-lo.json"]);
+  await q.evaluate(() => selectSite("camp", false));
+  await q.waitForFunction(() => baseFull && HOMES.length > 1000, null, { timeout: 20000 });
   await ctx.close();
 });
 
