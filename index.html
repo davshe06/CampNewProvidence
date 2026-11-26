@@ -4752,7 +4752,7 @@ function openHome(hm, fly) {
     </dl>
     <div class="acts">
       <button class="btn" id="hp-copy">Copy address</button>
-      <a href="${gmaps(la, lo)}" target="_blank" rel="noopener">Map ↗</a>
+      ${mapLinks(la, lo, homeFull(hm))}
     </div>
     <div class="warn">Private home. Ask the owner before setting foot on the lot.</div>`;
   pop.querySelector(".x").onclick = closeHome;
@@ -4859,7 +4859,7 @@ function openPin(g) {
       ${zone ? `<dt>Detecting area</dt><dd>${esc(zone.name)} (${esc(zone.ratingText)})</dd>` : ""}
       ${lot ? `<dt>Mapped lot</dt><dd>Near ${esc((siteOf(lot.site) || {}).name || "")}${lot.year ? ", built " + lot.year : ""}</dd>` : ""}
     </dl>
-    <div class="acts"><a href="${gmaps(g.lat, g.lon)}" target="_blank" rel="noopener">Map ↗</a>${g.src ? `<span class="meta">Located by ${esc(g.src)}</span>` : ""}</div>`;
+    <div class="acts">${mapLinks(g.lat, g.lon, g.label)}${g.src ? `<span class="meta">Located by ${esc(g.src)}</span>` : ""}</div>`;
   pop.querySelector(".x").onclick = () => { pin = null; closeHome(); };
   pop.hidden = false;
   flyTo(wx, wy, dCamp < 3 ? 30000 : 9000);
@@ -4943,7 +4943,7 @@ function openHere(g) {
     ${zoneBox}
     <dl><dt>Nearest ${WAR_LONG[era]} sites</dt></dl>
     <ol class="near">${near.map(n => `<li><button data-site="${n.x.id}">${esc(n.x.name)}</button>, ${distTxt(n.d)}</li>`).join("")}</ol>
-    <div class="acts"><a href="${gmaps(g.lat, g.lon)}" target="_blank" rel="noopener">Map ↗</a></div>`;
+    <div class="acts">${mapLinks(g.lat, g.lon, g.label || "You are here")}</div>`;
   pop.querySelector(".x").onclick = () => { pin = null; closeHome(); };
   pop.querySelectorAll("[data-site]").forEach(b => b.onclick = () => { pin = null; closeHome(); selectSite(b.dataset.site, false); });
   pop.hidden = false;
@@ -5449,6 +5449,10 @@ const pane = document.getElementById("pane");
 let currentTab = "site";
 const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const gmaps = (la, lo) => `https://www.google.com/maps/search/?api=1&query=${la.toFixed(5)},${lo.toFixed(5)}`;
+/* Apple Maps: opens the Maps app on iPhone, iPad and Mac, and Apple Maps on the web elsewhere.
+   q labels the pin; t=k shows satellite imagery. */
+const amaps = (la, lo, label, sat) => `https://maps.apple.com/?ll=${la.toFixed(5)},${lo.toFixed(5)}&q=${encodeURIComponent(label || "Dropped pin")}${sat ? "&t=k" : ""}`;
+const mapLinks = (la, lo, label) => `<a href="${gmaps(la, lo)}" target="_blank" rel="noopener">Google Maps ↗</a><a href="${amaps(la, lo, label)}" target="_blank" rel="noopener">Apple Maps ↗</a>`;
 const statusChip = (st) => `<span class="chip st-${st.status}">${esc(st.statusText)}</span>`;
 const eraChip = (st) => st.era === "later" ? `<span class="chip era-later">Civil War &amp; later</span>` : `<span class="chip era-1780">${esc(st.era)}</span>`;
 
@@ -5535,7 +5539,9 @@ function renderSite() {
       <button class="btn" id="copyc">Copy</button></div>
     <div class="linkrow">
       <a href="${gmaps(st.lat, st.lon)}" target="_blank" rel="noopener">Open in Google Maps ↗</a>
+      <a href="${amaps(st.lat, st.lon, st.name)}" target="_blank" rel="noopener">Open in Apple Maps ↗</a>
       <a href="https://www.google.com/maps/@${st.lat.toFixed(5)},${st.lon.toFixed(5)},800m/data=!3m1!1e3" target="_blank" rel="noopener">Satellite view ↗</a>
+      <a href="${amaps(st.lat, st.lon, st.name, true)}" target="_blank" rel="noopener">Apple satellite ↗</a>
     </div>
     <h3>Other places on the map</h3>
     <ul class="list">${SITES.filter(s => s.id !== st.id && (s.layer === st.layer)).slice(0, 8).map(s => `
@@ -6314,7 +6320,7 @@ function renderVisit() {
     </ul>
     <h3>Notes</h3>
     <ul class="tight">
-      <li>Site points are placed from published descriptions on top of the NC OneMap base, so treat them as close, not surveyed. Use the Google Maps links to confirm before you drive.</li>
+      <li>Site points are placed from published descriptions on top of the NC OneMap base, so treat them as close, not surveyed. Use the Google Maps or Apple Maps links to confirm before you drive.</li>
       <li>Around the camp, roads, creeks, the county line and lot lines come from NC OneMap. Regional rivers and the 1780 road beyond the camp are simplified sketches.</li>
       <li>2030 is the camp's 250th anniversary; Union County residents have asked the county to mark it.</li>
     </ul>`;
