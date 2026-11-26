@@ -2,7 +2,10 @@
 
 An interactive map of Revolutionary War and Civil War history across seven
 Southern states: Virginia, West Virginia, North Carolina, South Carolina,
-Tennessee, Georgia and Florida. The header switches between three areas:
+Tennessee, Georgia and Florida. A **state picker** in the header (All states, or one
+state) narrows the map view and the Story, People, Detecting, Visit and Library
+tabs. With North or South Carolina selected, the Story and Detecting tabs link to the
+original in-depth Charlotte / Camp New Providence and Charleston pages. Coverage:
 
 - **Charlotte area**, centred on Camp New Providence, the Southern Continental
   Army's encampment on Six Mile Creek (Providence Road / NC 16, at the

@@ -416,8 +416,13 @@ body.fs .mapwrap { position: fixed !important; inset: 0; z-index: 900; height: a
 .terrkey { display: flex; gap: 10px; flex-wrap: wrap; font-size: .78rem; margin-top: 4px; }
 .terrkey i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -2px; margin-right: 4px; opacity: .75; }
 @media (max-width: 600px) { .areaseg .btn { padding: 6px 8px; font-size: .78rem; } }
-.statefilter { display: flex; align-items: center; gap: 8px; padding: 10px 16px 0; font-size: .85rem; }
-.statefilter select { flex: 1; max-width: 240px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--line, #ccc); background: var(--paper); color: var(--ink); font: inherit; }
+.statepick { display: inline-flex; }
+.statepick .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.statepick select { padding: 8px 30px 8px 12px; border-radius: 8px; border: 1px solid var(--line, #c9c2b0); background: var(--paper); color: var(--ink);
+  font: 600 .9rem var(--sans, system-ui); cursor: pointer; min-width: 150px; }
+@media (max-width: 600px) { .statepick select { padding: 6px 26px 6px 10px; font-size: .82rem; min-width: 0; } }
+.dives { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.backbtn { margin-bottom: 10px; }
 .stchip { display: inline-block; font-size: .7rem; font-weight: 700; letter-spacing: .04em; padding: 1px 5px; border-radius: 4px; background: var(--chip, rgba(0,0,0,.07)); margin-right: 4px; }
 .toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--panel); padding: 7px 14px; border-radius: 3px; font-size: .82rem; z-index: 20; }
 </style>
@@ -430,11 +435,13 @@ body.fs .mapwrap { position: fixed !important; inset: 0; z-index: 900; height: a
     <span class="sub" id="subtitle">Southern Continental Army encampment · Six Mile Creek, Mecklenburg–Union line · Oct–Dec 1780</span>
   </div>
   <div class="toprow">
-  <div class="seg areaseg" role="group" aria-label="Which area">
-    <button class="btn" id="area-charlotte" aria-pressed="true">Charlotte</button>
-    <button class="btn" id="area-charleston" aria-pressed="false">Charleston</button>
-    <button class="btn" id="area-carolinas" aria-pressed="false">All states</button>
-  </div>
+  <label class="statepick">
+    <span class="vh">State</span>
+    <select id="stsel" aria-label="Choose a state, or all states">
+      <option value="all">All states</option><option value="VA">Virginia</option><option value="WV">West Virginia</option><option value="NC">North Carolina</option>
+      <option value="SC">South Carolina</option><option value="TN">Tennessee</option><option value="GA">Georgia</option><option value="FL">Florida</option>
+    </select>
+  </label>
   <div class="seg era" role="group" aria-label="Which war">
     <button class="btn" id="era-rev" aria-pressed="true"><span class="long">Revolutionary War</span><span class="short">Revolution</span></button>
     <button class="btn" id="era-cw" aria-pressed="false">Civil War</button>
@@ -513,13 +520,6 @@ body.fs .mapwrap { position: fixed !important; inset: 0; z-index: 900; height: a
   </div>
 
   <aside class="panel" aria-label="Details">
-    <div class="statefilter" id="statefilter" hidden>
-      <label for="stsel">Show</label>
-      <select id="stsel" aria-label="Filter the panel by state">
-        <option value="all">All seven states</option><option value="VA">Virginia</option><option value="WV">West Virginia</option><option value="NC">North Carolina</option>
-        <option value="SC">South Carolina</option><option value="TN">Tennessee</option><option value="GA">Georgia</option><option value="FL">Florida</option>
-      </select>
-    </div>
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" data-tab="site" aria-selected="true">Site</button>
       <button class="tab" role="tab" data-tab="story" aria-selected="false">Story</button>
@@ -3099,7 +3099,7 @@ function buildHomes(raw) { HOMES = raw.map((r, i) => {
 }); }
 let selHome = null, popAt = null, pin = null;
 let era = "rev", area = "charlotte";
-try { const a = localStorage.getItem("cnp-area"); if (a === "charleston" || a === "carolinas") area = a; } catch { /* storage unavailable */ }
+area = "carolinas";   // one region; the state picker narrows it
 try { if (localStorage.getItem("cnp-era") === "cw") era = "cw"; } catch { /* storage unavailable */ }
 function el(tag, attrs, parent, text) {
   const e = document.createElementNS(NS, tag);
@@ -3662,18 +3662,15 @@ function drawPin() {
 /* ---------- era toggle ---------- */
 function setArea(a, quiet) {
   area = a;
-  for (const n of ["charlotte", "charleston", "carolinas"]) document.getElementById("area-" + n).setAttribute("aria-pressed", n === a);
-  try { localStorage.setItem("cnp-area", a); } catch { /* storage unavailable */ }
   if (popAt) { popAt = null; selHome = null; pop.hidden = true; }
   setEra(era, quiet);
 }
 document.getElementById("notice").addEventListener("click", (e) => e.currentTarget.classList.toggle("open"));
-for (const n of ["charlotte", "charleston", "carolinas"]) document.getElementById("area-" + n).addEventListener("click", () => { if (area !== n) { scenLock = null; setArea(n); } });
 const ERA = {
   "car-rev": { sub: "Virginia, West Virginia, the Carolinas, Tennessee, Georgia and Florida · the Revolution, 1771–1782",
-               note: "<b>The Revolution in seven states.</b> Every site, army and fleet. The time slider follows the part of the map you're looking at, or the site you select; pick a state in the panel to focus on it." },
+               note: "<b>The Revolution in seven states.</b> Every site, army and fleet. The time slider follows the part of the map you're looking at, or the site you select; choose a state at the top to focus on it." },
   "car-cw":  { sub: "Virginia, West Virginia, the Carolinas, Tennessee, Georgia and Florida · the Civil War, 1859–1865",
-               note: "<b>The Civil War in seven states.</b> Every site, army and fleet. The time slider follows the part of the map you're looking at, or the site you select; pick a state in the panel to focus on it." },
+               note: "<b>The Civil War in seven states.</b> Every site, army and fleet. The time slider follows the part of the map you're looking at, or the site you select; choose a state at the top to focus on it." },
   "chs-rev": { sub: "Charleston and the Lowcountry · Sullivan's Island 1776, the sieges of 1779–80 and the occupation to 1782",
                note: "<b>Revolutionary Charleston.</b> Forts, siege lines, plantations and the wreck of HMS Actaeon. Switch to Civil War for Fort Sumter, Fort Wagner and the Hunley." },
   "chs-cw":  { sub: "Charleston Harbor · Fort Sumter, Fort Wagner, the Hunley and the wrecks of the blockade, 1860–1865",
@@ -3705,7 +3702,6 @@ function setEra(e, quiet) {
   document.getElementById("v-charlotte").hidden = !(clt || car);
   document.getElementById("v-harbor").hidden = clt; document.getElementById("v-lowcountry").hidden = clt || car;
   document.getElementById("v-carolinas").hidden = !car; document.getElementById("v-region").hidden = !car;
-  document.getElementById("statefilter").hidden = !car;
   selForce = null; selected = car ? (rev ? "moorescreek" : "fortfisher") : clt ? (rev ? "camp" : "bates") : (rev ? "c-moultrie76" : "c-sumter");
   if (popAt) { popAt = null; selHome = null; pop.hidden = true; }
   try { localStorage.setItem("cnp-era", e); } catch { /* storage unavailable */ }
@@ -4416,7 +4412,7 @@ const whereName = () => stateF === "all" ? "the South" : STATE_NAMES[stateF];
 const stsel = document.getElementById("stsel");
 stsel.value = stateF;
 stsel.addEventListener("change", () => {
-  stateF = stsel.value;
+  stateF = stsel.value; localDive = null;
   try { localStorage.setItem("cnp-state", stateF); } catch { /* storage unavailable */ }
   scenLock = null;
   if (stateF === "all") setPreset("region"); else fit(stateBox(stateF), true);
@@ -4467,13 +4463,38 @@ function renderStoryCAR() {
   pane.innerHTML = `
     <h2>${era === "rev" ? "The Revolution" : "The Civil War"} in ${stateF === "all" ? "seven Southern states" : STATE_NAMES[stateF]}</h2>
     <div class="kicker">Every dated event on the map${stateF === "all" ? "" : " in " + STATE_NAMES[stateF]}. Select one to move the slider to that timeline and date and fly to the place.</div>
+    ${divesHTML()}
     <p>${stateF !== "all" && STATE_INTRO[era][stateF] ? STATE_INTRO[era][stateF] : era === "rev" ? "The Carolinas saw some of the earliest resistance to British rule and some of the hardest fighting of the war. After Charleston fell in 1780, the war here became a civil war between neighbors as much as a fight between armies: Patriot and Loyalist militia, partisans like Marion and Sumter, and Greene's small Continental army wore down the British until they held only Charleston." : "South Carolina was the first state to secede and North Carolina the last. The war came first to the coast, where Union fleets took the sounds and sea islands and freedom-seekers by the thousands reached Union lines. It ended inland, as Sherman marched through both states and Johnston surrendered at Bennett Place, the largest surrender of the war."}</p>
     <ul class="list">${rows.map(t => `
       <li><button class="rowbtn${t.iso.slice(5) === md ? " today" : ""}" data-iso="${t.iso}" ${t.site ? `data-st="${t.site}"` : ""}>
         <span class="when">${esc(t.d)}</span><span class="what">${esc(t.t)}</span><span class="why">${esc(t.s)}</span></button></li>`).join("")}</ul>`;
   pane.querySelectorAll(".rowbtn[data-iso]").forEach(b => b.addEventListener("click", () => goToDay(b.dataset.iso, b.dataset.st)));
+  wireDives();
+}
+/* The Charlotte and Charleston modes' own long-form pages, reached from the Story and Detecting tabs. */
+let localDive = null;
+function renderDive(kind) {
+  const old = area; area = localDive;
+  try { kind === "story" ? renderStory() : renderDetect(); } finally { area = old; }
+  pane.insertAdjacentHTML("afterbegin", `<button class="btn backbtn" id="diveback">← Back to ${stateF === "all" ? "all states" : esc(STATE_NAMES[stateF])}</button>`);
+  document.getElementById("diveback").onclick = () => { localDive = null; showTab(currentTab); };
+}
+function divesHTML() {
+  const d = [];
+  if (stateF === "all" || stateF === "NC") d.push(`<button class="btn" data-dive="charlotte">Charlotte${era === "rev" ? " and Camp New Providence" : ""}</button>`);
+  if (stateF === "all" || stateF === "SC") d.push(`<button class="btn" data-dive="charleston">Charleston</button>`);
+  return d.length ? `<div class="callout dives"><b>In depth:</b> ${d.join("")}</div>` : "";
+}
+function wireDives() {
+  pane.querySelectorAll("[data-dive]").forEach(b => b.addEventListener("click", () => {
+    localDive = b.dataset.dive;
+    if (localDive === "charlotte") { if (era === "rev") setPreset("camp"); else fit(PRESETS.cw, true); }
+    else setPreset(era === "rev" ? "lowcountry" : "harbor");
+    showTab(currentTab);
+  }));
 }
 function renderStory() {
+  if (area === "carolinas" && localDive) return renderDive("story");
   if (area === "carolinas") return renderStoryCAR();
   if (area === "charleston") return renderStoryCHS();
   if (era === "cw") return renderStoryCW();
@@ -4577,6 +4598,7 @@ function renderDetectCAR(rating) {
   pane.innerHTML = `
     <h2>Metal detecting</h2>
     <div class="kicker">Every site for this war ${stateF === "all" ? "in all seven states" : "in " + STATE_NAMES[stateF]}, with zones rated by who owns the land.</div>
+    ${divesHTML()}
     <div class="callout"><b>Read this first.</b> National parks, national wildlife refuges, military land, state historic sites and state parks are off-limits. Cemeteries and churchyards are never open. Shipwrecks and state bottomland are protected. Private land always needs the owner's written permission.</div>
     <h3>Zones by site (${sids.length})</h3>
     ${sids.map(sid => { const st = siteOf(sid), zs = ZONES.filter(z => z.site === sid), n = HOMES.filter(h => h.site === sid).length;
@@ -4584,7 +4606,7 @@ function renderDetectCAR(rating) {
         <summary class="zh"><span class="zn">${esc(st.name)}</span><span class="zr">${zs.map(z => esc(RATING_SHORT[z.rating])).join(" · ")}${n ? ` · ${n} homes` : ""}</span></summary>
         ${zs.map(z => `<p><b style="color:${rating[z.rating]}">${esc(z.name)}:</b> ${esc(z.text)}</p>`).join("")}
         <button class="btn" data-zone="${zs[zs.length - 1].id}">Show on map</button></details>`; }).join("")}`;
-  wireRows();
+  wireRows(); wireDives();
 }
 function renderDetectCHS(rating) {
   const sids = [...new Set(ZONES.filter(z => zoneInArea(z) && (siteOf(z.site) || {}).area === "charleston").map(z => z.site))];
@@ -4610,6 +4632,7 @@ function renderDetectCHS(rating) {
 const RATING_SHORT = { hi: "High", mid: "Moderate", low: "Low", off: "Off-limits" };
 function renderDetect() {
   const rating = { hi: "var(--hi)", mid: "var(--mid)", low: "var(--low)", off: "var(--off)" };
+  if (area === "carolinas" && localDive) return renderDive("detect");
   if (area === "charleston") return renderDetectCHS(rating);
   if (area === "carolinas") return renderDetectCAR(rating);
   pane.innerHTML = `
