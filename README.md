@@ -160,3 +160,11 @@ reported finds.
 
 Note: the camp dates to the Revolutionary War, not the Civil War, despite
 some online listings.
+
+## Tests
+
+`npm install`, then `npm test` runs the smoke tests in `tests/smoke.mjs` with Playwright:
+data integrity (every site, event, person and waypoint reference), state lookups, timeline
+jumps, the slider following the view, search, battle popups (each once), the panel toggle,
+pan transforms, and a phone layout check. Outside network is blocked during tests. GitHub
+Actions runs them on every pull request (`.github/workflows/test.yml`).

@@ -1,0 +1,12 @@
+{
+  "name": "wars-in-america-map",
+  "private": true,
+  "description": "Interactive map of Revolutionary War and Civil War history. A static site: no build step.",
+  "type": "module",
+  "scripts": {
+    "test": "node tests/smoke.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  }
+}
