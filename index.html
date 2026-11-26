@@ -1811,7 +1811,7 @@ const SCENARIOS = [
         wp: [W_("1863-06-01", 32.4316, -80.6698, "Leave Beaufort"), W_("1863-06-02", 32.64, -80.55, "Up the Combahee; over 700 people freed"),
              W_("1863-06-03", 32.4316, -80.6698, "Return to Beaufort")] }] },
   { id: "clt-cw", area: "charlotte", era: "cw", name: "1865: Sherman and the end in the Carolinas", start: "1865-02-01", end: "1865-05-12", at: "1865-04-19",
-    band: ["1865-04-18", "1865-04-26", "Davis in Charlotte"], fit: "carolinas", bbox: [31.5, -84.0, 37.6, -76.5],
+    band: ["1865-04-18", "1865-04-26", "Davis in Charlotte"], fit: "carolinas", bbox: [32.3, -82.8, 36.8, -76.8],
     events: [
       { iso: "1865-02-03", d: "Feb 3, 1865", t: "Rivers' Bridge", s: "A Confederate stand on the Salkehatchie.", site: "riversbridge" },
       { iso: "1865-02-11", d: "Feb 11", t: "Aiken", s: "Wheeler turns back Kilpatrick's cavalry.", site: "aiken" },
@@ -2356,7 +2356,7 @@ function prepWater(rings) {
     for (const [x, y] of pts) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; } return { pts, x0, y0, x1, y1 }; });
 }
 function drawCoast() {
-  if (!WATER) return;
+  if (!WATER || view.s < 300) return;   // far out, the regional water is detailed enough
   const s = view.s; let d = "";
   for (const r of WATER) {
     const ax = sx_(r.x0), bx = sx_(r.x1), ay = sy_(r.y0), by = sy_(r.y1);
@@ -2405,7 +2405,7 @@ function drawBaseUnder() {
       const [a1, o1, a2, o2] = COAST_BOX, [cx1, cy1] = toScreen(a2, o1), [cx2, cy2] = toScreen(a1, o2);
       const cp = el("clipPath", { id: "rgn-clip" }, el("defs", {}, g));
       el("path", { d: `M-10,-10H${W + 10}V${H + 10}H-10Z M${cx1},${cy1}H${cx2}V${cy2}H${cx1}Z`, "clip-rule": "evenodd" }, cp);
-      el("path", { d, class: "rgn-water", "fill-rule": "evenodd", "clip-path": "url(#rgn-clip)" }, g);
+      el("path", { d, class: "rgn-water", "fill-rule": "evenodd", ...(WATER && view.s >= 300 ? { "clip-path": "url(#rgn-clip)" } : {}) }, g);
     }
     let rd = ""; for (const rv of BASE.rivers) for (const r of rv.parts) if (onScreen(r)) rd += partD(r);
     if (rd) el("path", { d: rd, class: "rgn-river", "stroke-width": (Math.max(1.2, Math.min(3, s / 1500))).toFixed(2) }, g);
@@ -2748,28 +2748,34 @@ function setScenario(id, keepDay) {
   if (sc.band) { band.hidden = false; band.style.cssText = `left:${pct(dayOf(sc.band[0]))};width:${pct(Math.max(1, dayOf(sc.band[1]) - dayOf(sc.band[0])))}`; } else band.hidden = true;
   ttrack.querySelectorAll(".ttick").forEach(t => t.remove());
   for (const t of sc.evs) {
-    if (sc.id === "clt-rev" && !SITES.some(x => x.id === t.site && x.type === "battle")) continue;
+    if ((sc.id === "clt-rev" || sc.total) && !SITES.some(x => x.id === t.site && x.type === "battle")) continue;
     const tk = document.createElement("div"); tk.className = "ttick"; tk.style.left = pct(dayOf(t.iso)); tk.title = t.d + ": " + t.t; ttrack.appendChild(tk);
   }
   // month labels spaced to scale
-  const a0 = new Date(DAY0), a1 = new Date(DAY0 + DAYS * 864e5), n = monthsBetween(a0, a1), stepM = n <= 3 ? 1 : n <= 8 ? 2 : n <= 18 ? 3 : 6;
+  const a0 = new Date(DAY0), a1 = new Date(DAY0 + DAYS * 864e5), n = monthsBetween(a0, a1), stepM = n <= 3 ? 1 : n <= 8 ? 2 : n <= 18 ? 3 : n <= 36 ? 6 : 12;
   const lab = [];
   for (let m = 0; m <= n; m += stepM) {
-    const d = new Date(Date.UTC(a0.getUTCFullYear(), a0.getUTCMonth() + m, 1)), dd = (d - DAY0) / 864e5;
+    const d = stepM === 12 ? new Date(Date.UTC(a0.getUTCFullYear() + m / 12 + 1, 0, 1)) : new Date(Date.UTC(a0.getUTCFullYear(), a0.getUTCMonth() + m, 1)), dd = (d - DAY0) / 864e5;
     if (dd < 0 || dd > DAYS) continue;
-    const txt = d.toLocaleDateString("en-US", { timeZone: "UTC", month: "short" }) + (d.getUTCMonth() === 0 || !lab.length ? " " + d.getUTCFullYear() : "");
+    const txt = stepM === 12 ? String(d.getUTCFullYear()) : d.toLocaleDateString("en-US", { timeZone: "UTC", month: "short" }) + (d.getUTCMonth() === 0 || !lab.length ? " " + d.getUTCFullYear() : "");
     lab.push(`<span style="left:${pct(dd)};transform:translateX(${dd < DAYS * .05 ? "0" : dd > DAYS * .95 ? "-100%" : "-50%"})">${txt}</span>`);
   }
   document.getElementById("tlabels").innerHTML = lab.join("");
   // timeline picker: every timeline of this war, in date order
-  const opts = SCENARIOS.filter(x => x.era === era).sort((a, b) => a.start < b.start ? -1 : 1);
+  const opts = SCENARIOS.filter(x => x.era === era).sort((a, b) => (b.total ? 1 : 0) - (a.total ? 1 : 0) || (a.start < b.start ? -1 : 1));
   tscen.innerHTML = opts.map(x => `<option value="${x.id}"${x.id === sc.id ? " selected" : ""}>${esc(x.name)}</option>`).join("");
   tscen.hidden = opts.length < 2;
   if (!tscen.hidden) tscen.title = "Choose a timeline";
   selForce = null;
   setDay(keepDay ? tDay : dayOf(sc.at), true);
 }
-tscen.addEventListener("change", () => { stopPlay(); scenLock = tscen.value; lockSite = null; setScenario(tscen.value); render(); });
+tscen.addEventListener("change", () => {
+  stopPlay(); scenLock = tscen.value; lockSite = null;
+  const iso = new Date(DAY0 + Math.round(tDay) * 864e5).toISOString().slice(0, 10), sc = SCENARIOS.find(x => x.id === tscen.value);
+  setScenario(tscen.value);
+  if (sc && sc.total && iso >= sc.start && iso <= sc.end) setDay(dayOf(iso), true);   // the whole war keeps the date you were on
+  render();
+});
 const DEFAULT_SCEN = { "charlotte-rev": "clt-rev", "charlotte-cw": "clt-cw", "charleston-rev": "chs-1780", "charleston-cw": "chs-cw", "carolinas-rev": "sc-1781", "carolinas-cw": "clt-cw" };
 function scenarioFor(a, e) { return SCENARIOS.find(x => x.id === DEFAULT_SCEN[a + "-" + e]) || SCENARIOS.find(x => x.era === e); }
 /* The slider follows the map: among this war's timelines whose box holds the view centre,
@@ -2791,13 +2797,20 @@ function scenOnScreen(x, v) {
 }
 function bestScenarioForView() {
   const v = viewInfo();
-  let c = SCENARIOS.filter(x => x.era === era && x.bbox && inBox(x.bbox, v.la, v.lo)).map(x => ({ x, n: scenOnScreen(x, v) }));
+  const whole = SCENARIOS.find(x => x.era === era && x.total);
+  let c = SCENARIOS.filter(x => x.era === era && !x.total && x.bbox && inBox(x.bbox, v.la, v.lo)).map(x => ({ x, n: scenOnScreen(x, v) }));
+  const pick = pickRegional(c, v);
+  // zoomed out to both states: the whole war fits the view better than any one campaign
+  if (whole && (!pick || sizeFit(whole, v) < sizeFit(pick, v))) return whole;
+  return pick;
+}
+function pickRegional(c, v) {
   if (!c.some(o => o.n)) return c.length ? c.sort((a, b) => sizeFit(a.x, v) - sizeFit(b.x, v))[0].x : null;
   c = c.filter(o => o.n);
   const top = Math.max(...c.map(o => o.n));
   const close = c.filter(o => o.n >= top * 0.75);            // the timelines with the most going on here
   close.sort((a, b) => sizeFit(a.x, v) - sizeFit(b.x, v) || (b.x.primary ? 1 : 0) - (a.x.primary ? 1 : 0));
-  if (SCEN && close.some(o => o.x === SCEN)) return SCEN;     // a good fit already: don't flip
+  if (SCEN && !SCEN.total && close.some(o => o.x === SCEN)) return SCEN;     // a good fit already: don't flip
   return close[0].x;
 }
 const sizeFit = (x, v) => Math.abs(Math.log(((x.bbox[2] - x.bbox[0]) * (x.bbox[3] - x.bbox[1])) / v.area));
@@ -2810,7 +2823,12 @@ function autoScenario() {
     scenLock = null; lockSite = null;
   }
   const b = bestScenarioForView();
-  if (b && b !== SCEN) { setScenario(b.id); requestRender(); }
+  if (b && b !== SCEN) {
+    const iso = new Date(DAY0 + Math.round(tDay) * 864e5).toISOString().slice(0, 10);
+    setScenario(b.id);
+    if (iso >= b.start && iso <= b.end) setDay(dayOf(iso), true);   // stay on the same date where the new timeline covers it
+    requestRender();
+  }
 }
 function scheduleAutoScenario() { clearTimeout(autoT); autoT = setTimeout(autoScenario, 450); }
 function scenarioForSite(st) {
@@ -2852,7 +2870,9 @@ playBtn.addEventListener("click", () => {
   if (SCEN && SCEN.fit && !playFitted) { playFitted = true; if (typeof SCEN.fit === "string") setPreset(SCEN.fit); else fit(SCEN.fit, true); }
   playBtn.textContent = "❚❚"; playBtn.setAttribute("aria-label", "Pause");
   const stepDays = Math.max(1, Math.round(DAYS / 430));   // longer timelines advance several days per tick
-  playT = setInterval(() => { if (tDay >= DAYS) return stopPlay(); setDay(tDay + stepDays); }, (reduceMotion ? 160 : 70) / playSpeed);
+  // the whole war: one day per tick while armies march or a battle is near, fast through quiet months
+  const busy = () => FORCES.some(f => { const a = forceAt(f, tDay); return a && a.moving && f.days[a.i + 1] - f.days[a.i] <= 45; }) || SCEN.evs.some(t => Math.abs(dayOf(t.iso) - tDay) < 4);
+  playT = setInterval(() => { if (tDay >= DAYS) return stopPlay(); setDay(tDay + (SCEN.total ? (busy() ? 1 : 10) : stepDays)); }, (reduceMotion ? 160 : 70) / playSpeed);
 });
 function goToDay(iso, siteId) {
   stopPlay();
@@ -2978,7 +2998,7 @@ svg.addEventListener("keydown", (e) => {
   const fk = e.target.closest && e.target.closest(".force");
   if (fk && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); selectForce(fk.dataset.id); }
 });
-const clampS = (s) => Math.min(400000, Math.max(120, s));
+const clampS = (s) => Math.min(400000, Math.max(36, s));
 /* Eased zoom. The world point under the anchor (cursor, pinch centre or map
    centre) stays pinned under it for every frame, so features never slide. */
 const zs = { target: null, ax: 0, ay: 0, wx: 0, wy: 0, raf: 0 };
@@ -3279,6 +3299,40 @@ function renderStoryCHS() {
       <li><button class="rowbtn${t.md === md ? " today" : ""}" ${t.site ? `data-site="${t.site}"` : "disabled"}>
         <span class="when">${esc(t.d)}</span><span class="what">${esc(t.t)}</span><span class="why">${esc(t.s)}</span></button></li>`).join("")}</ul>`;
   wireRows();
+}
+/* "The whole war": every army, fleet and event of one war on one timeline. An army that
+   appears in more than one timeline is joined into one track: the later timeline's
+   waypoints replace the earlier one's for the dates they cover. */
+const WHOLE_JOIN = { rev: [["mdde", "greene81", "greene-sc"], ["corn", "corn81"], ["lee81", "lee-sc"], ["sumter", "sumter81"], ["clinton76nc", "clinton76"]],
+                     cw: [["hoke", "hoke65"]] };
+const WHOLE_NAME = { mdde: "Greene's army (Maryland & Delaware Continentals)", corn: "Cornwallis's army", lee81: "Lee's Legion", sumter: "Sumter's SC militia", clinton76nc: "Clinton's expedition", hoke: "Hoke's division" };
+function buildWholeWar() {
+  for (const e of ["rev", "cw"]) {
+    const scs = SCENARIOS.filter(x => x.era === e && !x.total);
+    const all = scs.flatMap(sc => sc.forces || CLT_REV_FORCES), byId = Object.fromEntries(all.map(f => [f.id, f])), used = new Set(), forces = [];
+    for (const grp of WHOLE_JOIN[e]) {
+      let wp = [];
+      for (const id of grp) {
+        const f = byId[id]; if (!f) continue; used.add(id);
+        const a = f.wp[0][0], b = f.wp[f.wp.length - 1][0];
+        wp = wp.filter(w => w[0] < a || w[0] > b).concat(f.wp).sort((x, y) => x[0] < y[0] ? -1 : x[0] > y[0] ? 1 : 0);
+      }
+      const last = byId[grp[grp.length - 1]], first = byId[grp[0]];
+      forces.push({ ...last, id: "all-" + first.id, name: WHOLE_NAME[first.id] || last.name, wp });
+    }
+    for (const f of all) if (!used.has(f.id)) forces.push({ ...f, id: "all-" + f.id });
+    const seen = new Set(), events = [];
+    const pre = (CAR_PRELUDE[e] || []).map(t => ({ ...t }));
+    for (const t of [...pre, ...scs.flatMap(sc => sc.events || TIMELINE.filter(x => x.iso))]) {
+      const k = t.iso + "|" + t.t; if (seen.has(k)) continue; seen.add(k);
+      events.push({ ...t, d: /\d{4}/.test(t.d) ? t.d : t.d + ", " + t.iso.slice(0, 4) });
+    }
+    const start = e === "rev" ? "1775-05-01" : "1860-12-01", end = e === "rev" ? "1782-12-31" : "1865-05-15";
+    SCENARIOS.push({ id: "all-" + e, area: "carolinas", era: e, total: true, start, end, at: start,
+      name: e === "rev" ? "★ The whole war, 1775–82: every army and fleet" : "★ The whole war, 1860–65: every army and fleet",
+      fit: "carolinas", bbox: [31.6, -85.0, 37.2, -74.8], forces,
+      events: events.filter(t => t.iso >= start && t.iso <= end).sort((a, b) => a.iso < b.iso ? -1 : a.iso > b.iso ? 1 : 0) });
+  }
 }
 const CAR_PRELUDE = {
   rev: [{ iso: "1766-02-21", d: "Feb 1766", t: "Stamp Act defied", s: "Armed colonists at Brunswick stop enforcement of the Stamp Act.", site: "brunswick" },
@@ -3609,6 +3663,7 @@ function toast(msg) {
 /* ---------- boot ---------- */
 if (innerWidth < 900) document.getElementById("layers").open = false;
 setDay(tDay, true);
+buildWholeWar();
 setArea(area, true);
 fetch("basemap.json").then(r => r.ok ? r.json() : null).then(j => { if (j) { prepBase(j); render(); } }).catch(() => {});
 fetch("charleston-water.json").then(r => r.ok ? r.json() : null).then(j => { if (j) { prepWater(j); render(); } }).catch(() => {});

@@ -47,7 +47,14 @@ Contents:
   **The slider follows the map**: each timeline has a geographic box, and as you pan or
   zoom it switches to the timeline with the most going on in view. Selecting a site
   jumps to its timeline and date. The drop-down lists every timeline of the war; one
-  picked by hand stays until you move out of its region. Ships are drawn as boats. The
+  picked by hand stays until you move out of its region.
+- **The whole war**: the first entry in the timeline drop-down plays every army, fleet
+  and event of the war on one slider (1775–82 or 1860–65), with year labels. An army
+  that appears in several campaign timelines (Greene, Cornwallis, Lee, Sumter, Clinton,
+  Hoke) is joined into one continuous track. Playback slows to a day per step while
+  armies are marching or a battle is near, and skips quickly through quiet months; the
+  whole Revolution plays in about a minute at 1×. Zooming out to both states selects it
+  automatically. You can zoom out far enough to see both states on a phone. Ships are drawn as boats. The
   original Charlotte timeline: April 20, 1780 to June 20, 1781, six months either
   side of the camp. Ten forces move along dated waypoints with trails; battles pulse as
   the date passes. Routes between waypoints are straight lines.
