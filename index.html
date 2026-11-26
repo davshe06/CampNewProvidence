@@ -2327,7 +2327,7 @@ const BATTLE_NUM = {
   waxhaws: ["American ~400 · British Legion ~270", "American ~310 (113 killed) · British ~20"],
   camden: ["American ~3,700 · British ~2,100", "American ~1,900 · British ~320"],
   kings: ["Patriot ~900 · Loyalist ~1,100", "Patriot ~90 · Loyalist ~1,000 (most captured)"],
-  cowpens: ["American ~2,000 · British ~1,100", "American ~150 · British ~830 (about 700 captured)"],
+  cowpens: ["American ~1,100–2,000 (estimates vary with the militia count) · British ~1,100", "American ~150 · British ~830 (about 700 captured)"],
   guilford: ["American ~4,400 · British ~1,900", "American ~260 · British ~530"],
   hobkirk: ["American ~1,550 · British ~900", "American ~270 · British ~260"],
   eutaw: ["American ~2,200 · British ~2,000", "American ~520 · British ~880"],
@@ -3437,12 +3437,12 @@ const SCENARIOS = [
     events: [
       { iso: "1778-07-04", d: "July 4, 1778", t: "Kaskaskia", s: "Clark takes the British post in the Illinois country without a shot." },
       { iso: "1778-09-18", d: "Sept 1778", t: "Boonesborough", s: "Blackfish's siege fails.", site: "ky-boonesborough" },
-      { iso: "1778-12-17", d: "Dec 17, 1778", t: "Hamilton retakes Vincennes", s: "The British lieutenant governor marches from Detroit." },
+      { iso: "1778-12-17", d: "Dec 17, 1778", st: "IN", t: "Hamilton retakes Vincennes", s: "The British lieutenant governor marches from Detroit." },
       { iso: "1779-02-25", d: "Feb 25, 1779", t: "Vincennes", s: "Clark's winter march forces Hamilton to surrender.", site: "in-vincennes" },
       { iso: "1782-03-08", d: "Mar 8, 1782", t: "Gnadenhutten", s: "Militia murder 96 Christian Lenape.", site: "oh-gnadenhutten" },
       { iso: "1782-06-05", d: "June 1782", t: "Sandusky", s: "Crawford's expedition routed.", site: "oh-sandusky" },
       { iso: "1782-08-19", d: "Aug 19, 1782", t: "Blue Licks", s: "Kentucky militia ambushed.", site: "ky-bluelicks" },
-      { iso: "1782-11-10", d: "Nov 1782", t: "Clark's last raid", s: "Shawnee towns on the Great Miami burned." }],
+      { iso: "1782-11-10", d: "Nov 1782", st: "OH", t: "Clark's last raid", s: "Shawnee towns on the Great Miami burned." }],
     forces: [
       { id: "clark", name: "Clark's Virginians", ab: "GC", c: "militia", side: "nc", desc: "Lt. Col. George Rogers Clark's Illinois Regiment of Virginia volunteers and French allies.",
         wp: [W_("1778-06-26", 38.27, -85.75, "Falls of the Ohio"), W_("1778-07-04", 37.92, -89.91, "Take Kaskaskia"), W_("1779-02-06", 37.92, -89.91, "Leave Kaskaskia in flood"),
@@ -5944,7 +5944,7 @@ function renderStoryCAR() {
   const add = (t) => { const k = t.iso + "|" + t.t; if (!t.iso || seen.has(k)) return; seen.add(k); rows.push(t); };
   CAR_PRELUDE[era].forEach(t => { if (siteIn(t.site)) add(t); });
   for (const sc of SCENARIOS.filter(x => x.era === era && !x.total)) (sc.events || (sc.id === "clt-rev" ? TIMELINE.filter(t => t.iso) : [])).forEach(t => {
-    if (t.site ? !siteIn(t.site) : !inStateF(scenState(sc))) return;
+    if (t.site ? !siteIn(t.site) : !inStateF(t.st || scenState(sc))) return;   // an event can name its own state when its timeline spans several
     add({ ...t, d: t.d.match(/\d{4}/) ? t.d : t.d + ", " + t.iso.slice(0, 4) });
   });
   rows.sort((a, b) => a.iso < b.iso ? -1 : a.iso > b.iso ? 1 : 0);
