@@ -3863,6 +3863,7 @@ function renderScene() {
   drawAttribution();
   scheduleAutoScenario();
   scheduleHash();
+  if (typeof loadForView === "function") loadForView();
 
   // scale bar
   const target = 90 / (s / M_PER_DEG); // metres in 90px
@@ -4800,6 +4801,7 @@ const eraChip = (st) => st.era === "later" ? `<span class="chip era-later">Civil
 
 function showTab(name) {
   currentTab = name;
+  if (name === "detect") { try { needHomes(); } catch { /* not ready yet */ } }
   document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.tab === name));
   ({ site: renderSite, story: renderStory, people: renderPeople, detect: renderDetect, visit: renderVisit, library: renderLibrary, sources: renderSources })[name]();
   pane.scrollTop = 0;
@@ -5596,12 +5598,38 @@ if (innerWidth < 900) document.getElementById("layers").open = false;
 setDay(tDay, true);
 buildWholeWar();
 setArea(area, true);
-fetch("basemap.json").then(r => r.ok ? r.json() : null).then(j => { if (j) { prepBase(j); render(); } }).catch(() => {});
-fetch("charleston-water.json").then(r => r.ok ? r.json() : null).then(j => { if (j) { prepWater(j); render(); } }).catch(() => {});
-fetch("homes.json").then(r => r.ok ? r.json() : Promise.reject(r.status)).then(raw => {
-  buildHomes(raw); render();
-  if (currentTab === "detect") renderDetect();
-}).catch(() => toast("Couldn't load the homes data (homes.json). Open the page from a web server, not as a local file."));
+/* Data loads in stages so the first view appears fast:
+   basemap-lo.json (about 50 KB compressed: big towns, simplified roads, rivers and water) at once;
+   the detailed basemap.json when the view zooms to state level or a search starts;
+   homes.json when zoomed in close (or the Detecting tab opens); Charleston's water near the harbor. */
+let baseFull = false, baseLoading = false, homesLoading = false, waterLoading = false;
+function needBase() {
+  if (baseFull || baseLoading) return baseLoading;
+  baseLoading = fetch("basemap.json").then(r => r.ok ? r.json() : null).then(j => { if (j) { prepBase(j); baseFull = true; requestRender(); } })
+    .catch(() => {}).finally(() => { baseLoading = false; });
+  return baseLoading;
+}
+function needHomes() {
+  if (homesLoading || HOMES.length) return;
+  homesLoading = true;
+  fetch("homes.json").then(r => r.ok ? r.json() : Promise.reject(r.status)).then(raw => {
+    buildHomes(raw); requestRender();
+    if (currentTab === "detect") renderDetect();
+  }).catch(() => { homesLoading = false; });
+}
+function needWater() {
+  if (waterLoading || WATER) return;
+  waterLoading = true;
+  fetch("charleston-water.json").then(r => r.ok ? r.json() : null).then(j => { if (j) { prepWater(j); requestRender(); } }).catch(() => { waterLoading = false; });
+}
+function loadForView() {
+  if (!baseFull && view.s >= 100) needBase();
+  if (view.s >= 700) needHomes();
+  if (view.s >= 300 && !WATER) { const [la, lo] = toLatLon(W / 2, H / 2); if (Math.abs(la - 32.8) < 1 && Math.abs(lo + 79.95) < 1.2) needWater(); }
+}
+fetch("basemap-lo.json").then(r => r.ok ? r.json() : null).then(j => { if (j && !baseFull) { prepBase(j); render(); } loadForView(); })
+  .catch(() => needBase());
+document.getElementById("addr-q").addEventListener("focus", needBase);
 W = wrap.clientWidth || 800; H = wrap.clientHeight || 600;
 const startId = location.hash.slice(1);
 if (startId.includes("=") && applyHash(startId)) {

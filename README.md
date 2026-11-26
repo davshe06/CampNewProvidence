@@ -86,6 +86,11 @@ Contents:
 - **Offline**: a service worker (`sw.js`) caches the page and its data on the first visit,
   so the map opens with no signal; updates are picked up on the next visit. The site can
   be installed to a phone's home screen (`manifest.webmanifest`).
+- **Fast first load**: the page first loads `basemap-lo.json` (about 50 KB compressed:
+  large towns and simplified roads, rivers and water). The detailed `basemap.json` follows
+  when you zoom to state level or start a search, `homes.json` when you zoom in close or
+  open Detecting, and Charleston's detailed water near the harbor. On a simulated slow
+  connection the map appeared in 5.5 s instead of 25 s.
 - **Full screen**: the corner button fills the screen with the map (a fixed overlay on
   phones that have no Fullscreen API).
 - **New timelines**: Virginia 1775–76 (Dunmore), Georgia and East Florida 1777–79,
