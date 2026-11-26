@@ -216,6 +216,18 @@ await test("wars: French and Indian War and War of 1812 switch, show only their 
   await p.evaluate(() => { setEra("rev", true); showTab("site"); });
 });
 
+await test("maps: sites and searched addresses link to Google Maps and Apple Maps", async () => {
+  await p.evaluate(() => { selectSite("cowpens", false); });
+  await p.waitForTimeout(300);
+  const href = await p.locator('#pane a:has-text("Open in Apple Maps")').getAttribute("href");
+  assert.match(href, /^https:\/\/maps\.apple\.com\/\?ll=35\.1\d+,-81\.8\d+&q=/);
+  await p.evaluate(() => openPin({ lat: 35.0855, lon: -80.7266, label: "100 Main St, Matthews, NC" }));
+  const ap = await p.locator('#homepop a:has-text("Apple Maps")').getAttribute("href");
+  assert.ok(ap.includes("q=100%20Main%20St%2C%20Matthews%2C%20NC"), ap);
+  assert.equal(await p.locator('#homepop a:has-text("Google Maps")').count(), 1);
+  await p.evaluate(() => { pin = null; closeHome(); });
+});
+
 await test("no script errors on desktop", async () => { assert.deepEqual(p.errors, []); });
 
 await test("phone: no horizontal scroll, no errors", async () => {
