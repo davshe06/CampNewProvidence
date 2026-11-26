@@ -426,9 +426,7 @@ body.fs .mapwrap { position: fixed !important; inset: 0; z-index: 900; height: a
 #map .bpop .bt { font: 700 12.5px var(--sans, system-ui); fill: var(--ink); }
 #map .bpop .bw { font: 700 11.5px var(--sans, system-ui); letter-spacing: .02em; }
 #map .bpop .bd { font: 11px var(--sans, system-ui); fill: var(--ink-soft); }
-#map .bpop { pointer-events: none; animation: bpop-in .25s ease-out; }
-@keyframes bpop-in { from { opacity: 0; transform: translateY(6px); } }
-@media (prefers-reduced-motion: reduce) { #map .bpop { animation: none; } }
+#map .bpop { pointer-events: none; }
 .terrkey { display: flex; gap: 10px; flex-wrap: wrap; font-size: .78rem; margin-top: 4px; }
 .terrkey i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -2px; margin-right: 4px; opacity: .75; }
 @media (max-width: 600px) { .areaseg .btn { padding: 6px 8px; font-size: .78rem; } }
@@ -2122,12 +2120,32 @@ function winnerFor(t) {
   if (!st || !st.date || Math.abs((utc(st.date) - utc(t.iso)) / 864e5) > 2) return null;
   return st.win || WIN[st.id] || null;
 }
-let POPS = [], popTimer = 0;
+/* Popups while playing: each battle shows once (the same battle often appears in two timelines,
+   or on consecutive days), stays about five seconds of real time, fades in and out by its age
+   rather than by a CSS animation that every redraw would restart, and at most four show at once. */
+let POPS = [], popTimer = 0, popDwell = 0;
+const popSeen = new Map();
+const popLife = () => 5200 / Math.sqrt(playSpeed);
 function addPop(t) {
   const w = winnerFor(t); if (!w) return;
-  POPS = POPS.filter(p => p.t.site !== t.site);
-  POPS.push({ t, w, until: performance.now() + 3800 / playSpeed });
-  clearTimeout(popTimer); popTimer = setTimeout(requestRender, 3900 / playSpeed);
+  const d = utc(t.iso) / 864e5, prev = popSeen.get(t.site);
+  if (prev !== undefined && Math.abs(d - prev) < 21) return;   // already shown for this battle
+  popSeen.set(t.site, d);
+  const now = performance.now();
+  POPS = POPS.filter(p => p.t.site !== t.site).slice(-3);
+  POPS.push({ t, w, born: now, until: now + popLife() });
+  if (playT) popDwell = now + 1100 / Math.sqrt(playSpeed);
+  tickPops();
+}
+function tickPops() {   // keep popups fading while paused; during playback each tick redraws anyway
+  if (popTimer) return;
+  const loop = () => {
+    popTimer = 0;
+    const live = POPS.some(p => p.until > performance.now());
+    if (!playT) requestRender();
+    if (live) popTimer = setTimeout(loop, 60);
+  };
+  popTimer = setTimeout(loop, 60);
 }
 function drawBattlePops() {
   if (!SCEN) return;
@@ -2151,7 +2169,8 @@ function drawBattlePops() {
     if (by < 6) by = y + 22;
     while (placed.some(q => bx < q.x + q.w && bx + bw > q.x && by < q.y + q.h + 4 && by + bh + 4 > q.y)) by -= bh + 6;
     placed.push({ x: bx, y: by, w: bw, h: bh });
-    const g = el("g", { class: "bpop" }, svg);
+    const op = p.born ? Math.max(0, Math.min(1, (now - p.born) / 300, (p.until - now) / 700)) : 1;
+    const g = el("g", { class: "bpop", opacity: op.toFixed(2) }, svg);
     el("line", { x1: x, y1: y, x2: Math.min(Math.max(x, bx + 10), bx + bw - 10), y2: by > y ? by : by + bh, stroke: col, "stroke-width": 1.5 }, g);
     el("rect", { x: bx, y: by, width: bw, height: bh, rx: 6, class: "bx", stroke: col }, g);
     el("rect", { x: bx, y: by, width: 5, height: bh, rx: 2, fill: col }, g);
@@ -4280,7 +4299,7 @@ const ttrack = document.getElementById("ttrack");
 const monthsBetween = (a, b) => (b.getUTCFullYear() - a.getUTCFullYear()) * 12 + b.getUTCMonth() - a.getUTCMonth();
 function setScenario(id, keepDay) {
   const sc = SCENARIOS.find(x => x.id === id) || SCENARIOS[0];
-  POPS = [];
+  POPS = []; popSeen.clear();
   SCEN = sc;
   FORCES = sc.forces || CLT_REV_FORCES;
   sc.evs = sc.events || TIMELINE.filter(t => t.iso);
@@ -4399,7 +4418,7 @@ function setDay(d, quiet) {
   if (!quiet) requestRender();
   if (selForce && currentTab === "site") renderForce();
 }
-tslider.addEventListener("input", () => { stopPlay(); setDay(+tslider.value); });
+tslider.addEventListener("input", () => { stopPlay(); popSeen.clear(); POPS = []; setDay(+tslider.value); });
 let playT = 0, playSpeed = 1, playFitted = false;
 document.querySelectorAll(".speed .btn").forEach(b => b.addEventListener("click", () => {
   playSpeed = +b.dataset.speed;
@@ -4410,6 +4429,7 @@ const playBtn = document.getElementById("tplay");
 function stopPlay() { if (playT) { clearInterval(playT); playT = 0; playBtn.textContent = "▶"; playBtn.setAttribute("aria-label", "Play the campaign"); } }
 playBtn.addEventListener("click", () => {
   if (playT) return stopPlay();
+  popSeen.clear();
   if (tDay >= DAYS) setDay(0);
   if (!layers.moves) { layers.moves = true; document.getElementById("L-moves").checked = true; }
   if (SCEN && SCEN.fit && !playFitted) { playFitted = true; if (typeof SCEN.fit === "string") setPreset(SCEN.fit); else fit(SCEN.fit, true); }
@@ -4417,7 +4437,7 @@ playBtn.addEventListener("click", () => {
   const stepDays = Math.max(1, Math.round(DAYS / 430));   // longer timelines advance several days per tick
   // the whole war: one day per tick while armies march or a battle is near, fast through quiet months
   const busy = () => FORCES.some(f => { const a = forceAt(f, tDay); return a && a.moving && f.days[a.i + 1] - f.days[a.i] <= 45; }) || SCEN.evs.some(t => Math.abs(dayOf(t.iso) - tDay) < 4);
-  playT = setInterval(() => { if (tDay >= DAYS) return stopPlay(); setDay(tDay + (SCEN.total ? (busy() ? 1 : 10) : stepDays)); }, (reduceMotion ? 160 : 70) / playSpeed);
+  playT = setInterval(() => { if (tDay >= DAYS) return stopPlay(); if (performance.now() < popDwell) return; /* hold briefly on each new battle */ setDay(tDay + (SCEN.total ? (busy() ? 1 : 10) : stepDays)); }, (reduceMotion ? 160 : 70) / playSpeed);
 });
 function goToDay(iso, siteId) {
   stopPlay();
@@ -4934,7 +4954,7 @@ function buildWholeWar() {
     const seen = new Set(), events = [];
     const pre = (CAR_PRELUDE[e] || []).map(t => ({ ...t }));
     for (const t of [...pre, ...scs.flatMap(sc => sc.events || TIMELINE.filter(x => x.iso))]) {
-      const k = t.iso + "|" + t.t; if (seen.has(k)) continue; seen.add(k);
+      const k = t.site ? t.site + "|" + t.iso : t.iso + "|" + t.t; if (seen.has(k)) continue; seen.add(k);
       events.push({ ...t, d: /\d{4}/.test(t.d) ? t.d : t.d + ", " + t.iso.slice(0, 4) });
     }
     const start = e === "rev" ? "1774-09-01" : "1859-10-01", end = e === "rev" ? "1782-12-31" : "1865-05-25";
