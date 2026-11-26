@@ -77,6 +77,15 @@ Contents:
   homes are drawn only when zoomed in.
 - **Hide the info panel**: the arrow at the top of the panel slides it away so the map
   takes its room; the arrow by the zoom buttons brings it back. The choice is remembered.
+- **Where am I** (crosshair button): uses the device's location to show where you stand,
+  the state, the five nearest sites, and the detecting zone you're in, with a clear warning
+  on off-limits land.
+- **Share** (link button): the address bar always holds the current view (war, state,
+  timeline, date, selected site and map position), so a copied or shared link reopens
+  exactly that view. Old `#siteid` links still work.
+- **Offline**: a service worker (`sw.js`) caches the page and its data on the first visit,
+  so the map opens with no signal; updates are picked up on the next visit. The site can
+  be installed to a phone's home screen (`manifest.webmanifest`).
 - **Full screen**: the corner button fills the screen with the map (a fixed overlay on
   phones that have no Fullscreen API).
 - **New timelines**: Virginia 1775–76 (Dunmore), Georgia and East Florida 1777–79,
