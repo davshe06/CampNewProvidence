@@ -4139,13 +4139,55 @@ const GEOCODER = "https://services.gis.nc.gov/secure/rest/services/AddressNC/Add
 const kmBetween = (a1, o1, a2, o2) => { const R = 6371, r = Math.PI / 180, dA = (a2 - a1) * r, dO = (o2 - o1) * r;
   const h = Math.sin(dA / 2) ** 2 + Math.cos(a1 * r) * Math.cos(a2 * r) * Math.sin(dO / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(h)); };
 const distTxt = (km) => km < 1 ? `${Math.round(km * 1000)} m (${Math.round(km * 3280.84)} ft)` : `${km.toFixed(1)} km (${(km / 1.609).toFixed(1)} mi)`;
+/* Street addresses anywhere in the U.S.:
+   1. North Carolina addresses go first to the State's AddressNC geocoder (parcel-accurate).
+   2. Everything else goes to the U.S. Census Bureau geocoder (free, every state), called as
+      JSONP because it sends no CORS header.
+   3. If the Census finds nothing, OpenStreetMap's Nominatim tries (U.S. only, one request). */
+const isNC = (q) => /\b(NC|N\.C\.|North Carolina)\b/i.test(q);
+// "1 S CASTILLO DR, ST AUGUSTINE, FL, 32084" -> "1 S Castillo Dr, St Augustine, FL 32084"
+function censusCase(addr) {
+  const parts = addr.split(", "), zip = /^\d{5}/.test(parts[parts.length - 1]) ? parts.pop() : "", st = parts.length > 1 ? parts.pop() : "";
+  const word = (w) => /^(N|S|E|W|NE|NW|SE|SW)$/.test(w) ? w : w.charAt(0) + w.slice(1).toLowerCase();
+  return parts.map(p => p.split(" ").map(word).join(" ")).join(", ") + (st ? ", " + st : "") + (zip ? " " + zip : "");
+}
+function censusGeocode(q) {
+  return new Promise((resolve, reject) => {
+    const cb = "cgc" + Date.now().toString(36) + Math.floor(Math.random() * 1e6), sc = document.createElement("script");
+    const done = (v, err) => { clearTimeout(t); delete window[cb]; sc.remove(); err ? reject(err) : resolve(v); };
+    const t = setTimeout(() => done(null, new Error("timeout")), 10000);
+    window[cb] = (j) => {
+      const m = j && j.result && j.result.addressMatches && j.result.addressMatches[0];
+      done(m ? { lat: m.coordinates.y, lon: m.coordinates.x, label: censusCase(m.matchedAddress), src: "U.S. Census Bureau" } : null);
+    };
+    sc.onerror = () => done(null, new Error("network"));
+    sc.src = "https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?" + new URLSearchParams({ address: q, benchmark: "Public_AR_Current", format: "jsonp", callback: cb });
+    document.head.appendChild(sc);
+  });
+}
+async function osmGeocode(q) {
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 9000);
+  try {
+    const r = await fetch("https://nominatim.openstreetmap.org/search?" + new URLSearchParams({ q, format: "jsonv2", countrycodes: "us", limit: 1 }), { signal: ctl.signal });
+    const j = await r.json(), c = j && j[0];
+    return c ? { lat: +c.lat, lon: +c.lon, label: c.display_name.replace(/, United States$/, ""), src: "OpenStreetMap" } : null;
+  } finally { clearTimeout(t); }
+}
+async function geocodeAny(q) {
+  let failed = 0;
+  const tryOne = async (fn) => { try { return await fn(q); } catch { failed++; return null; } };
+  const g = (isNC(q) && await tryOne(geocode)) || await tryOne(censusGeocode) || await tryOne(osmGeocode);
+  if (g) return g;
+  if (failed >= 2) throw new Error("services unreachable");
+  return null;
+}
 async function geocode(q) {
-  if (!/\b(NC|N\.C\.|North Carolina)\b/i.test(q)) q += ", NC";
+  if (!isNC(q)) q += ", NC";
   const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 9000);
   try {
     const r = await fetch(GEOCODER + "?" + new URLSearchParams({ SingleLine: q, outSR: 4326, maxLocations: 1, f: "json" }), { signal: ctl.signal });
     const j = await r.json(), c = j.candidates && j.candidates[0];
-    return c && c.score >= 75 ? { lat: c.location.y, lon: c.location.x, label: c.address, score: c.score } : null;
+    return c && c.score >= 75 ? { lat: c.location.y, lon: c.location.x, label: c.address, score: c.score, src: "AddressNC" } : null;
   } finally { clearTimeout(t); }
 }
 function openPin(g) {
@@ -4163,15 +4205,16 @@ function openPin(g) {
     <div class="addr">${esc(g.label)}</div>
     <div class="meta">${g.lat.toFixed(5)}, ${g.lon.toFixed(5)}</div>
     <dl>
-      <dt>To the camp marker</dt><dd>${distTxt(dCamp)}</dd>
+      ${dCamp < 80 ? `<dt>To the camp marker</dt><dd>${distTxt(dCamp)}</dd>` : ""}
+      ${stateAt(g.lat, g.lon) ? `<dt>State</dt><dd>${esc(STATE_NAMES[stateAt(g.lat, g.lon)])}</dd>` : ""}
       <dt>Nearest site</dt><dd>${esc(near.x.name)}, ${distTxt(near.d)}</dd>
       ${zone ? `<dt>Detecting area</dt><dd>${esc(zone.name)} (${esc(zone.ratingText)})</dd>` : ""}
       ${lot ? `<dt>Mapped lot</dt><dd>Near ${esc((siteOf(lot.site) || {}).name || "")}${lot.year ? ", built " + lot.year : ""}</dd>` : ""}
     </dl>
-    <div class="acts"><a href="${gmaps(g.lat, g.lon)}" target="_blank" rel="noopener">Map ↗</a></div>`;
+    <div class="acts"><a href="${gmaps(g.lat, g.lon)}" target="_blank" rel="noopener">Map ↗</a>${g.src ? `<span class="meta">Located by ${esc(g.src)}</span>` : ""}</div>`;
   pop.querySelector(".x").onclick = () => { pin = null; closeHome(); };
   pop.hidden = false;
-  flyTo(wx, wy, Math.max(Math.min(view.s, 60000), dCamp < 3 ? 30000 : 9000));
+  flyTo(wx, wy, dCamp < 3 ? 30000 : 9000);
 }
 /* Search: cities and towns (2020 Census places), states, historic sites and named views first;
    anything that looks like a street address goes to the address lookup. */
@@ -4245,15 +4288,17 @@ document.getElementById("addrform").addEventListener("submit", async (e) => {
     if (r) return goToResult(r);
   }
   const local = HOMES.find(h => homeFull(h).toLowerCase().startsWith(q.toLowerCase()) || h.addr.toLowerCase() === q.toLowerCase());
+  if (local && !/,/.test(q)) return openHome(local, true);   // a mapped home near a site, typed as listed
+  const btn = e.submitter || document.querySelector("#addrform button"); btn.disabled = true; btn.textContent = "…";
   try {
-    const g = await geocode(q);
+    const g = await geocodeAny(q);
     if (g) return openPin(g);
     if (local) return openHome(local, true);
-    toast("No match. Street addresses work in North Carolina; elsewhere, search a city, town or site.");
+    toast("No address matched. Add the city and state, for example “1 Lexington Rd, Concord, MA”.");
   } catch {
     if (local) return openHome(local, true);
-    toast("The address service didn't answer. Cities, towns and sites can still be searched.");
-  }
+    toast("The address services didn't answer. Cities, towns and sites can still be searched.");
+  } finally { btn.disabled = false; btn.textContent = "Go"; }
 });
 function drawPin() {
   if (!pin) return;
