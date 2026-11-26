@@ -1,4 +1,4 @@
-# Carolina War History Interactive Map
+# Wars in America Map
 
 An interactive map of Revolutionary War and Civil War history across seven
 Southern states: Virginia, West Virginia, North Carolina, South Carolina,
