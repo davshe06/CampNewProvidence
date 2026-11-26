@@ -1,8 +1,9 @@
 # Wars in America Map
 
-An interactive map of Revolutionary War and Civil War history across seven
-Southern states: Virginia, West Virginia, North Carolina, South Carolina,
-Tennessee, Georgia and Florida. A **state picker** in the header (All states, or one
+An interactive map of Revolutionary War and Civil War history from Maine to
+Florida: Maine, New Hampshire, Vermont, Massachusetts, Rhode Island, Connecticut,
+New York, New Jersey, Pennsylvania, Delaware, Maryland, Washington D.C., Virginia,
+West Virginia, North Carolina, South Carolina, Tennessee, Georgia and Florida. A **state picker** in the header (All states, or one
 state) narrows the map view and the Story, People, Detecting, Visit and Library
 tabs. With North or South Carolina selected, the Story and Detecting tabs link to the
 original in-depth Charlotte / Camp New Providence and Charleston pages. Coverage:
@@ -75,6 +76,12 @@ Contents:
   Virginia 1861–62, 1862–63 and 1864–65, Western Virginia 1861–63, Tennessee 1862,
   Chickamauga–Chattanooga–Knoxville 1863, Atlanta and the March to the Sea 1864, and
   Florida 1861–65.
+- **The Northeast** (58 sites; timelines for Lexington–Concord and the Siege of
+  Boston, Ticonderoga and Canada, New York and New Jersey 1776–77, Saratoga, the
+  Philadelphia campaign, raids and the northern frontier, the Penobscot Expedition,
+  Antietam 1862 and the Gettysburg campaign 1863; Monocacy and Fort Stevens join the
+  1864 Virginia timeline). The base map now runs from Florida to Maine and the Great
+  Lakes; Canada is masked roughly as land.
 - **The whole war**: the first entry in the timeline drop-down plays every army, fleet
   and event of the war on one slider (1775–82 or 1860–65), with year labels. An army
   that appears in several campaign timelines (Greene, Cornwallis, Lee, Sumter, Clinton,
