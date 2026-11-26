@@ -69,6 +69,12 @@ Contents:
   Revolution and the Union in the Civil War; red is British, Loyalist and allied
   Native nations, and the Confederacy. It is approximate by design. Army markers and
   trails use the same blue and red.
+- **Smooth pan and zoom**: while you drag, pinch, wheel or fly, the last full drawing is
+  moved and scaled as one GPU layer; the map is redrawn when the motion pauses or the view
+  has moved far. Base-map shapes are clipped to the view and thinned to about a pixel, and
+  homes are drawn only when zoomed in.
+- **Hide the info panel**: the arrow at the top of the panel slides it away so the map
+  takes its room; the arrow by the zoom buttons brings it back. The choice is remembered.
 - **Full screen**: the corner button fills the screen with the map (a fixed overlay on
   phones that have no Fullscreen API).
 - **New timelines**: Virginia 1775–76 (Dunmore), Georgia and East Florida 1777–79,

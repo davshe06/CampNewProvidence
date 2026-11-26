@@ -90,7 +90,20 @@ button { font: inherit; color: inherit; }
 .notice b { color: var(--ink); font-weight: 600; }
 
 /* ---------- main grid ---------- */
-.main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 430px; }
+.main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 430px; transition: grid-template-columns .28s ease; }
+body.pmin .main { grid-template-columns: minmax(0, 1fr) 0px; }
+.panel { position: relative; overflow: hidden; }
+body.pmin .panel { visibility: hidden; transition: visibility 0s .28s; }
+.phide { position: absolute; top: 8px; right: 8px; z-index: 3; width: 30px; height: 30px; padding: 0; display: grid; place-items: center; }
+.tabs { padding-right: 44px !important; }
+#pshow svg, .phide svg { display: block; margin: auto; }
+@media (max-width: 900px) {
+  body.pmin .panel { display: none; }
+  body.pmin .mapwrap { height: calc(100dvh - 150px); }
+  .phide svg { transform: rotate(90deg); }
+  #pshow svg { transform: rotate(-90deg); }
+}
+@media (prefers-reduced-motion: reduce) { .main { transition: none; } }
 @media (max-width: 900px) {
   body { height: auto; }
   html { height: auto; }
@@ -406,6 +419,9 @@ body.fs .mapwrap { position: fixed !important; inset: 0; z-index: 900; height: a
 #fs svg { width: 16px; height: 16px; display: block; margin: auto; }
 #map .terr-b { fill: var(--terr-b); } #map .terr-r { fill: var(--terr-r); }
 #map g.terr { opacity: .26; pointer-events: none; }
+#map { transform-origin: 0 0; will-change: transform; }
+#map.moving g.terr > g { filter: none; }
+#map.moving .bpop { display: none; }
 #map .bpop rect.bx { fill: var(--paper); stroke-width: 2; }
 #map .bpop .bt { font: 700 12.5px var(--sans, system-ui); fill: var(--ink); }
 #map .bpop .bw { font: 700 11.5px var(--sans, system-ui); letter-spacing: .02em; }
@@ -490,6 +506,7 @@ body.fs .mapwrap { position: fixed !important; inset: 0; z-index: 900; height: a
     <div class="mapctl tr">
       <button class="btn sq" id="zin" aria-label="Zoom in">+</button>
       <button class="btn sq" id="zout" aria-label="Zoom out">−</button>
+      <button class="btn sq" id="pshow" aria-label="Show the info panel" title="Show panel" hidden><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 3L5 8l5 5"/></svg></button>
       <button class="btn sq" id="fs" aria-label="Full-screen map" aria-pressed="false" title="Full screen"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1.5 5.5v-4h4M10.5 1.5h4v4M14.5 10.5v4h-4M5.5 14.5h-4v-4"/></svg></button>
     </div>
     <div class="mapctl bl">
@@ -524,6 +541,7 @@ body.fs .mapwrap { position: fixed !important; inset: 0; z-index: 900; height: a
   </div>
 
   <aside class="panel" aria-label="Details">
+    <button class="btn sq phide" id="phide" aria-label="Hide the info panel" title="Hide panel"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 3l5 5-5 5"/></svg></button>
     <div class="tabs" role="tablist">
       <button class="tab" role="tab" data-tab="site" aria-selected="true">Site</button>
       <button class="tab" role="tab" data-tab="story" aria-selected="false">Story</button>
@@ -3568,7 +3586,7 @@ function flyTo(cx, cy, s, animate = true) {
     const k = Math.min(1, (t - t0) / dur), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
     view.cx = a.cx + (cx - a.cx) * e; view.cy = a.cy + (cy - a.cy) * e;
     view.s = Math.exp(Math.log(a.s) + (Math.log(s) - Math.log(a.s)) * e);
-    render();
+    if (k < 1) moveRender(); else render();
     if (k < 1) anim = requestAnimationFrame(step); else anim = null;
   };
   anim = requestAnimationFrame(step);
@@ -3657,7 +3675,34 @@ function requestRender() {
   rafPending = true;
   requestAnimationFrame(() => { rafPending = false; render(); });
 }
+/* Rendering. A full render rebuilds the whole SVG (roads, water, rivers, homes, sites, armies).
+   While the map is being dragged, pinched, wheeled or flown, moveRender() only moves and scales the
+   last full render with one transform, and a full render follows when the motion pauses, or sooner
+   if the view has moved far enough to expose empty edges. */
+let rootG = null, lastR = null, lastFull = 0, idleT = 0;
 function render() {
+  clearTimeout(idleT);
+  renderScene();
+  rootG = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  rootG.setAttribute("class", "root");
+  while (svg.firstChild) rootG.appendChild(svg.firstChild);
+  svg.appendChild(rootG);
+  lastR = { cx: view.cx, cy: view.cy, s: view.s, W, H };
+  lastFull = performance.now();
+  svg.style.transform = "";
+  svg.classList.remove("moving");
+}
+function moveRender() {
+  if (!rootG || !lastR || lastR.W !== wrap.clientWidth || lastR.H !== wrap.clientHeight) return requestRender();
+  const k = view.s / lastR.s;
+  const tx = W / 2 * (1 - k) + (lastR.cx - view.cx) * view.s, ty = H / 2 * (1 - k) + (lastR.cy - view.cy) * view.s;
+  const far = k > 2 || k < 0.5 || Math.abs(tx - W / 2 * (1 - k)) > W * 0.35 || Math.abs(ty - H / 2 * (1 - k)) > H * 0.35;
+  if (far && performance.now() - lastFull > 90) { render(); return; }
+  svg.classList.add("moving");
+  svg.style.transform = `matrix(${k.toFixed(5)},0,0,${k.toFixed(5)},${tx.toFixed(1)},${ty.toFixed(1)})`;   // composited: no repaint
+  clearTimeout(idleT); idleT = setTimeout(render, 130);
+}
+function renderScene() {
   W = wrap.clientWidth; H = wrap.clientHeight;
   svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
   svg.textContent = "";
@@ -3738,7 +3783,7 @@ function render() {
   }
 
   // homes on the camp ground (modern overlay)
-  if (layers.homes && layers.modern) drawHomes();
+  if (layers.homes && layers.modern && view.s >= 1000) drawHomes();
 
   // sites
   const gs = el("g", {}, svg);
@@ -3848,7 +3893,51 @@ function prepBase(b) {
              return { ...pl, n, wx, wy }; }) };
 }
 const onScreen = (r, pad = 0) => !(sx_(r.x1) < -pad || sx_(r.x0) > W + pad || sy_(r.y1) < -pad || sy_(r.y0) > H + pad);
-const partD = (r, poly) => { let d = ""; const step = poly ? 1 : view.s < 400 ? 3 : view.s < 1200 ? 2 : 1;   // polygons keep every vertex (corners matter)
+/* Screen-space path for a base-map part: vertices within a pixel or two of the last one are
+   dropped, lines are cut where they leave the view, and polygons are clipped to the view (plus a
+   margin), so a coastline thousands of pixels long costs only what is on screen. */
+const CLIPM = 60;
+function clipRing(pts) {   // Sutherland–Hodgman against the padded view rectangle
+  const x0 = -CLIPM, y0 = -CLIPM, x1 = W + CLIPM, y1 = H + CLIPM;
+  const edges = [[p => p[0] >= x0, (a, b) => { const t = (x0 - a[0]) / (b[0] - a[0]); return [x0, a[1] + t * (b[1] - a[1])]; }],
+                 [p => p[0] <= x1, (a, b) => { const t = (x1 - a[0]) / (b[0] - a[0]); return [x1, a[1] + t * (b[1] - a[1])]; }],
+                 [p => p[1] >= y0, (a, b) => { const t = (y0 - a[1]) / (b[1] - a[1]); return [a[0] + t * (b[0] - a[0]), y0]; }],
+                 [p => p[1] <= y1, (a, b) => { const t = (y1 - a[1]) / (b[1] - a[1]); return [a[0] + t * (b[0] - a[0]), y1]; }]];
+  let out = pts;
+  for (const [inside, cut] of edges) {
+    const inp = out; out = [];
+    for (let i = 0; i < inp.length; i++) {
+      const a = inp[(i + inp.length - 1) % inp.length], b = inp[i];
+      if (inside(b)) { if (!inside(a)) out.push(cut(a, b)); out.push(b); } else if (inside(a)) out.push(cut(a, b));
+    }
+    if (!out.length) return out;
+  }
+  return out;
+}
+const partD = (r, poly) => {
+  const tol = view.s < 120 ? 2.4 : view.s < 600 ? 1.8 : 1.3, n = r.w.length;
+  const pts = []; let lx = -1e9, ly = -1e9;
+  for (let i = 0; i < n; i++) {
+    const x = sx_(r.w[i][0]), y = sy_(r.w[i][1]);
+    if (i && i < n - 1 && Math.abs(x - lx) + Math.abs(y - ly) < tol) continue;
+    pts.push([x, y]); lx = x; ly = y;
+  }
+  if (poly) {
+    const inView = sx_(r.x0) >= -CLIPM && sx_(r.x1) <= W + CLIPM && sy_(r.y0) >= -CLIPM && sy_(r.y1) <= H + CLIPM;
+    const c = inView ? pts : clipRing(pts);
+    if (c.length < 3) return "";
+    return "M" + c.map(p => p[0].toFixed(1) + "," + p[1].toFixed(1)).join("L");
+  }
+  let d = "", pen = false;
+  const out = (p) => p[0] < -CLIPM || p[0] > W + CLIPM || p[1] < -CLIPM || p[1] > H + CLIPM;
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i], prevOut = i === 0 || out(pts[i - 1]), nextOut = i === pts.length - 1 || out(pts[i + 1]);
+    if (out(p) && prevOut && nextOut) { pen = false; continue; }   // a vertex whose neighbours are also off screen
+    d += (pen ? "L" : "M") + p[0].toFixed(1) + "," + p[1].toFixed(1); pen = true;
+  }
+  return d;
+};
+const partD_old = (r, poly) => { let d = ""; const step = poly ? 1 : view.s < 400 ? 3 : view.s < 1200 ? 2 : 1;
   for (let i = 0; i < r.w.length; i += step) d += (i ? "L" : "M") + sx_(r.w[i][0]).toFixed(1) + "," + sy_(r.w[i][1]).toFixed(1);
   const l = r.w[r.w.length - 1]; return d + "L" + sx_(l[0]).toFixed(1) + "," + sy_(l[1]).toFixed(1); };
 function drawBaseUnder() {
@@ -4367,7 +4456,7 @@ function renderForce() {
 
 /* ---------- interaction ---------- */
 const pointers = new Map();
-const pos = (e) => { const r = svg.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+const pos = (e) => { const r = wrap.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };   // the wrapper: the SVG itself may be mid-transform
 let dragStart = null, moved = false, pinch0 = null;
 let lastPtrType = "mouse", downAt = 0, lastTap = null;
 svg.addEventListener("pointerdown", (e) => {
@@ -4403,16 +4492,17 @@ svg.addEventListener("pointermove", (e) => {
     const wx = (pinch0.mid[0] - W / 2) / pinch0.s + pinch0.cx, wy = (pinch0.mid[1] - H / 2) / pinch0.s + pinch0.cy;
     const mid = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
     view.s = ns; view.cx = wx - (mid[0] - W / 2) / ns; view.cy = wy - (mid[1] - H / 2) / ns;
-    moved = true; requestRender(); return;
+    moved = true; moveRender(); return;
   }
   if (dragStart) {
     const dx = px - dragStart.x, dy = py - dragStart.y;
     if (Math.abs(dx) + Math.abs(dy) > 4) { moved = true; svg.classList.add("dragging"); }
-    if (moved) { view.cx = dragStart.cx - dx / view.s; view.cy = dragStart.cy - dy / view.s; requestRender(); }
+    if (moved) { view.cx = dragStart.cx - dx / view.s; view.cy = dragStart.cy - dy / view.s; moveRender(); }
   }
 });
 function endPointer(e) {
   const wasDrag = moved;
+  if (wasDrag && svg.classList.contains("moving")) requestRender();
   const tgt = dragStart && dragStart.target;
   pointers.delete(e.pointerId);
   if (pointers.size < 2) pinch0 = null;
@@ -4472,7 +4562,7 @@ function zoomStep() {
   const cur = Math.log(view.s), tgt = Math.log(zs.target);
   const done = Math.abs(tgt - cur) < 0.003;
   pinZoom(Math.exp(done ? tgt : cur + (tgt - cur) * 0.3));
-  render();
+  if (done) render(); else moveRender();
   if (done) { zs.raf = 0; zs.target = null; } else zs.raf = requestAnimationFrame(zoomStep);
 }
 svg.addEventListener("wheel", (e) => {
@@ -4500,6 +4590,17 @@ for (const k in layers) {
   box.addEventListener("change", () => { layers[k] = box.checked; if (k === "moves") { document.getElementById("timebar").hidden = !box.checked; if (!box.checked) stopPlay(); } render(); if (k === "zones" && box.checked) showTab("detect"); });
 }
 new ResizeObserver(() => requestRender()).observe(wrap);
+/* Hide or show the info panel; the map takes the room. */
+const pshow = document.getElementById("pshow");
+function setPanel(open) {
+  document.body.classList.toggle("pmin", !open);
+  pshow.hidden = open;
+  try { localStorage.setItem("cnp-panel", open ? "open" : "min"); } catch { /* storage unavailable */ }
+  (open ? document.getElementById("phide") : pshow).focus({ preventScroll: true });
+}
+document.getElementById("phide").addEventListener("click", () => setPanel(false));
+pshow.addEventListener("click", () => setPanel(true));
+try { if (localStorage.getItem("cnp-panel") === "min") { document.body.classList.add("pmin"); pshow.hidden = false; } } catch { /* storage unavailable */ }
 const fsBtn = document.getElementById("fs");
 function setFS(on) { document.body.classList.toggle("fs", on); fsBtn.setAttribute("aria-pressed", on); fsBtn.title = on ? "Exit full screen" : "Full screen"; requestRender(); }
 fsBtn.addEventListener("click", async () => {
