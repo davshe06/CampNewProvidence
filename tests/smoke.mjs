@@ -50,7 +50,7 @@ await test("data: every reference resolves", async () => {
     }
     for (const k of Object.values(CAR_PRELUDE).flat()) if (k.site && !ids.has(k.site)) out.push("prelude -> " + k.site);
     for (const pp of PEOPLE) if (pp.site && !ids.has(pp.site)) out.push("person -> " + pp.site);
-    for (const s of SITES) if (!(s.lat > 24 && s.lat < 48 && s.lon > -91 && s.lon < -66)) out.push("site off map: " + s.id);
+    for (const s of SITES) if (!(s.lat > 24 && s.lat < 48 && s.lon > -92.5 && s.lon < -66)) out.push("site off map: " + s.id);
     return out;
   });
   assert.deepEqual(bad, []);

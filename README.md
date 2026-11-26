@@ -112,6 +112,11 @@ Contents:
   Antietam 1862 and the Gettysburg campaign 1863; Monocacy and Fort Stevens join the
   1864 Virginia timeline). The base map now runs from Florida to Maine and the Great
   Lakes; Canada is masked roughly as land.
+- **Kentucky, Ohio, Indiana and Mississippi** (31 sites): the western Revolutionary frontier
+  (Boonesborough, Clark at Vincennes, Gnadenhutten, Crawford's defeat, Blue Licks) and the
+  Civil War (Columbus, Mill Springs, Perryville, Camp Nelson, Morgan's Raid through Indiana
+  and Ohio, Corinth, the Vicksburg campaign, Brice's Crossroads, Tupelo), with six new
+  timelines. The base map now reaches west past the Mississippi.
 - **The whole war**: the first entry in the timeline drop-down plays every army, fleet
   and event of the war on one slider (1775–82 or 1860–65), with year labels. An army
   that appears in several campaign timelines (Greene, Cornwallis, Lee, Sumter, Clinton,
