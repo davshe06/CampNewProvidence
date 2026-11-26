@@ -1,6 +1,7 @@
 # Wars in America Map
 
-An interactive map of Revolutionary War and Civil War history from Maine to
+An interactive map of four wars (the French and Indian War, the Revolution, the War of
+1812 and the Civil War) from Maine to
 Florida: Maine, New Hampshire, Vermont, Massachusetts, Rhode Island, Connecticut,
 New York, New Jersey, Pennsylvania, Delaware, Maryland, Washington D.C., Virginia,
 West Virginia, North Carolina, South Carolina, Tennessee, Georgia and Florida. A **state picker** in the header (All states, or one
@@ -117,6 +118,16 @@ Contents:
   Civil War (Columbus, Mill Springs, Perryville, Camp Nelson, Morgan's Raid through Indiana
   and Ohio, Corinth, the Vicksburg campaign, Brice's Crossroads, Tupelo), with six new
   timelines. The base map now reaches west past the Mississippi.
+- **French and Indian War and War of 1812** (40 sites, six timelines): four war buttons
+  in the header, in order. The French and Indian War covers the Forks of the Ohio
+  (Washington at Jumonville Glen and Fort Necessity, Braddock's defeat, Forbes), Lake George,
+  Lake Champlain and Niagara (Fort William Henry, Carillon), Fort Loudoun and Pontiac's War
+  (Bushy Run); blue is France and its Native allies, red is Britain and its colonists. The
+  War of 1812 covers the Great Lakes and Lake Champlain (Fort Meigs, Lake Erie, Sackets Harbor,
+  Plattsburgh), the Chesapeake (Bladensburg, the burning of Washington, North Point, Fort
+  McHenry), Maine and Connecticut, and Pensacola and New Orleans. Each has its own people
+  (with traceable paths for Washington, Braddock, Montcalm, Harrison, Jackson and others),
+  territory, flag key, Visit list and Library links.
 - **The whole war**: the first entry in the timeline drop-down plays every army, fleet
   and event of the war on one slider (1775–82 or 1860–65), with year labels. An army
   that appears in several campaign timelines (Greene, Cornwallis, Lee, Sumter, Clinton,

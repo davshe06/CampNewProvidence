@@ -200,6 +200,22 @@ await test("people: tracing Washington's path draws it", async () => {
   assert.equal(await p.locator("#map .ppath-line").count(), 0);
 });
 
+await test("wars: French and Indian War and War of 1812 switch, show only their own sites, and link", async () => {
+  for (const [w, home] of [["fiw", "fiw-necessity"], ["w12", "w12-fortmchenry"]]) {
+    await p.click("#era-" + w); await p.waitForTimeout(600);
+    const r = await p.evaluate(() => ({ era, scen: SCEN.era, sel: selected, own: SITES.filter(s => siteWar(s) === era).length,
+      wrong: [...document.querySelectorAll("#map text")].filter(t => /^(Cowpens|Kings Mountain|Gettysburg|Fort Fisher)$/.test(t.textContent)).length,
+      tl: [...document.getElementById("tscen").options].every(o => SCENARIOS.find(x => x.id === o.value).era === era) }));
+    assert.equal(r.era, w); assert.equal(r.scen, w); assert.equal(r.sel, home); assert.ok(r.own >= 15, w + " sites"); assert.equal(r.wrong, 0); assert.ok(r.tl, w + " timelines");
+    for (const t of ["story", "people", "visit", "library"]) { await p.evaluate((t) => showTab(t), t); assert.ok((await p.locator("#pane li, #pane details, #pane a[href^='http']").count()) > 0, w + " " + t + " is empty"); }
+  }
+  await p.evaluate(() => selectSite("fiw-carillon", false)); await p.waitForTimeout(500);
+  assert.deepEqual(await p.evaluate(() => [era, SCEN.id, curIso()]), ["fiw", "fiw-lakes", "1758-07-08"]);
+  await p.evaluate(() => selectSite("w12-neworleans", false)); await p.waitForTimeout(500);
+  assert.deepEqual(await p.evaluate(() => [era, SCEN.id, curIso()]), ["w12", "w12-south", "1815-01-08"]);
+  await p.evaluate(() => { setEra("rev", true); showTab("site"); });
+});
+
 await test("no script errors on desktop", async () => { assert.deepEqual(p.errors, []); });
 
 await test("phone: no horizontal scroll, no errors", async () => {
