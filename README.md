@@ -206,6 +206,18 @@ reported finds.
 Note: the camp dates to the Revolutionary War, not the Civil War, despite
 some online listings.
 
+**Rest of North America**: land, lakes and modern state, province and country outlines from
+Natural Earth 1:50m (public domain), in `na.json`. For each war the areas beyond the mapped states
+are shaded by who held them on the slider's date: New France, Louisiana, Rupert's Land, New Spain,
+the Province of Quebec, Upper and Lower Canada, Oregon Country, Russian America, the Confederacy and
+U.S. territories, and Native nations' own lands. They change at the dates that moved them (for
+example Montreal's surrender in 1760, the 1763 peace, Clark's capture of the Illinois country in 1778,
+Spain's capture of Mobile in 1780, the British occupation of Detroit in 1812–13, secession and
+surrender dates in the Civil War). The areas are built from modern units, split along a few period
+lines (the Mississippi in Minnesota, 31°N in Alabama, the Hudson Bay height of land in Ontario and
+Quebec), so borders are approximate. The layer is "Rest of North America" in the layer list; the
+legend below the flags explains the shading. `tools/build_na.py` rebuilds `na.json` from the Natural Earth files.
+
 **Source links**: each site panel ends with "Sources and further reading", each
 person's bio has a "Read more" link, and each timeline event (in the Story list and
 under the time slider) links to a source. Links come from Wikipedia, the American
