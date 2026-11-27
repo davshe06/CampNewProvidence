@@ -206,6 +206,14 @@ reported finds.
 Note: the camp dates to the Revolutionary War, not the Civil War, despite
 some online listings.
 
+**Portraits**: 147 of the 193 people have a portrait from Wikimedia Commons, each the lead image of
+the person's Wikipedia article and checked to be a likeness made from life, or a faithful copy of one:
+paintings by Peale, Copley, Stuart and Reynolds, Brady photographs, and the like. Statues, memorials,
+imagined battle scenes and later invented prints (such as the 1776–77 London mezzotints of Rogers,
+Arnold and Howe, or the familiar images of Pontiac and Tecumseh) are left out. Thirty people are marked
+"No portrait from life is known"; the rest show "No verified portrait on file yet" until a likeness can
+be confirmed.
+
 **Texas Revolution (1835–36)**: the fifth war on the map, with 21 sites from Anahuac and Gonzales to
 the Alamo, Goliad, San Jacinto and Velasco; two timelines (1835: Gonzales to Béxar; 1836: the Alamo to San
 Jacinto) plus the whole war, with the Texian, Tejano and Mexican armies' routes; 25 people; and Texas added
