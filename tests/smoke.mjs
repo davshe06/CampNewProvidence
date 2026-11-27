@@ -243,6 +243,25 @@ await test("buildings: zooming in on a site outside the Carolinas loads its buil
   await p.evaluate(() => closeHome());
 });
 
+await test("sources: sites, people and events link to outside sources", async () => {
+  await p.evaluate(() => { selectSite("cowpens", false); });
+  await p.waitForTimeout(300);
+  const hrefs = await p.$$eval("#pane ul.srcs a", as => as.map(a => a.href));
+  assert.ok(hrefs.some(h => h.startsWith("https://en.wikipedia.org/wiki/")), hrefs.join(" "));
+  assert.ok(hrefs.some(h => h.startsWith("https://www.battlefields.org/learn/")), hrefs.join(" "));
+  const r = await p.evaluate(() => {
+    const bad = [];
+    const all = [...Object.values(SRC.s), ...Object.values(SRC.p), ...Object.values(SRC.e)].flat();
+    for (const x of all) { const u = srcURL(x); if (!/^https:\/\/[a-z.]+\//.test(u)) bad.push(u); }
+    const ids = new Set(SITES.map(s => s.id)), names = new Set(PEOPLE.map(q => q.n));
+    for (const id of Object.keys(SRC.s)) if (!ids.has(id)) bad.push("site " + id);
+    for (const n of Object.keys(SRC.p)) if (!names.has(n)) bad.push("person " + n);
+    return { bad, n: all.length, sites: Object.keys(SRC.s).length };
+  });
+  assert.deepEqual(r.bad, []);
+  assert.ok(r.sites > 300, "sites with sources: " + r.sites);
+});
+
 await test("no script errors on desktop", async () => { assert.deepEqual(p.errors, []); });
 
 await test("phone: no horizontal scroll, no errors", async () => {

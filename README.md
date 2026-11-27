@@ -206,6 +206,15 @@ reported finds.
 Note: the camp dates to the Revolutionary War, not the Civil War, despite
 some online listings.
 
+**Source links**: each site panel ends with "Sources and further reading", each
+person's bio has a "Read more" link, and each timeline event (in the Story list and
+under the time slider) links to a source. Links come from Wikipedia, the American
+Battlefield Trust's battle pages, National Park Service unit pages, and NC Department of
+Natural and Cultural Resources highway-marker essays. Every link was checked live when it
+was added (Wikipedia titles through its API, with redirects followed and disambiguation
+pages dropped). Places with no reliable page, mostly local Charlotte sites, have none
+rather than a guess. Events at a site fall back to that site's sources.
+
 ## Tests
 
 `npm install`, then `npm test` runs the smoke tests in `tests/smoke.mjs` with Playwright:
