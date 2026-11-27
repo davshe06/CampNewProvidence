@@ -16,6 +16,11 @@
 /* Layout: a field-survey map fills the left; a ledger panel of tabs (site, story, people, detecting, visit, sources) sits on the right. Stacks on phones. */
 :root {
  --blue-side: #1f4fa3; --blue-side2: #3f7fd0; --red-side: #b8262c; --red-side2: #d9583f; --terr-b: #2a62c9; --terr-r: #d23a2f;
+  --na-b: color-mix(in srgb, var(--terr-b) 20%, var(--paper)); --na-b2: color-mix(in srgb, var(--terr-b) 9%, var(--paper));
+  --na-r: color-mix(in srgb, var(--terr-r) 18%, var(--paper)); --na-es: color-mix(in srgb, #d6a630 26%, var(--paper));
+  --na-nat: color-mix(in srgb, #6f9a52 22%, var(--paper)); --na-ru: color-mix(in srgb, #8a6aa8 20%, var(--paper));
+  --na-neu: color-mix(in srgb, #8c8475 14%, var(--paper)); --na-dis: color-mix(in srgb, #5e8f8a 20%, var(--paper));
+  --na-gb: color-mix(in srgb, #b07a72 16%, var(--paper));
   --paper: #e6e9df;       /* cool survey vellum */
   --paper-2: #d9ddd0;
   --panel: #f4f5f0;
@@ -438,6 +443,18 @@ body.fs .mapwrap { position: fixed !important; inset: 0; z-index: 900; height: a
 .homepop .okzone { margin: 8px 0 4px; padding: 7px 9px; border-radius: 6px; background: rgba(31,79,163,.08); border-left: 4px solid var(--blue-side); font-size: .82rem; line-height: 1.35; }
 .homepop ol.near { margin: 4px 0 0; padding-left: 18px; font-size: .82rem; }
 .homepop ol.near button { background: none; border: 0; padding: 1px 0; color: var(--ink); text-decoration: underline; cursor: pointer; font: inherit; text-align: left; }
+#map .na-fill { stroke-width: 1.2; stroke-linejoin: round; }
+#map .na-fill { fill: var(--paper); stroke: var(--paper); }
+#map .na-land { fill: var(--paper); }
+#map .na-b { fill: var(--na-b); stroke: var(--na-b); } #map .na-b2 { fill: var(--na-b2); stroke: var(--na-b2); } #map .na-r { fill: var(--na-r); stroke: var(--na-r); }
+#map .na-es { fill: var(--na-es); stroke: var(--na-es); } #map .na-nat { fill: var(--na-nat); stroke: var(--na-nat); } #map .na-ru { fill: var(--na-ru); stroke: var(--na-ru); }
+#map .na-neu { fill: var(--na-neu); stroke: var(--na-neu); } #map .na-dis { fill: var(--na-dis); stroke: var(--na-dis); } #map .na-gb { fill: var(--na-gb); stroke: var(--na-gb); }
+#map .na-cov { stroke: none; opacity: .8; }
+#map .na-edge { fill: none; stroke: var(--ink-soft); stroke-width: 1; stroke-dasharray: 5 3; opacity: .55; }
+#map .na-label { font-family: var(--f-display, var(--f-body)); fill: var(--ink-soft); letter-spacing: .12em; font-style: italic; paint-order: stroke; stroke: var(--paper); stroke-width: 3px; stroke-opacity: .6; }
+.nakey { display: flex; gap: 4px 10px; flex-wrap: wrap; font-size: .76rem; margin-top: 6px; }
+.nakey b { flex-basis: 100%; font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; }
+.nakey i { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -2px; margin-right: 4px; border: 1px solid var(--rule); }
 #map .terr-b { fill: var(--terr-b); } #map .terr-r { fill: var(--terr-r); }
 #map g.terr { opacity: .26; pointer-events: none; }
 #map { transform-origin: 0 0; will-change: transform; }
@@ -519,6 +536,7 @@ dl.nums dt { font-weight: 700; } dl.nums dd { margin: 0; }
         <label><input type="checkbox" id="L-homes" checked> <span class="sw" style="background:var(--modern);height:8px;width:8px"></span>Homes near the sites</label>
         <label><input type="checkbox" id="L-later"> <span class="sw" style="background:var(--later)"></span>Civil War &amp; later</label>
         <label><input type="checkbox" id="L-moves" checked> <span class="sw" style="background:linear-gradient(90deg,var(--blue-side) 50%,var(--red-side) 50%)"></span>Army &amp; ship movements (slider)</label>
+        <label><input type="checkbox" id="L-period" checked> <span class="sw" style="background:linear-gradient(90deg,var(--na-es) 33%,var(--na-nat) 33% 66%,var(--na-b) 66%)"></span>Rest of North America (borders of the time)</label>
         <label><input type="checkbox" id="L-terr" checked> <span class="sw" style="background:linear-gradient(90deg,var(--terr-b) 50%,var(--terr-r) 50%);opacity:.6"></span>Territory held (approximate)</label>
         <label><input type="checkbox" id="L-grid" checked> <span class="sw" style="background:var(--ink-soft)"></span>Lat/long graticule</label>
         <div class="flagkey" id="flagkey"></div>
@@ -2464,7 +2482,8 @@ function renderFlagKey() {
   if (era === "fiw") label.gb = "British regulars (Union Flag)";
   const tk = { fiw: ["French-held", "British-held"], rev: ["American-held", "British-held"], w12: ["American-held", "British-held"], cw: ["Union-held", "Confederate-held"] }[era];
   document.getElementById("flagkey").innerHTML = `<b>Flags</b>` + keys.map(k => `<span>${flagHTML(k, 24)} ${label[k]}</span>`).join("") +
-    `<div class="terrkey"><span><i style="background:var(--terr-b)"></i>${tk[0]}</span><span><i style="background:var(--terr-r)"></i>${tk[1]}</span></div>`;
+    `<div class="terrkey"><span><i style="background:var(--terr-b)"></i>${tk[0]}</span><span><i style="background:var(--terr-r)"></i>${tk[1]}</span></div>` +
+    (NA && layers.period ? `<div class="nakey"><b>Beyond the mapped states</b>${NA.wars[era].legend.map(([c, t]) => `<span><i style="background:var(--na-${c})"></i>${esc(t)}</span>`).join("")}</div>` : "");
 }
 
 /* ======================= TIMELINES (scenarios) =======================
@@ -4202,7 +4221,7 @@ const M_PER_DEG = 111320;
 const svg = document.getElementById("map");
 const wrap = document.getElementById("mapwrap");
 const view = { cx: 0, cy: 0, s: 10000 };
-const layers = { terrain: true, camp: true, sites: true, zones: false, modern: true, homes: true, moves: true, terr: true, later: false, grid: true };
+const layers = { period: true, terrain: true, camp: true, sites: true, zones: false, modern: true, homes: true, moves: true, terr: true, later: false, grid: true };
 let selected = null;
 let W = 800, H = 600;
 
@@ -4289,7 +4308,7 @@ function lineLabel(g, line, cls) {
 }
 
 function graticule(g) {
-  const steps = [2, 1, 0.5, 0.25, 0.1, 0.05, 0.02, 0.01, 0.005, 0.002, 0.001];
+  const steps = [10, 5, 2, 1, 0.5, 0.25, 0.1, 0.05, 0.02, 0.01, 0.005, 0.002, 0.001];
   let step = steps[0];
   for (const st of steps) { if (st * view.s >= 110) step = st; }
   const [latTop, lonL] = toLatLon(0, 0), [latBot, lonR] = toLatLon(W, H);
@@ -4551,7 +4570,7 @@ function drawCoast() {
 let coastShown = false;
 function drawAttribution() {
   if (!coastShown && !BASE) return;
-  el("text", { x: W - 10, y: H - (document.getElementById("timebar").hidden ? 10 : 112), "text-anchor": "end", class: "attrib" }, svg, "Base map: U.S. Census Bureau TIGER" + (layers.homes && layers.modern && view.s >= 700 ? " · Buildings: NC OneMap, Charleston County, FEMA/ORNL USA Structures" : ""));
+  el("text", { x: W - 10, y: H - (document.getElementById("timebar").hidden ? 10 : 112), "text-anchor": "end", class: "attrib" }, svg, "Base map: U.S. Census Bureau TIGER" + (NA && view.s < 300 ? ", Natural Earth" : "") + (layers.homes && layers.modern && view.s >= 700 ? " · Buildings: NC OneMap, Charleston County, FEMA/ORNL USA Structures" : ""));
 }
 /* Regional base map (U.S. Census TIGERweb, public domain), loaded from basemap.json:
    interstates, US highways, towns with 2020 population, major rivers, big water and state lines.
@@ -4562,10 +4581,13 @@ function prepBase(b) {
     for (const [x, y] of w) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; } return { w, x0, y0, x1, y1 }; };
   const named = (arr) => arr.map(r => ({ n: r.n.replace(/^I--/, "I-"), parts: r.p.map(prep) }));
   BASE = { interstates: named(b.interstates), us: named(b.us), rivers: named(b.rivers),
-           water: b.water.map(prep), states: b.states.map(prep),
+           water: b.water.map(prep), states: b.states.map(prep), ocean: null,
            places: b.places.map(pl => { const [wx, wy] = world(pl.lat, pl.lon);
-             const n = pl.n.replace(/ consolidated government.*$/i, "").replace(/ \(balance\)$/i, "").replace(/-Richmond County$/, "").replace(/ Metropolitan Government$/i, "");
+             const n = pl.n.replace(/ consolidated government.*$/i, "").replace(/ \(balance\)$/i, "").replace(/-Richmond County$/, "").replace(/ Metropolitan Government$/i, "").replace(/\/.* metro government$/i, "");
              return { ...pl, n, wx, wy }; }) };
+  // the detailed base map's ocean is one big ring (its box minus the state outlines); note its box
+  const oc = BASE.water.find(r => r.x1 - r.x0 > 15);
+  if (oc) BASE.ocean = [oc.x0, oc.y0, oc.x1, oc.y1];
 }
 const onScreen = (r, pad = 0) => !(sx_(r.x1) < -pad || sx_(r.x0) > W + pad || sy_(r.y1) < -pad || sy_(r.y0) > H + pad);
 /* Screen-space path for a base-map part: vertices within a pixel or two of the last one are
@@ -4615,9 +4637,67 @@ const partD = (r, poly) => {
 const partD_old = (r, poly) => { let d = ""; const step = poly ? 1 : view.s < 400 ? 3 : view.s < 1200 ? 2 : 1;
   for (let i = 0; i < r.w.length; i += step) d += (i ? "L" : "M") + sx_(r.w[i][0]).toFixed(1) + "," + sy_(r.w[i][1]).toFixed(1);
   const l = r.w[r.w.length - 1]; return d + "L" + sx_(l[0]).toFixed(1) + "," + sy_(l[1]).toFixed(1); };
+/* North America beyond the mapped states: Natural Earth 1:50m land, lakes and modern units
+   (public domain), assembled into each war's political areas as of the slider date. Period borders
+   are approximate: most follow modern state or province lines, with a few split where the old line
+   differs a lot. Loaded from na.json after the page opens. */
+var NA = null;   // var: the legend can ask before this line runs
+const prepRing = (pts) => { const w = pts.map(([la, lo]) => world(la, lo)); let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  for (const [x, y] of w) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; } return { w, x0, y0, x1, y1 }; };
+function prepNA(j) {
+  NA = { pieces: Object.entries(j.pieces).map(([id, rs]) => ({ id, rings: rs.map(prepRing) })), covland: j.covland.map(prepRing), lakes: j.lakes.map(prepRing),
+         edges: j.edges.map(([a, b, pts]) => ({ a, b, ...prepRing(pts) })), wars: j.wars,
+         states: Object.entries(STATE_SHAPES).map(([st, rs]) => ({ st, rings: rs.map(r => prepRing(r)) })) };
+}
+function naSlice() {
+  const sl = NA.wars[era].slices, iso = curIso();
+  return sl.find(x => iso >= x.from && iso < x.to) || sl[sl.length - 1];
+}
+const ringsD = (rings) => { let d = ""; for (const r of rings) if (onScreen(r)) { const pd = partD(r, true); if (pd) d += pd + "Z"; } return d; };
+function drawNALand(g) {   // sea everywhere the detailed coast doesn't cover, then land
+  let sea = `M-10,-10H${W + 10}V${H + 10}H-10Z`;
+  if (BASE.ocean) { const [x0, y0, x1, y1] = BASE.ocean.map((v, i) => i % 2 ? sy_(v) : sx_(v));
+    sea += `M${x0.toFixed(1)},${y0.toFixed(1)}H${x1.toFixed(1)}V${y1.toFixed(1)}H${x0.toFixed(1)}Z`; }
+  el("path", { d: sea, class: "rgn-water", "fill-rule": "evenodd" }, g);
+  let ld = ringsD(NA.covland); for (const s of NA.states) ld += ringsD(s.rings);
+  for (const p of NA.pieces) ld += ringsD(p.rings);
+  if (ld) el("path", { d: ld, class: "na-land" }, g);
+}
+function drawNA(g) {   // period areas over the coarse regional water, with their borders
+  const sl = naSlice(), per = layers.period, byCls = {}, reg = {};
+  for (const p of NA.pieces) {
+    const ri = sl.map[p.id], c = per && ri != null ? sl.regions[ri][1] : "";
+    reg[p.id] = ri;
+    const d = ringsD(p.rings); if (d) byCls[c] = (byCls[c] || "") + d;
+  }
+  for (const [c, d] of Object.entries(byCls)) el("path", { d, class: "na-fill" + (c ? " na-" + c : ""), "fill-rule": "evenodd" }, g);
+  if (per) {
+    const iso = curIso(), cov = NA.wars[era].cov;
+    for (const s of NA.states) {
+      const steps = cov[s.st]; if (!steps) continue;
+      const hit = steps.find(([until]) => iso < until); if (!hit || !hit[1]) continue;
+      const d = ringsD(s.rings); if (d) el("path", { d, class: "na-fill na-cov na-" + hit[1] }, g);
+    }
+  }
+  let lk = ringsD(NA.lakes); if (lk) el("path", { d: lk, class: "rgn-water", "fill-rule": "evenodd" }, g);
+  if (per) { let ed = ""; for (const e of NA.edges) if (reg[e.a] !== reg[e.b] && onScreen(e)) ed += partD(e); if (ed) el("path", { d: ed, class: "na-edge" }, g); }
+}
+function drawNALabels(boxes, free) {
+  const s = view.s; if (s > 90) return;
+  const iso = curIso(), g = el("g", {}, svg);
+  for (const [la, lo, t, size, from, to] of NA.wars[era].labels) {
+    if (!(iso >= from && iso < to) || (size === "s" && s < 22)) continue;
+    const [wx, wy] = world(la, lo), x = sx_(wx), y = sy_(wy), fs = size === "l" ? 13 : 11;
+    if (x < 0 || x > W || y < 0 || y > H) continue;
+    const w = t.length * fs * 0.62, b = { x: x - w / 2, y: y - fs, w, h: fs + 4 };
+    if (!free(b)) continue; boxes.push(b);
+    el("text", { x, y, "text-anchor": "middle", class: "na-label", style: `font-size:${fs}px` }, g, t);
+  }
+}
 function drawBaseUnder() {
   if (!BASE) return;
   const s = view.s, g = el("g", {}, svg);
+  if (NA && layers.terrain) drawNALand(g);
   if (layers.terrain) {
     let d = ""; for (const r of BASE.water) if (onScreen(r) && (sx_(r.x1) - sx_(r.x0) > 2)) { const pd = partD(r, true); if (pd) d += pd + "Z"; }
     if (d) {
@@ -4627,6 +4707,7 @@ function drawBaseUnder() {
       el("path", { d: `M-10,-10H${W + 10}V${H + 10}H-10Z M${cx1},${cy1}H${cx2}V${cy2}H${cx1}Z`, "clip-rule": "evenodd" }, cp);
       el("path", { d, class: "rgn-water", "fill-rule": "evenodd", ...(WATER && view.s >= 300 ? { "clip-path": "url(#rgn-clip)" } : {}) }, g);
     }
+    if (NA) drawNA(g);
     let rd = ""; for (const rv of BASE.rivers) for (const r of rv.parts) if (onScreen(r)) rd += partD(r);
     if (rd) el("path", { d: rd, class: "rgn-river", "stroke-width": (Math.max(1.2, Math.min(3, s / 1500))).toFixed(2) }, g);
     let sd = ""; for (const r of BASE.states) if (onScreen(r)) sd += partD(r);
@@ -4641,6 +4722,7 @@ function drawBaseUnder() {
 }
 function drawBaseLabels(boxes, free) {
   if (!BASE) return;
+  if (NA && layers.period) drawNALabels(boxes, free);
   const s = view.s, g = el("g", {}, svg);
   // towns, biggest first; the zoom sets the smallest population shown
   if (layers.modern) {
@@ -6434,6 +6516,7 @@ function loadForView() {
   if (view.s >= 300 && !WATER) { const [la, lo] = toLatLon(W / 2, H / 2); if (Math.abs(la - 32.8) < 1 && Math.abs(lo + 79.95) < 1.2) needWater(); }
 }
 fetch("basemap-lo.json").then(r => r.ok ? r.json() : null).then(j => { if (j && !baseFull) { prepBase(j); render(); } loadForView(); })
+  .finally(() => fetch("na.json").then(r => r.ok ? r.json() : null).then(j => { if (j) { prepNA(j); renderFlagKey(); requestRender(); } }).catch(() => {}))
   .catch(() => needBase());
 document.getElementById("addr-q").addEventListener("focus", needBase);
 W = wrap.clientWidth || 800; H = wrap.clientHeight || 600;

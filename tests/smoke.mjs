@@ -171,7 +171,7 @@ await test("load: light base map first, detail and homes only when zoomed in", a
   await q.goto(base + "#e=rev&v=37,-80,40");
   await q.waitForFunction(() => typeof BASE !== "undefined" && BASE, null, { timeout: 20000 });
   await q.waitForTimeout(1200);
-  assert.deepEqual(got.filter(f => f !== "manifest.webmanifest"), ["basemap-lo.json"]);
+  assert.deepEqual(got.filter(f => f !== "manifest.webmanifest"), ["basemap-lo.json", "na.json"]);   // the light map, then the rest of the continent
   await q.evaluate(() => selectSite("camp", false));
   await q.waitForFunction(() => baseFull && HOMES.length > 1000, null, { timeout: 20000 });
   await ctx.close();
@@ -260,6 +260,26 @@ await test("sources: sites, people and events link to outside sources", async ()
   });
   assert.deepEqual(r.bad, []);
   assert.ok(r.sites > 300, "sites with sources: " + r.sites);
+});
+
+await test("north america: the rest of the continent shows each war's borders for the slider date", async () => {
+  await p.waitForFunction(() => NA !== null, null, { timeout: 15000 });
+  const r = await p.evaluate(() => {
+    const out = {};
+    setEra("fiw", true);
+    setScenario(SCENARIOS.filter(x => x.era === "fiw").sort((a, b) => b.events.length - a.events.length)[0].id);   // the whole war
+    for (const [k, iso] of [["fiw55", "1755-07-09"], ["fiw63", "1763-06-01"]]) {
+      setDay(dayOf(iso));
+      view.cx = -90 * K; view.cy = -42; view.s = 16; render();
+      out[k] = { iso: curIso(), scen: SCEN.id, days: DAYS, b: document.querySelectorAll("#map .na-b").length, es: document.querySelectorAll("#map .na-es").length,
+                 labels: [...document.querySelectorAll("#map .na-label")].map(t => t.textContent), key: document.querySelector(".nakey")?.textContent || "" };
+    }
+    setEra("rev", true);
+    return out;
+  });
+  assert.ok(r.fiw55.b > 0 && r.fiw55.labels.includes("NEW FRANCE"), JSON.stringify(r.fiw55));
+  assert.ok(r.fiw63.es > 0 && r.fiw63.labels.some(t => t.startsWith("CANADA")), JSON.stringify(r.fiw63));
+  assert.match(r.fiw55.key, /French/);
 });
 
 await test("no script errors on desktop", async () => { assert.deepEqual(p.errors, []); });
