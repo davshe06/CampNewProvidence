@@ -6653,17 +6653,34 @@ function renderVisit() {
 }
 
 function renderSources() {
+  const GEN = [
+    ["Reference works", [
+      ["Wikipedia (an article for most sites, people and battles)", "https://en.wikipedia.org/"],
+      ["American Battlefield Trust, battle pages", "https://www.battlefields.org/learn"],
+      ["National Park Service, park and battlefield sites", "https://www.nps.gov/"],
+      ["Handbook of Texas (Texas State Historical Association)", "https://www.tshaonline.org/handbook"],
+      ["Historical Marker Database (state and local markers)", "https://www.hmdb.org/"]]],
+    ["Map and building data", [
+      ["U.S. Census Bureau TIGERweb (roads, towns, rivers, coasts, state lines)", "https://tigerweb.geo.census.gov/tigerwebmain/TIGERweb_main.html"],
+      ["Natural Earth (the rest of North America)", "https://www.naturalearthdata.com/"],
+      ["FEMA / ORNL USA Structures (buildings around each site)", "https://services2.arcgis.com/FiaPA4ga0iQKduv3/ArcGIS/rest/services/USA_Structures_View/FeatureServer"],
+      ["NC OneMap statewide parcels (homes near the camp)", "https://www.nconemap.gov/"],
+      ["Wikimedia Commons (portraits)", "https://commons.wikimedia.org/"]]],
+    ["Detecting law", [
+      ["Archaeological Resources Protection Act (federal land)", "https://www.nps.gov/subjects/archeology/archaeological-resources-protection-act.htm"]]]];
+  const list = (arr) => `<ul class="src">${arr.map(([t, u]) => `<li><a href="${u}" target="_blank" rel="noopener">${esc(t)}</a></li>`).join("")}</ul>`;
   pane.innerHTML = `
     <h2>Sources</h2>
     <div class="kicker">Where the history on this map comes from, and how sure it is.</div>
-    <p>Firm: the dates and place of the camp, its 1,300–2,600 strength, the November 25 council, the officers named on the marker, Greene's arrival, and the Cowpens and Rugeley's outcomes. Less firm: the October 20 founding date (local historians), the exact departure date (Dec 17 vs Dec 20), and the date of Rugeley's Mill (Dec 4 vs Nov 30). Conjectural: the camp layout and the detecting zones, which are drawn from how armies of the period camped.</p>
-    <ul class="src">${SOURCES.map(([t, u]) => `<li><a href="${u}" target="_blank" rel="noopener">${esc(t)}</a></li>`).join("")}</ul>
-    <h3>Ideas for going deeper</h3>
-    <ul class="tight">
-      <li>Search the pension statements at revwarapps.org for “New Providence” and “Six Mile Creek” to collect first-hand memories of the camp.</li>
-      <li>Read Greene's December 1780 letters in <i>The Papers of General Nathanael Greene</i>, vol. 6, for his view of the army he inherited.</li>
-      <li>Ask the NC Office of State Archaeology whether any site-file entries exist for the camp area.</li>
-    </ul>`;
+    <p>Every site, person and timeline event links to its own sources: look for "Sources and further reading" at the end of a site, "Read more" under a person, and "Source" beside an event or under the time slider. Those links were checked when they were added.</p>
+    <p><b>Firm:</b> battle dates, places and outcomes, and who commanded, as given by the major references below. <b>Approximate:</b> troop strengths and losses (shown as round numbers; sources differ), army routes between known points, and site locations marked "Location approximate." <b>Interpretation:</b> the territory shading, the borders of the rest of North America, camp layouts and detecting zones are drawn from how armies of the period moved and camped, not from surveys or finds.</p>
+    <p>Portraits are shown only where the picture is a likeness made from life, or a faithful copy of one; otherwise a person's card says so.</p>
+    ${GEN.map(([h, arr]) => `<h3>${h}</h3>${list(arr)}`).join("")}
+    <p>Each site's Detecting tab gives the rules for that land; state laws differ.</p>
+    <details class="srcmore"><summary>Camp New Providence and Charlotte: the original local study</summary>
+      <p>The map began as a study of the 1780 American camp at New Providence, south of Charlotte. Firm: the dates and place of the camp, its 1,300–2,600 strength, the November 25 council and Greene's arrival. Less firm: the October 20 founding date and the exact departure date. Conjectural: the camp layout and its detecting zones.</p>
+      ${list(SOURCES)}
+    </details>`;
 }
 
 function copy(text) {
