@@ -206,6 +206,15 @@ reported finds.
 Note: the camp dates to the Revolutionary War, not the Civil War, despite
 some online listings.
 
+**Texas Revolution (1835–36)**: the fifth war on the map, with 21 sites from Anahuac and Gonzales to
+the Alamo, Goliad, San Jacinto and Velasco; two timelines (1835: Gonzales to Béxar; 1836: the Alamo to San
+Jacinto) plus the whole war, with the Texian, Tejano and Mexican armies' routes; 25 people; and Texas added
+to the base map (TIGERweb roads, towns, rivers and the Gulf coast) and to the territory shading. The
+default shading covers only the settled part of Texas: Comanchería, to the west and north, was held by
+neither side, and the Nueces Strip belonged to Tamaulipas and Coahuila. Sources are the Handbook of Texas
+(Texas State Historical Association), Wikipedia and the National Park Service; buildings come from the
+same FEMA/ORNL layer as elsewhere.
+
 **Rest of North America**: land, lakes and modern state, province and country outlines from
 Natural Earth 1:50m (public domain), in `na.json`. For each war the areas beyond the mapped states
 are shaded by who held them on the slider's date: New France, Louisiana, Rupert's Land, New Spain,
