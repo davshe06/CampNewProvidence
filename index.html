@@ -581,6 +581,11 @@ dl.nums dt { font-weight: 700; } dl.nums dd { margin: 0; }
          year built (0 = not recorded), subdivision, county, zone id, lot outline as
          flat [x,y,...] metres, site id]. Owner names deliberately omitted. */
 let HOMES_RAW = [];   // loaded from homes.json at start-up;
+/* Buildings around every other site: FEMA / Oak Ridge National Laboratory USA Structures (CC BY 4.0),
+   footprints of every building over 450 sq ft, with occupancy type and, where the state supplies it,
+   the street address. One file per site (homes/<site id>.json, nearest 350 within 750 m), loaded when
+   you zoom in near that site. Same row layout as homes.json plus a building type at [11]. */
+const HOME_FILES = new Set(["aiken","alamance","arsenal","averasboro","bates","bennett","bentonville","blackstock","brunswick","c-actaeon","c-breach64","c-castlepinckney","c-dorchester","c-drayton","c-evacuation","c-exchange","c-ftjohnson","c-gadsden","c-lasch","c-middleton","c-monckscorner","c-moultrie61","c-secession","c-stmichaels","c-sumter","c-swampangel","c-wagner","camden","charleston","charlotte","cheraw","cheraw65","columbia65","cowpens","ct-groton","ct-ridgefield","dan","davidsoncollege","dc-fords","dc-fortstevens","de-coochs","edenton","elizabethtown","elmwood","eutaw","fishdam","fishingcreek","fiw-bushyrun","fiw-carillon","fiw-crownpoint","fiw-cumberland","fiw-duquesne","fiw-fortwmhenry","fiw-jumonville","fiw-kittanning","fiw-lakegeorge","fiw-leboeuf","fiw-ligonier","fiw-loudoun","fiw-monongahela","fiw-necessity","fiw-niagara","fiw-oswego","fiw-snowshoes","fl-alligator","fl-gainesville","fl-jacksonville","fl-jefferson","fl-keywest","fl-marianna","fl-naturalbridge","fl-olustee","fl-pensacola","fl-pickens","fl-staug62","fl-staugustine","fl-tallahassee","fl-thomascreek","ford","fortanderson","fortfisher","fortgranby","fortjohnston","fortmacon","fortmill","fortmotte","fortwatson","ga-andersonville","ga-atlanta","ga-augusta","ga-briercreek","ga-chase","ga-chickamauga","ga-fortmorris","ga-griswoldville","ga-irwinville","ga-jonesboro","ga-kennesaw","ga-mcallister","ga-milledgeville","ga-peachtree","ga-pulaski","ga-resaca","ga-savannah64","ga-savannah78","ga-savannah82","ga-siege79","georgetown","grindal","guilford","halifax","hammond","hangingrock","hillsborough","hobkirk","huck","in-corydon","in-vincennes","jackson","kings","ky-bluelicks","ky-boonesborough","ky-campnelson","ky-columbus","ky-cynthiana","ky-middlecreek","ky-millsprings","ky-munfordville","ky-paducah","ky-perryville","ky-richmond","lindley","ma-bunkerhill","ma-concord","ma-dorchester","ma-lexington","ma-massacre","ma-teaparty","marker","md-antietam","md-baltimore","md-monocacy","md-pointlookout","md-southmountain","me-falmouth","me-machias","me-penobscot","me-portland","mint","moorescreek","ms-bigblack","ms-brices","ms-chickasaw","ms-corinth","ms-hollysprings","ms-iuka","ms-jackson","ms-meridian","ms-portgibson","ms-raymond","ms-tupelo","ms-vicksburg","musgrove","navyyard","neuse","newbern","nh-fortwm","ninetysix","nj-fortlee","nj-monmouth","nj-morristown","nj-princeton","nj-redbank","nj-springfield","nj-trenton","ny-bennington","ny-cherryvalley","ny-draftriots","ny-elmira","ny-fortwashington","ny-harlem","ny-longisland","ny-newtown","ny-oriskany","ny-saratoga","ny-stanwix","ny-stonypoint","ny-ticonderoga","ny-valcour","ny-westpoint","ny-whiteplains","oh-buffington","oh-campchase","oh-gnadenhutten","oh-salineville","oh-sandusky","pa-brandywine","pa-chambersburg","pa-germantown","pa-gettysburg","pa-hanover","pa-independence","pa-mifflin","pa-paoli","pa-valleyforge","pa-wrightsville","pa-wyoming","penn","phifer","plymouth","portroyal61","portroyal79","pyles","ri-newport","riversbridge","roanoke","rockymount","rugeley","settlers","shallowford","sycamore","tn-boydscreek","tn-chattanooga","tn-chickamauga79","tn-christian","tn-donelson","tn-forthenry","tn-fortpillow","tn-franklin","tn-island10","tn-islandflats","tn-knoxville","tn-memphis","tn-nashville62","tn-nashville64","tn-shiloh","tn-stonesriver","tn-watauga","torrence","tryon","va-appomattox","va-ballsbluff","va-bigbethel","va-blandford","va-brandystation","va-cedarcreek","va-cedarmtn","va-chancellorsville","va-coldharbor","va-crater","va-fiveforks","va-fortmonroe","va-fredericksburg","va-frontroyal","va-gainesmill","va-greatbridge","va-greenspring","va-gwynn","va-kemps","va-kernstown","va-malvern","va-manassas1","va-manassas2","va-mcdowell","va-monticello","va-newmarket","va-norfolk","va-petersburg","va-pointoffork","va-portrepublic","va-portsmouth","va-richmond65","va-richmond81","va-sailorscreek","va-sevenpines","va-spencers","va-spotsylvania","va-wilderness","va-williamsburg","va-winchester1","va-winchester3","va-yorktown","vt-stalbans","w12-bladensburg","w12-buffalo","w12-castine","w12-craneyisland","w12-fortharrison","w12-fortmchenry","w12-fortmeigs","w12-fortstephenson","w12-hampden","w12-hampton","w12-havredegrace","w12-neworleans","w12-niagara","w12-northpoint","w12-oswego","w12-pensacola","w12-plattsburgh","w12-sackets","w12-stonington","w12-tippecanoe","w12-washington","waxhaws","wilmington","wilmington65","winnsboro","wv-carnifex","wv-droop","wv-forthenry","wv-harpersferry","wv-philippi","wv-pointpleasant","wv-richmtn","wv-wheeling"]);
 </script>
 <script>
 "use strict";
@@ -4201,12 +4206,12 @@ const toLatLon = (sx, sy) => { const x = (sx - W / 2) / view.s + view.cx, y = (s
 const offset = (o, dx, dy) => [o.lat + dy / M_PER_DEG, o.lon + dx / (M_PER_DEG * K)];
 
 let HOMES = [];
-function buildHomes(raw) { HOMES = raw.map((r, i) => {
+function buildHomes(raw) { HOMES = HOMES.concat(raw.map((r, i0) => { const i = HOMES.length + i0;
   const toW = (x, y) => world(CAMP_ORIGIN.lat + y / M_PER_DEG, CAMP_ORIGIN.lon + x / (M_PER_DEG * K));
   const lot = []; for (let j = 0; j < r[9].length; j += 2) lot.push(toW(r[9][j], r[9][j + 1]));
   const [wx, wy] = toW(r[0], r[1]);
-  return { i, wx, wy, addr: r[2], city: r[3], zip: r[4], year: r[5], sub: r[6], county: r[7], zone: r[8], lot, site: r[10] || "camp" };
-}); }
+  return { i, wx, wy, addr: r[2], city: r[3], zip: r[4], year: r[5], sub: r[6], county: r[7], zone: r[8], lot, site: r[10] || "camp", kind: r[11] || "", fema: r.length > 11 };
+})); }
 let selHome = null, popAt = null, pin = null;
 let era = "rev", area = "charlotte";
 area = "carolinas";   // one region; the state picker narrows it
@@ -4540,7 +4545,7 @@ function drawCoast() {
 let coastShown = false;
 function drawAttribution() {
   if (!coastShown && !BASE) return;
-  el("text", { x: W - 10, y: H - (document.getElementById("timebar").hidden ? 10 : 112), "text-anchor": "end", class: "attrib" }, svg, "Base map: U.S. Census Bureau TIGER");
+  el("text", { x: W - 10, y: H - (document.getElementById("timebar").hidden ? 10 : 112), "text-anchor": "end", class: "attrib" }, svg, "Base map: U.S. Census Bureau TIGER" + (layers.homes && layers.modern && view.s >= 700 ? " · Buildings: NC OneMap, Charleston County, FEMA/ORNL USA Structures" : ""));
 }
 /* Regional base map (U.S. Census TIGERweb, public domain), loaded from basemap.json:
    interstates, US highways, towns with 2020 population, major rivers, big water and state lines.
@@ -4733,8 +4738,12 @@ for (const st of SITES) (st.dz || []).forEach((d, n) => ZONES.push({ id: `z-${st
 const zoneInEra = (z) => { const st = siteOf(z.site); return !st || siteWar(st) === era; };
 const zoneInArea = (z) => { const st = siteOf(z.site); return zoneInEra(z) && (area === "carolinas" || !st || (st.area || "charlotte") === area); };
 const pop = document.getElementById("homepop");
-const homeState = (hm) => ((siteOf(hm.site) || {}).area === "charleston" ? "SC" : "NC");
-function homeFull(hm) { return hm.addr + ", " + (hm.city || hm.county + " County") + ", " + homeState(hm) + (hm.zip ? " " + hm.zip : ""); }
+const homeState = (hm) => { const st = siteOf(hm.site); return (st && siteState(st)) || (st && st.area === "charleston" ? "SC" : "NC"); };
+const homeTitle = (hm) => hm.addr || `${hm.kind || "Building"} near ${(siteOf(hm.site) || {}).name || "the site"}`;
+function homeFull(hm) {
+  if (!hm.addr) { const [la, lo] = [-hm.wy, hm.wx / K]; return `${homeTitle(hm)} (${la.toFixed(5)}, ${lo.toFixed(5)})`; }
+  return hm.addr + ", " + (hm.city || (hm.county ? hm.county + " County" : "")) + ", " + homeState(hm) + (hm.zip ? " " + hm.zip : "");
+}
 function openHome(hm, fly) {
   selHome = hm; popAt = hm;
   const zn = hm.zone ? (ZONES.find(z => z.id === hm.zone) || {}).name : hm.site === "camp" ? ZONE_NAMES[""] : "Outside the rated zones";
@@ -4742,19 +4751,21 @@ function openHome(hm, fly) {
   const [la, lo] = [-hm.wy, hm.wx / K];
   pop.innerHTML = `
     <button class="x" aria-label="Close">×</button>
-    <div class="addr">${esc(hm.addr)}</div>
-    <div class="meta">${hm.city ? esc(hm.city + ", " + homeState(hm) + (hm.zip ? " " + hm.zip : "")) + " · " : ""}${esc(hm.county)} County${hm.city ? "" : ", " + homeState(hm)}</div>
+    <div class="addr">${esc(homeTitle(hm))}</div>
+    <div class="meta">${hm.city ? esc(hm.city + ", " + homeState(hm) + (hm.zip ? " " + hm.zip : "")) + (hm.county && hm.county !== hm.city ? " · " : "") : ""}${hm.county && hm.county !== hm.city ? esc(hm.county) + " County" : ""}${hm.city ? "" : (hm.county ? ", " : "") + homeState(hm)}${hm.addr ? "" : ` · ${la.toFixed(5)}, ${lo.toFixed(5)}`}</div>
     <dl>
       <dt>Near</dt><dd>${esc(st.name)}</dd>
-      <dt>Built</dt><dd>${hm.year || "Not recorded"}</dd>
+      ${hm.kind ? `<dt>Type</dt><dd>${esc(hm.kind)}</dd>` : ""}
+      ${hm.fema && !hm.year ? "" : `<dt>Built</dt><dd>${hm.year || "Not recorded"}</dd>`}
       ${hm.sub ? `<dt>Subdivision</dt><dd>${esc(hm.sub)}</dd>` : ""}
       <dt>Detecting area</dt><dd>${esc(zn)}</dd>
     </dl>
     <div class="acts">
-      <button class="btn" id="hp-copy">Copy address</button>
+      <button class="btn" id="hp-copy">${hm.addr ? "Copy address" : "Copy location"}</button>
       ${mapLinks(la, lo, homeFull(hm))}
     </div>
-    <div class="warn">Private home. Ask the owner before setting foot on the lot.</div>`;
+    <div class="warn">${!hm.kind || /House|Home|Apartment|Mobile|Dwelling|Dormitory/i.test(hm.kind) ? "Private home. Ask the owner before setting foot on the lot." : "Private property unless posted as public. Ask before setting foot on it."}</div>
+    ${hm.fema ? `<div class="meta">Footprint and type: FEMA / Oak Ridge National Laboratory USA Structures.</div>` : ""}`;
   pop.querySelector(".x").onclick = closeHome;
   pop.querySelector("#hp-copy").onclick = () => copy(homeFull(hm));
   pop.hidden = false;
@@ -6369,8 +6380,23 @@ function needBase() {
     .catch(() => {}).finally(() => { baseLoading = false; });
   return baseLoading;
 }
+/* Load the building files for sites in or near the view (zoomed in), a few at a time. */
+const homesLoaded = new Set(), homesPending = new Set();
+function needSiteHomes() {
+  if (!(layers.homes && layers.modern) || view.s < 700) return;
+  const [la0, lo0] = toLatLon(-W * 0.3, H * 1.3), [la1, lo1] = toLatLon(W * 1.3, -H * 0.3);
+  for (const st of SITES) {
+    if (!HOME_FILES.has(st.id) || homesLoaded.has(st.id) || homesPending.has(st.id)) continue;
+    if (st.lat < la0 - 0.01 || st.lat > la1 + 0.01 || st.lon < lo0 - 0.012 || st.lon > lo1 + 0.012) continue;
+    if (homesPending.size >= 4) break;
+    homesPending.add(st.id);
+    fetch("homes/" + st.id + ".json").then(r => r.ok ? r.json() : Promise.reject(r.status)).then(raw => {
+      homesLoaded.add(st.id); buildHomes(raw); requestRender();
+    }).catch(() => {}).finally(() => { homesPending.delete(st.id); if (homesPending.size === 0) loadForView(); });
+  }
+}
 function needHomes() {
-  if (homesLoading || HOMES.length) return;
+  if (homesLoading) return;
   homesLoading = true;
   fetch("homes.json").then(r => r.ok ? r.json() : Promise.reject(r.status)).then(raw => {
     buildHomes(raw); requestRender();
@@ -6384,7 +6410,7 @@ function needWater() {
 }
 function loadForView() {
   if (!baseFull && view.s >= 100) needBase();
-  if (view.s >= 700) needHomes();
+  if (view.s >= 700) { needHomes(); needSiteHomes(); }
   if (view.s >= 300 && !WATER) { const [la, lo] = toLatLon(W / 2, H / 2); if (Math.abs(la - 32.8) < 1 && Math.abs(lo + 79.95) < 1.2) needWater(); }
 }
 fetch("basemap-lo.json").then(r => r.ok ? r.json() : null).then(j => { if (j && !baseFull) { prepBase(j); render(); } loadForView(); })

@@ -229,6 +229,20 @@ await test("maps: sites and searched addresses link to Google Maps and Apple Map
   await p.evaluate(() => { pin = null; closeHome(); });
 });
 
+await test("buildings: zooming in on a site outside the Carolinas loads its buildings", async () => {
+  await p.evaluate(() => selectSite("va-williamsburg", false));
+  await p.waitForFunction(() => HOMES.some(h => h.site === "va-williamsburg"), null, { timeout: 15000 });
+  const r = await p.evaluate(() => {
+    const hm = HOMES.find(h => h.site === "va-williamsburg" && h.addr);
+    openHome(hm, false);
+    return { n: HOMES.filter(h => h.site === "va-williamsburg").length, title: document.querySelector("#homepop .addr").textContent, kind: hm.kind };
+  });
+  assert.ok(r.n > 50, "buildings loaded: " + r.n);
+  assert.match(r.title, /^\d+ /);
+  assert.ok(r.kind);
+  await p.evaluate(() => closeHome());
+});
+
 await test("no script errors on desktop", async () => { assert.deepEqual(p.errors, []); });
 
 await test("phone: no horizontal scroll, no errors", async () => {

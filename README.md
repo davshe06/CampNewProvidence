@@ -128,6 +128,13 @@ Contents:
   McHenry), Maine and Connecticut, and Pensacola and New Orleans. Each has its own people
   (with traceable paths for Washington, Braddock, Montcalm, Harrison, Jackson and others),
   territory, flag key, Visit list and Library links.
+- **Buildings around every site**: zoom in near any site to see today's homes and buildings
+  around it. North Carolina sites use the statewide parcel map and Charleston uses the county's;
+  every other site uses FEMA / Oak Ridge National Laboratory's USA Structures footprints (CC BY 4.0):
+  the nearest 350 buildings within 750 m, with type and, where the state supplies one, the street
+  address (South Carolina's records have none). Each site's file (`homes/<site id>.json`) loads only
+  when you zoom in near it. No owner names are requested or stored. Offshore wrecks and open-water
+  sites have no buildings around them.
 - **The whole war**: the first entry in the timeline drop-down plays every army, fleet
   and event of the war on one slider (1775–82 or 1860–65), with year labels. An army
   that appears in several campaign timelines (Greene, Cornwallis, Lee, Sumter, Clinton,
