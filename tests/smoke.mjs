@@ -51,7 +51,7 @@ await test("data: every reference resolves", async () => {
     for (const sc of SCENARIOS) if (sc.events && !sc.total) for (const e of sc.events) if (e.iso && (e.iso < sc.start || e.iso > sc.end)) out.push(`${sc.id} event outside its dates: ${e.iso} ${e.t}`);
     for (const k of Object.values(CAR_PRELUDE).flat()) if (k.site && !ids.has(k.site)) out.push("prelude -> " + k.site);
     for (const pp of PEOPLE) if (pp.site && !ids.has(pp.site)) out.push("person -> " + pp.site);
-    for (const s of SITES) if (!(s.lat > 24 && s.lat < 48 && s.lon > -92.5 && s.lon < -66)) out.push("site off map: " + s.id);
+    for (const s of SITES) if (!(s.lat > 24 && s.lat < 48 && s.lon > -107 && s.lon < -66)) out.push("site off map: " + s.id);
     return out;
   });
   assert.deepEqual(bad, []);
@@ -202,7 +202,7 @@ await test("people: tracing Washington's path draws it", async () => {
 });
 
 await test("wars: French and Indian War and War of 1812 switch, show only their own sites, and link", async () => {
-  for (const [w, home] of [["fiw", "fiw-necessity"], ["w12", "w12-fortmchenry"]]) {
+  for (const [w, home] of [["fiw", "fiw-necessity"], ["w12", "w12-fortmchenry"], ["tx", "tx-alamo"]]) {
     await p.click("#era-" + w); await p.waitForTimeout(600);
     const r = await p.evaluate(() => ({ era, scen: SCEN.era, sel: selected, own: SITES.filter(s => siteWar(s) === era).length,
       wrong: [...document.querySelectorAll("#map text")].filter(t => /^(Cowpens|Kings Mountain|Gettysburg|Fort Fisher)$/.test(t.textContent)).length,

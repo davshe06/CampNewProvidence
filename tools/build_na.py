@@ -146,6 +146,18 @@ WARS['w12'] = [
   (BRIT_ISLES + FR_ISLES + C('Saint Lucia', 'Dominica', 'Grenada', 'St. Vin. and Gren.', 'Trinidad and Tobago', 'U.S. Virgin Is.', 'Curaçao', 'St. Pierre and Miquelon'), R((X, 'British Caribbean', 'r'))),
   (C('Netherlands-carib', 'Aruba', 'Sint Maarten', 'Greenland'), R((X, 'Danish and Dutch', 'neu'))),
 ]
+WARS['tx'] = [
+  (US('LA', 'AR', 'MO', 'MI', 'IL', 'WI', 'MN_E', 'MN_W', 'IA', 'KS', 'NE', 'ND', 'SD', 'MT', 'WY', 'CO', 'AL_N', 'AL_S'), R((X, 'United States (neutral)', 'neu'))),
+  (US('OK'), R((X, 'Indian Territory (U.S.)', 'nat'))),
+  (US('NM', 'AZ', 'CA', 'NV', 'UT') + C('Mexico'), R((X, 'Mexico', 'r'))),
+  (US('WA', 'OR', 'ID') + CA('BC'), R((X, 'Oregon Country (joint U.S.–British)', 'dis'))),
+  (CA('ON_S', 'QC_S', 'NB', 'NS_M', 'NS_CB', 'PE', 'NL_I', 'NL_L') + RUPERT + CA('NT', 'YT'), R((X, 'British North America', 'gb'))),
+  (US('AK'), R((X, 'Russian America', 'ru'))),
+  (C('Guatemala', 'Belize', 'Honduras', 'El Salvador', 'Nicaragua', 'Costa Rica', 'Panama', 'Haiti', 'Dominican Rep.'), R((X, 'Other', 'neu'))),
+  (C('Cuba', 'Puerto Rico'), R((X, 'Spanish', 'es'))),
+  (BRIT_ISLES + C('Saint Lucia', 'Dominica', 'Grenada', 'St. Vin. and Gren.', 'Trinidad and Tobago'), R((X, 'British North America', 'gb'))),
+  (FR_ISLES + DUTCH + C('U.S. Virgin Is.', 'Greenland', 'St. Pierre and Miquelon'), R((X, 'Other', 'neu'))),
+]
 UNION_ST = US('MI', 'IL', 'WI', 'MN_E', 'MN_W', 'IA', 'MO', 'CA', 'OR')
 WARS['cw'] = [
   (UNION_ST, R((X, 'Union', 'b'))),
@@ -189,6 +201,10 @@ LABELS = {  # [lat, lon, text, size, from, to]
          [44.6, -88.6, 'Michigan and Illinois territories', 's', '', X], [25.5, -103.0, 'NEW SPAIN', 'l', '', X],
          [46.0, -120.0, 'OREGON COUNTRY · disputed', 'l', '', X], [63.5, -152.0, 'RUSSIAN AMERICA', 'l', '', X], [29.3, -82.3, 'SPANISH FLORIDA', 's', '', X],
          [46.4, -66.3, 'NEW BRUNSWICK', 's', '', X], [21.7, -79.6, 'CUBA · Spanish', 's', '', X], [19.1, -72.6, 'HAITI', 's', '', X]],
+ 'tx': [[31.6, -99.6, 'MEXICAN TEXAS', 'l', '', '1836-03-02'], [31.6, -99.6, 'REPUBLIC OF TEXAS', 'l', '1836-03-02', X],
+        [33.8, -101.2, 'Comanchería', 's', '', X], [25.8, -103.0, 'MEXICO', 'l', '', X], [34.6, -106.2, 'Nuevo México', 's', '', X], [37.0, -119.8, 'Alta California', 's', '', X],
+        [40.5, -89.5, 'UNITED STATES', 'l', '', X], [35.6, -97.2, 'Indian Territory', 's', '', X], [46.0, -120.0, 'OREGON COUNTRY', 'l', '', X],
+        [57.5, -96.0, "RUPERT'S LAND · Hudson's Bay Co.", 'l', '', X], [63.5, -152.0, 'RUSSIAN AMERICA', 'l', '', X], [21.7, -79.6, 'CUBA · Spanish', 's', '', X]],
  'cw': [[42.6, -75.6, 'UNION', 'l', '', X], [31.6, -86.9, 'CONFEDERACY', 'l', '', X], [43.5, -90.0, 'UNION', 'l', '', X],
         [30.6, -100.2, 'CONFEDERATE TEXAS', 'l', '1861-02-01', '1865-06-02'], [41.5, -106.0, 'U.S. TERRITORIES', 'l', '', X],
         [35.6, -97.2, 'Indian Territory', 's', '', X], [48.9, -76.0, 'PROVINCE OF CANADA · British', 'l', '', X],
@@ -200,12 +216,14 @@ LEGEND = {
  'fiw': [['b', 'French'], ['r', "British (and Hudson's Bay Co.)"], ['es', 'Spanish'], ['nat', 'Native nations'], ['neu', 'Danish and Dutch']],
  'rev': [['b', 'United States'], ['b2', 'France (U.S. ally)'], ['r', 'British'], ['es', 'Spanish'], ['nat', 'Native nations'], ['neu', 'Danish and Dutch']],
  'w12': [['b', 'United States'], ['b2', 'U.S. territories'], ['r', 'British'], ['es', 'Spanish'], ['dis', 'Oregon Country (disputed)'], ['ru', 'Russian'], ['neu', 'Other']],
+ 'tx': [['r', 'Mexico'], ['neu', 'United States (neutral) and others'], ['nat', 'Indian Territory'], ['dis', 'Oregon Country (joint U.S.–British)'], ['gb', 'British North America'], ['ru', 'Russian'], ['es', 'Spanish']],
  'cw': [['b', 'Union'], ['b2', 'U.S. territories'], ['r', 'Confederacy'], ['nat', 'Indian Territory'], ['gb', 'British North America'], ['es', 'Spanish'], ['ru', 'Russian'], ['neu', 'Mexico and others']],
 }
 COV = {  # mapped states with no default war shading: tint them with their period class
- 'fiw': {'KY': [[X, 'nat']], 'TN': [[X, 'nat']]},
- 'rev': {'TN': [[X, 'nat']], 'MS': [[X, 'nat']], 'FL': [['1783-09-03', ''], [X, 'es']]},
- 'w12': {'FL': [[X, 'es']]},
+ 'fiw': {'KY': [[X, 'nat']], 'TN': [[X, 'nat']], 'TX': [[X, 'es']]},
+ 'rev': {'TN': [[X, 'nat']], 'MS': [[X, 'nat']], 'FL': [['1783-09-03', ''], [X, 'es']], 'TX': [[X, 'es']]},
+ 'w12': {'FL': [[X, 'es']], 'TX': [[X, 'es']]},
+ 'tx': {st: [[X, 'neu']] for st in ['NC', 'SC', 'VA', 'WV', 'TN', 'GA', 'FL', 'MA', 'DC', 'RI', 'NH', 'ME', 'NY', 'VT', 'CT', 'DE', 'NJ', 'MD', 'PA', 'IN', 'KY', 'OH', 'MS']},
  'cw': {},
 }
 
