@@ -48,6 +48,7 @@ await test("data: every reference resolves", async () => {
       for (const f of sc.forces || []) for (let i = 1; i < f.wp.length; i++) if (f.wp[i][0] < f.wp[i - 1][0]) out.push(`${sc.id}/${f.id} waypoints out of order`);
       if (sc.start >= sc.end) out.push(`${sc.id} start after end`);
     }
+    for (const sc of SCENARIOS) if (sc.events && !sc.total) for (const e of sc.events) if (e.iso && (e.iso < sc.start || e.iso > sc.end)) out.push(`${sc.id} event outside its dates: ${e.iso} ${e.t}`);
     for (const k of Object.values(CAR_PRELUDE).flat()) if (k.site && !ids.has(k.site)) out.push("prelude -> " + k.site);
     for (const pp of PEOPLE) if (pp.site && !ids.has(pp.site)) out.push("person -> " + pp.site);
     for (const s of SITES) if (!(s.lat > 24 && s.lat < 48 && s.lon > -92.5 && s.lon < -66)) out.push("site off map: " + s.id);
