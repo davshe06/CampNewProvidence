@@ -206,7 +206,7 @@ reported finds.
 Note: the camp dates to the Revolutionary War, not the Civil War, despite
 some online listings.
 
-**Portraits**: 147 of the 193 people have a portrait from Wikimedia Commons, each the lead image of
+**Portraits**: 150 of the 193 people have a portrait from Wikimedia Commons, each the lead image of
 the person's Wikipedia article and checked to be a likeness made from life, or a faithful copy of one:
 paintings by Peale, Copley, Stuart and Reynolds, Brady photographs, and the like. Statues, memorials,
 imagined battle scenes and later invented prints (such as the 1776–77 London mezzotints of Rogers,
