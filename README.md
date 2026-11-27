@@ -206,11 +206,11 @@ reported finds.
 Note: the camp dates to the Revolutionary War, not the Civil War, despite
 some online listings.
 
-**Portraits**: 153 of the 193 people have a portrait from Wikimedia Commons, each the lead image of
+**Portraits**: 154 of the 193 people have a portrait from Wikimedia Commons, each the lead image of
 the person's Wikipedia article and checked to be a likeness made from life, or a faithful copy of one:
 paintings by Peale, Copley, Stuart and Reynolds, Brady photographs, and the like. Statues, memorials,
-imagined battle scenes and later invented prints (such as the 1776–77 London mezzotints of Rogers,
-Arnold and Howe, or the familiar images of Pontiac and Tecumseh) are left out. Thirty-five people are marked
+imagined battle scenes and later invented prints (such as the 1776–77 London mezzotints of Rogers
+and Howe, or the familiar images of Pontiac and Tecumseh) are left out (Benedict Arnold's 1776 print is shown, captioned as not a true likeness, because it is the image most people know). Thirty-five people are marked
 "No portrait from life is known"; the rest show "No verified portrait on file yet" until a likeness can
 be confirmed.
 
